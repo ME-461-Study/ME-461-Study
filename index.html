@@ -1,0 +1,883 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Midterm study lab for ME 461 Gas Dynamics, Chapters 1-6: practice questions, flashcards, homework-style problems, a timed mock exam and an equation sheet.">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>ME 461 Study Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=Barlow:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout: drafting-sheet study desk. Title-block header with view tabs; the work sheet on the left; a topic ledger (filter + mastery) on the right. Stacks on phones. Same palette and type as the Flow Lab. */
+:root{
+  --bg:#e9edf1; --panel:#f6f7f9; --ink:#17202c; --ink-2:#465264; --muted:#667183; --rule:#d0d6de; --field:#ffffff;
+  --accent:#1c58b5; --accent-soft:#dfe7f4;
+  --ok-bg:#dcefe4; --ok-fg:#165c37; --bad-bg:#f8e3cf; --bad-fg:#8a3d06; --info-bg:#dfe7f4; --info-fg:#1d4380;
+  --mr:#a86a0c; --bar:#c9d1db;
+  --f-display:"Barlow Semi Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0d1219; --panel:#121923; --ink:#e3e8ef; --ink-2:#a9b3c1; --muted:#7f8a9a; --rule:#253041; --field:#0a0f15;
+  --accent:#6ea6ff; --accent-soft:#172a46;
+  --ok-bg:#163526; --ok-fg:#8fe0b2; --bad-bg:#3d2510; --bad-fg:#ffc08a; --info-bg:#172a46; --info-fg:#a9c8ff;
+  --mr:#f3b545; --bar:#2c3a4d; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0d1219; --panel:#121923; --ink:#e3e8ef; --ink-2:#a9b3c1; --muted:#7f8a9a; --rule:#253041; --field:#0a0f15;
+  --accent:#6ea6ff; --accent-soft:#172a46;
+  --ok-bg:#163526; --ok-fg:#8fe0b2; --bad-bg:#3d2510; --bad-fg:#ffc08a; --info-bg:#172a46; --info-fg:#a9c8ff;
+  --mr:#f3b545; --bar:#2c3a4d; color-scheme:dark }
+
+body{background:var(--bg);color:var(--ink);font:16px/1.55 var(--f-body);-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+mjx-container{color:var(--ink)}
+mjx-container[jax="SVG"]{overflow:visible}
+.dsec p,.eq dd,.steps,.disp{overflow-y:hidden}
+
+/* header = title block */
+.bar{display:flex;flex-wrap:wrap;align-items:stretch;gap:0 28px;background:var(--panel);border-bottom:1px solid var(--rule);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.brand{display:flex;align-items:baseline;gap:12px;padding-block:12px}
+.brand h1{margin:0;font:700 21px/1.1 var(--f-display);letter-spacing:.08em;text-transform:uppercase}
+.brand .course{font:500 12px/1 var(--f-mono);color:var(--muted);letter-spacing:.04em}
+.tabs{display:flex;gap:2px;overflow-x:auto;min-width:0;flex:1 1 auto;scrollbar-width:thin}
+.tab{background:none;border:0;border-bottom:2px solid transparent;padding:13px 12px 11px;cursor:pointer;white-space:nowrap;text-decoration:none;
+  font:600 14px/1.2 var(--f-display);letter-spacing:.07em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:7px}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.tab .live{width:7px;height:7px;border-radius:50%;background:var(--bad-fg)}
+.tab.res{margin-left:auto;color:var(--ink-2)}
+.tab.res span{font:500 11px/1 var(--f-mono);letter-spacing:0;text-transform:none;color:var(--muted)}
+
+.wrap{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:28px;align-items:start;
+  padding-block:22px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+main{min-width:0;display:flex;flex-direction:column;gap:16px}
+.sheet{display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px 12px;font:500 11.5px/1.2 var(--f-mono);color:var(--muted);letter-spacing:.05em;text-transform:uppercase;
+  border:1px solid var(--rule);padding:8px 10px;background:var(--panel)}
+.sheet b{color:var(--ink);font-weight:500}
+.head h2{margin:0 0 4px;font:700 27px/1.1 var(--f-display);letter-spacing:.01em;text-wrap:balance}
+.head p{margin:0;color:var(--ink-2);max-width:64ch}
+
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.lbl{font:600 12px/1 var(--f-display);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-right:4px}
+.chip{background:transparent;border:1px solid var(--rule);border-radius:999px;padding:5px 12px;cursor:pointer;font-size:14px;color:var(--ink-2)}
+.chip:hover{border-color:var(--accent);color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--ink)}
+.btn{background:var(--ink);color:var(--panel);border:0;border-radius:4px;padding:9px 15px;cursor:pointer;font:600 14px/1 var(--f-display);letter-spacing:.08em;text-transform:uppercase}
+.btn:hover{background:var(--accent)}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--rule)}
+.btn.ghost:hover{border-color:var(--ink-2);background:transparent}
+.btn[disabled]{opacity:.45;cursor:default}
+.kbd{font:500 11px/1 var(--f-mono);color:var(--muted)}
+
+/* the work card */
+.card{background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:22px 22px 20px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.meta{display:flex;flex-wrap:wrap;gap:6px 14px;font:500 12px/1.3 var(--f-mono);color:var(--muted);letter-spacing:.02em}
+.meta .mr{color:var(--mr)}
+.qtext{font-size:18.5px;line-height:1.5;max-width:68ch;overflow-x:auto;overflow-y:hidden}
+.choices{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;list-style:none}
+.choice{display:grid;grid-template-columns:28px minmax(0,1fr);gap:12px;align-items:start;text-align:left;width:100%;background:var(--field);
+  border:1px solid var(--rule);border-radius:5px;padding:11px 13px;cursor:pointer;font-size:16px;line-height:1.45}
+.choice:hover:not([disabled]){border-color:var(--accent)}
+.choice .k{font:500 13px/1.6 var(--f-mono);color:var(--muted);border:1px solid var(--rule);border-radius:3px;text-align:center}
+.choice .t{min-width:0;overflow-x:auto;overflow-y:hidden}
+.choice[disabled]{cursor:default}
+.choice.right{background:var(--ok-bg);border-color:var(--ok-fg);color:var(--ok-fg)}
+.choice.wrong{background:var(--bad-bg);border-color:var(--bad-fg);color:var(--bad-fg)}
+.choice.right .k,.choice.wrong .k{border-color:currentColor;color:inherit}
+.fb{border-left:3px solid var(--rule);padding:4px 0 4px 14px;display:flex;flex-direction:column;gap:6px}
+.fb.ok{border-color:var(--ok-fg)} .fb.bad{border-color:var(--bad-fg)}
+.fb .verdict{font:700 15px/1.2 var(--f-display);letter-spacing:.08em;text-transform:uppercase}
+.fb.ok .verdict{color:var(--ok-fg)} .fb.bad .verdict{color:var(--bad-fg)}
+.fb .ex{margin:0;color:var(--ink);max-width:68ch;overflow-x:auto;overflow-y:hidden}
+.src{font:400 12px/1.4 var(--f-mono);color:var(--muted)}
+.foot{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.empty{color:var(--ink-2);padding:8px 0}
+
+/* flashcards */
+.flash{position:relative;min-height:260px;cursor:pointer;perspective:1400px}
+.flash .face{position:absolute;inset:0;background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:24px;display:flex;flex-direction:column;gap:12px;
+  backface-visibility:hidden;transition:transform .45s cubic-bezier(.3,.7,.3,1);overflow:auto}
+.flash .back{transform:rotateY(180deg)}
+.flash.flipped .front{transform:rotateY(-180deg)} .flash.flipped .back{transform:rotateY(0)}
+.flash h3{margin:0;font:700 24px/1.15 var(--f-display);text-wrap:balance}
+.flash .prompt{color:var(--ink-2);margin:0}
+.flash .ans{font-size:18px;line-height:1.5}
+.flash .hint{margin-top:auto;font:500 12px/1 var(--f-mono);color:var(--muted)}
+.disp{overflow-x:auto;padding:4px 0}
+
+/* numeric */
+.ansrow{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.ansrow input{width:180px;max-width:100%;font:500 16px/1 var(--f-mono);background:var(--field);border:1px solid var(--rule);border-radius:4px;padding:9px 10px;font-variant-numeric:tabular-nums}
+.ansrow .unit{font:500 14px/1 var(--f-mono);color:var(--ink-2)}
+.steps{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;overflow-x:auto}
+.steps li{padding-left:4px}
+
+.ptitle{margin:0;font:700 21px/1.2 var(--f-display);letter-spacing:.01em;text-wrap:balance}
+.parts{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.part{border:1px solid var(--rule);border-left:3px solid var(--rule);border-radius:5px;background:var(--field);padding:10px 12px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.part.ok{border-left-color:var(--ok-fg)} .part.bad{border-left-color:var(--bad-fg)}
+.ptop{display:grid;grid-template-columns:28px minmax(0,1fr);gap:6px;align-items:baseline}
+.plbl{font:500 13px/1 var(--f-mono);color:var(--muted)}
+.pq{min-width:0;overflow-x:auto;overflow-y:hidden}
+.part .ansrow{padding-left:34px}
+.part .ansrow input{width:150px}
+.btn.sm{padding:7px 11px;font-size:13px}
+.pv{font:600 13px/1 var(--f-display);letter-spacing:.08em;text-transform:uppercase}
+.pv.ok{color:var(--ok-fg)} .pv.bad{color:var(--bad-fg)}
+.psol{padding-left:34px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.psol .ans{font-size:15px}
+@media (max-width:520px){ .part .ansrow,.psol{padding-left:0} }
+/* exam */
+.examopts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.opt{text-align:left;background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:18px;cursor:pointer;display:flex;flex-direction:column;gap:6px}
+.opt:hover{border-color:var(--accent)}
+.opt b{font:700 22px/1 var(--f-display);letter-spacing:.02em}
+.opt span{color:var(--ink-2);font-size:14.5px}
+.ebar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;
+  background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:10px 12px;box-shadow:0 8px 16px -14px rgba(0,0,0,.5)}
+.clock{font:500 22px/1 var(--f-mono);font-variant-numeric:tabular-nums}
+.clock.low{color:var(--bad-fg)}
+.pills{display:flex;flex-wrap:wrap;gap:5px}
+.pill{width:30px;height:28px;border:1px solid var(--rule);border-radius:4px;background:var(--field);cursor:pointer;font:500 12px/1 var(--f-mono);color:var(--ink-2);font-variant-numeric:tabular-nums}
+.pill.done{background:var(--accent-soft);border-color:var(--accent);color:var(--ink)}
+.pill.cur{outline:2px solid var(--ink);outline-offset:1px}
+.pill.ok{background:var(--ok-bg);color:var(--ok-fg);border-color:var(--ok-fg)}
+.pill.bad{background:var(--bad-bg);color:var(--bad-fg);border-color:var(--bad-fg)}
+.score{display:flex;flex-wrap:wrap;gap:8px 28px;align-items:baseline}
+.score .big{font:700 56px/1 var(--f-display);font-variant-numeric:tabular-nums}
+.score span{color:var(--ink-2)}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--rule)}
+th{font:600 12px/1 var(--f-display);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+td.n{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+details.rev{border:1px solid var(--rule);border-radius:5px;background:var(--panel)}
+details.rev summary{cursor:pointer;padding:10px 14px;display:flex;gap:10px;align-items:baseline}
+details.rev summary .tag{font:600 12px/1 var(--f-display);letter-spacing:.1em;text-transform:uppercase;flex:none}
+details.rev .tag.ok{color:var(--ok-fg)} details.rev .tag.bad{color:var(--bad-fg)}
+details.rev .body{padding:0 14px 14px;display:flex;flex-direction:column;gap:8px}
+.inline-confirm{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--bad-bg);color:var(--bad-fg);border-radius:5px;padding:10px 12px}
+
+/* equations */
+.search{width:100%;max-width:420px;background:var(--field);border:1px solid var(--rule);border-radius:4px;padding:9px 11px}
+.eqgroup{display:flex;flex-direction:column;gap:12px}
+.eqgroup h3{display:flex;align-items:center;gap:10px;margin:10px 0 0;font:600 13px/1 var(--f-display);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.eqgroup h3::after{content:"";flex:1;height:1px;background:var(--rule)}
+.eq{background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:16px 18px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.eq .top{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline;justify-content:space-between}
+.eq h4{margin:0;font:700 19px/1.2 var(--f-display);letter-spacing:.01em}
+.eq .mrtag{font:500 11.5px/1 var(--f-mono);color:var(--mr)}
+.eq dl{margin:0;display:grid;grid-template-columns:max-content minmax(0,1fr);gap:5px 14px;font-size:15px}
+.eq dt{font:600 12px/1.6 var(--f-display);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.eq dd{margin:0;min-width:0;overflow-x:auto}
+.terms{display:flex;flex-wrap:wrap;gap:4px 16px}
+.terms span{white-space:nowrap}
+.eq .lab{font:600 13px/1 var(--f-display);letter-spacing:.08em;text-transform:uppercase;text-decoration:none}
+
+/* flags and deeper explanations */
+.tools{display:flex;flex-wrap:wrap;gap:8px}
+.tbtn{background:transparent;border:1px solid var(--rule);border-radius:4px;padding:7px 11px;cursor:pointer;font:600 13px/1 var(--f-display);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);display:inline-flex;gap:7px;align-items:center}
+.tbtn:hover{border-color:var(--ink-2);color:var(--ink)}
+.tbtn[aria-pressed="true"]{border-color:var(--mr);color:var(--mr)}
+.tbtn[aria-expanded="true"]{border-color:var(--accent);color:var(--accent)}
+.tbtn svg{width:13px;height:13px;flex:none}
+.deep{border:1px solid var(--rule);border-radius:5px;background:var(--field);padding:14px 16px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.dsec{display:flex;flex-direction:column;gap:6px;min-width:0}
+.dsec p{margin:0;max-width:68ch;overflow-x:auto}
+.mini{border-top:1px dashed var(--rule);padding-top:8px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.mini:first-of-type{border-top:0;padding-top:0}
+.mini-h{display:flex;flex-wrap:wrap;gap:4px 12px;justify-content:space-between;align-items:baseline}
+.mini-h b{font:700 15.5px/1.2 var(--f-display);letter-spacing:.02em}
+.linkbtn{background:none;border:0;padding:0;cursor:pointer;color:var(--accent);font:600 12.5px/1.2 var(--f-display);letter-spacing:.08em;text-transform:uppercase}
+.linkbtn:hover{text-decoration:underline}
+.where{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;font-size:15px}
+.where .file{display:block;font:400 12px/1.4 var(--f-mono);color:var(--muted);overflow-wrap:anywhere}
+.notebox{display:flex;flex-direction:column;gap:6px}
+.notebox textarea{width:100%;min-height:62px;resize:vertical;background:var(--field);border:1px solid var(--rule);border-radius:4px;padding:8px 10px;font:15px/1.45 var(--f-body);box-sizing:border-box}
+.flagged-mark{color:var(--mr)}
+.copyout{width:100%;min-height:120px;font:12px/1.4 var(--f-mono);background:var(--field);border:1px solid var(--rule);border-radius:4px;padding:8px;box-sizing:border-box}
+.eq.hl{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+
+/* side ledger */
+.side{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);background:var(--panel);border:1px solid var(--rule);border-radius:6px}
+.side summary{cursor:pointer;padding:12px 14px;font:600 13px/1 var(--f-display);letter-spacing:.12em;text-transform:uppercase;list-style:none;display:flex;justify-content:space-between}
+.side summary::-webkit-details-marker{display:none}
+.side .in{padding:14px;display:flex;flex-direction:column;gap:14px}
+.side h3{margin:0;font:600 12px/1 var(--f-display);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:10px}
+.side h3::after{content:"";flex:1;height:1px;background:var(--rule)}
+.tot{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tot div{border:1px solid var(--rule);border-radius:4px;padding:8px 10px}
+.tot dt{font-size:12.5px;color:var(--muted)} .tot dd{margin:2px 0 0;font:500 20px/1.1 var(--f-mono);font-variant-numeric:tabular-nums}
+.ledger{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.ledger li{border-bottom:1px dashed var(--rule)}
+.ledger li:last-child{border-bottom:0}
+.trow{display:grid;grid-template-columns:18px minmax(0,1fr) auto;gap:8px;align-items:center;width:100%;background:none;border:0;padding:7px 0;cursor:pointer;text-align:left}
+.trow .box{width:14px;height:14px;border:1.5px solid var(--ink-2);border-radius:3px;display:grid;place-items:center}
+.trow[aria-checked="true"] .box{background:var(--accent);border-color:var(--accent)}
+.trow[aria-checked="true"] .box::after{content:"";width:6px;height:3px;border:solid var(--panel);border-width:0 0 2px 2px;transform:rotate(-45deg) translate(1px,-1px)}
+.trow .nm{font-size:14.5px;line-height:1.25}
+.trow .ct{font:500 12px/1 var(--f-mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.trow .meter{grid-column:2/-1;height:4px;border-radius:2px;background:var(--bar);position:relative;overflow:hidden}
+.trow .meter i{position:absolute;inset:0 auto 0 0;border-radius:2px;background:var(--ok-fg)}
+.trow .meter i.weak{background:var(--bad-fg)}
+.trow[aria-checked="false"] .nm{color:var(--muted)}
+.weak-flag{font:600 10.5px/1 var(--f-display);letter-spacing:.1em;text-transform:uppercase;color:var(--bad-fg);margin-left:6px}
+.switch{display:flex;gap:10px;align-items:flex-start;cursor:pointer;font-size:14px;color:var(--ink-2)}
+.switch input{margin-top:3px;accent-color:var(--accent)}
+.note{margin:0;font-size:13px;color:var(--muted)}
+.reslink{display:flex;flex-direction:column;gap:3px;text-decoration:none;color:var(--ink-2);border:1px solid var(--rule);border-radius:5px;padding:10px 12px;font-size:13.5px;line-height:1.4}
+.reslink b{font:700 15px/1.2 var(--f-display);letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.reslink:hover{border-color:var(--accent)}
+@media (max-width: 520px){ .brand .course{display:none} }
+
+@media (max-width: 860px){
+  .wrap{grid-template-columns:minmax(0,1fr);gap:16px;padding-block:14px 40px}
+  .side{position:static;order:-1}
+  .card{padding:18px 16px}
+  .qtext{font-size:17px}
+  .tab.res{margin-left:0}
+}
+@media (min-width: 861px){ .side > summary{display:none} }
+@media (prefers-reduced-motion: reduce){ .flash .face{transition:none} }
+@media print{
+  :root,:root[data-theme="dark"]{--bg:#fff;--panel:#fff;--ink:#000;--ink-2:#222;--muted:#444;--rule:#bbb;--field:#fff;color-scheme:light}
+  body.print-eq .bar, body.print-eq .side, body.print-eq .sheet, body.print-eq .head, body.print-eq .row, body.print-eq .lab, body.print-eq #eq-texout{display:none!important}
+  body.print-eq .wrap{display:block;padding:0;max-width:none}
+  body.print-eq #eq-list{display:block!important;columns:2;column-gap:14px;font-size:9.5px}
+  body.print-eq .eqgroup{display:block}
+  body.print-eq .eqgroup h3{font-size:9px;margin:4px 0 2px;break-after:avoid}
+  body.print-eq .eq{break-inside:avoid;padding:4px 6px;margin:0 0 4px;gap:2px;border-radius:2px}
+  body.print-eq .eq h4{font-size:10px} body.print-eq .eq .mrtag{display:none}
+  body.print-eq .eq dl{font-size:8.5px;gap:1px 6px} body.print-eq .eq dt{font-size:7.5px}
+}
+
+</style>
+</head>
+<body>
+<header class="bar">
+  <div class="brand"><h1>ME 461 Study Lab</h1><span class="course">Gas Dynamics · Ch 1–6 · F26</span></div>
+  <nav class="tabs" role="tablist" aria-label="Study views">
+    <button class="tab" role="tab" data-view="practice" id="tab-practice">Practice</button>
+    <button class="tab" role="tab" data-view="cards" id="tab-cards">Flashcards</button>
+    <button class="tab" role="tab" data-view="problems" id="tab-problems">Problems</button>
+    <button class="tab" role="tab" data-view="exam" id="tab-exam">Mock exam</button>
+    <button class="tab" role="tab" data-view="equations" id="tab-equations">Equation sheet</button>
+    <a class="tab res" href="flow-lab.html">Flow Lab <span>calculator + visuals ↗</span></a>
+  </nav>
+</header>
+
+<div class="wrap">
+  <main id="main">
+    <section id="v-practice" hidden></section>
+    <section id="v-cards" hidden></section>
+    <section id="v-problems" hidden></section>
+    <section id="v-exam" hidden></section>
+    <section id="v-equations" hidden></section>
+  </main>
+
+  <details class="side" id="side">
+    <summary><span>Topics &amp; progress</span><span id="side-sum" class="kbd"></span></summary>
+    <div class="in">
+      <dl class="tot" id="totals"></dl>
+      <h3>Topics</h3>
+      <div class="row" style="gap:6px">
+        <button class="chip" id="t-all">All</button>
+        <button class="chip" id="t-none">None</button>
+        <button class="chip" id="t-weak">Weak only</button>
+      </div>
+      <ul class="ledger" id="ledger"></ul>
+      <label class="switch"><input type="checkbox" id="mr"><span>Weight high-yield items higher (homework-tested and worked-example material)</span></label>
+      <p class="note">Bars show your accuracy per topic. Red marks a weak topic (under 70% after 4 or more answers). Missed items come back more often. Progress is saved in this browser only.</p>
+      <h3>Flagged for follow-up</h3>
+      <div id="flagbox"></div>
+      <div id="reset-box"><button class="btn ghost" id="reset">Reset progress</button></div>
+      <h3>Resource</h3>
+      <a class="reslink" href="flow-lab.html"><b>Flow Lab</b><span>Isentropic, normal-shock, oblique-shock and Prandtl–Meyer calculator, plus interactive nozzle, θ–δ–M, Mach cone, corner and jet visuals.</span></a>
+    </div>
+  </details>
+</div>
+
+<script>
+window.MathJax = {
+  tex: { inlineMath: [["\\(","\\)"]], displayMath: [["\\[","\\]"]] },
+  svg: { fontCache: "global" },
+  options: { enableMenu: false },
+  startup: { typeset: false, ready() { MathJax.startup.defaultReady(); MathJax.startup.promise.then(() => window.__mjReady && window.__mjReady()); } }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js" async></script>
+<script src="gd.js"></script>
+<script src="bank.js"></script>
+<script src="problems.js"></script>
+<script>
+(function(){
+"use strict";
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c]));
+if (!window.AAE) { $("#main").innerHTML = '<p class="empty">The question bank did not load. Reload the page to try again.</p>'; return; }
+const { TOPICS, MC, CARDS, EQ, NUM } = window.AAE;
+const TN = Object.fromEntries(TOPICS.map(t => [t.id, t]));
+const KIND = { concept: "Concept", equation: "Equation: meaning & use", fact: "Key fact" };
+
+/* ---------- MathJax queue ---------- */
+let mjq = Promise.resolve(); const pending = new Set();
+function typeset(el){
+  if (!el) return;
+  if (!(window.MathJax && MathJax.typesetPromise)) { pending.add(el); return; }
+  mjq = mjq.then(() => MathJax.typesetPromise([el])).catch(() => {});
+}
+window.__mjReady = () => { pending.forEach(el => typeset(el)); pending.clear(); };
+
+/* ---------- saved state ---------- */
+const KEY = "me461-study-v1";
+let S = {};
+try { S = JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { S = {}; }
+S.items = S.items || {}; if (!Array.isArray(S.sel)) S.sel = TOPICS.map(t => t.id); if (S.mr === undefined) S.mr = true;
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+function rec(id, t, ok){ const it = S.items[id] || (S.items[id] = { t, r: 0, w: 0 }); if (ok) it.r++; else it.w++; it.l = Date.now(); it.t = t; save(); renderSide(); }
+function topicStat(t){ let r = 0, w = 0; for (const k in S.items) { const it = S.items[k]; if (it.t === t) { r += it.r; w += it.w; } } const n = r + w; return { r, w, n, acc: n ? r / n : null }; }
+const isWeakTopic = t => { const s = topicStat(t); return s.n >= 4 && s.acc < 0.7; };
+const selected = t => S.sel.includes(t);
+
+/* ---------- flags, deeper explanations, sources ---------- */
+const DEEP = window.AAE_DEEP || {}, NUMREF = window.AAE_NUMREF || {};
+const EQBY = Object.fromEntries(EQ.map(e => [e.id, e]));
+S.flags = S.flags || {};
+const isFlagged = id => !!S.flags[id];
+function toggleFlag(id, t, kind){ if (S.flags[id]) delete S.flags[id]; else S.flags[id] = { t, kind, at: Date.now(), note: "" }; save(); renderSide(); }
+const openDeep = new Set();
+const SRC = [
+  ["Reader", "Course reader (Rodríguez)", "CourseReaderv0p2.pdf"],
+  ["App. A", "Reader Appendix A: isentropic tables", "CourseReaderv0p2.pdf"],
+  ["App. B", "Reader Appendix B: normal-shock tables", "CourseReaderv0p2.pdf"],
+  ["App. C", "Appendix C oblique-shock charts", ""],
+  ["HW1", "Homework 1 (solution)", "HW1_Updates.pdf"],
+  ["HW2", "Homework 2 (solution)", "HW2-Solution.pdf"],
+  ["HW4", "Homework 4 (solution)", "HW4_Solution.pdf"]
+];
+function srcItems(src){
+  return String(src).split(";").map(x => x.trim()).filter(Boolean).map(part => {
+    const m = SRC.find(r => part.startsWith(r[0])); if (!m) return { name: part, loc: "", file: "" };
+    let rest = part.slice(m[0].length).trim(), loc = "";
+    if (rest) {
+      const plural = /[–,-]/.test(rest);
+      if (/^§/.test(rest)) loc = (plural ? "sections " : "section ") + rest.replace(/§/g, "");
+      else if (/^Ch\b/.test(rest)) loc = "chapter " + rest.replace(/^Ch\s*/, "");
+      else if (/^s\./.test(rest)) loc = (plural ? "slides " : "slide ") + rest.replace(/s\./g, "");
+      else if (/^p\./.test(rest)) loc = (plural ? "pages " : "page ") + rest.replace(/p\./g, "");
+      else loc = (/,/.test(rest) ? "problems " : "problem ") + rest.replace(/#/g, "");
+    }
+    return { name: m[1], loc, file: m[2] };
+  });
+}
+function whereHTML(src){ return `<ul class="where">${srcItems(src).map(x => `<li><b>${esc(x.name)}</b>${x.loc ? ", " + esc(x.loc) : ""}${x.file ? `<span class="file">${esc(x.file)}</span>` : ""}</li>`).join("")}</ul>`; }
+function eqMiniHTML(ids){
+  const list = ids.map(id => EQBY[id]).filter(Boolean); if (!list.length) return "";
+  return `<div class="dsec"><span class="lbl">Related equations</span>${list.map(e => `<div class="mini"><div class="mini-h"><b>${esc(e.name)}</b><button class="linkbtn" data-goeq="${e.id}">Open on equation sheet →</button></div><div class="disp">\\[${e.tex}\\]</div></div>`).join("")}</div>`;
+}
+function deepHTML(q){
+  const dd = DEEP[q.id];
+  return `<div class="deep" id="deep-${q.id}">
+    ${dd ? `<div class="dsec"><span class="lbl">Explained in more depth</span><p>${dd.d}</p></div>` : ""}
+    ${eqMiniHTML(dd ? dd.eq : [])}
+    <div class="dsec"><span class="lbl">Where it's covered</span>${whereHTML(q.src)}</div></div>`;
+}
+function numDeepHTML(g){
+  const r = NUMREF[g.id] || (g.eq ? { eq: g.eq, src: g.src } : null); if (!r) return "";
+  return `<div class="deep">${eqMiniHTML(r.eq)}<div class="dsec"><span class="lbl">Where it's covered</span>${whereHTML(r.src)}</div></div>`;
+}
+const FLAG_SVG = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 15V1.5M3 2h9l-2 3.5 2 3.5H3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+function flagBtn(id, t, kind){ const on = isFlagged(id); return `<button class="tbtn" data-flag="${id}" data-t="${t}" data-fkind="${kind}" aria-pressed="${on}">${FLAG_SVG}${on ? "Flagged" : "Flag for follow-up"}</button>`; }
+function moreBtn(id){ const on = openDeep.has(id); return `<button class="tbtn" data-more="${id}" aria-expanded="${on}">${on ? "Hide explanation" : "Explain more"}</button>`; }
+function noteHTML(id){ if (!isFlagged(id)) return ""; return `<div class="notebox"><label class="lbl" for="note-${id}">What's unclear? (optional)</label><textarea id="note-${id}" data-note="${id}" placeholder="e.g. why A* grows across the shock">${esc(S.flags[id].note || "")}</textarea></div>`; }
+
+function weight(item, mrBoost){
+  const s = S.items[item.id]; let w = 1;
+  if (S.mr && item.mr) w *= (mrBoost || 2);
+  if (!s) w *= 1.6; else { const n = s.r + s.w; w *= 1 + 3 * (s.w / n); if (s.r >= 3 && s.w === 0) w *= 0.5; }
+  if (isWeakTopic(item.t)) w *= 1.5;
+  if (S.flags && S.flags[item.id]) w *= 1.5;
+  return w;
+}
+function pickWeighted(pool, avoid, mrBoost){
+  let c = pool.filter(x => !avoid.includes(x.id)); if (!c.length) c = pool; if (!c.length) return null;
+  const ws = c.map(x => weight(x, mrBoost)); let tot = ws.reduce((a, b) => a + b, 0), r = Math.random() * tot;
+  for (let i = 0; i < c.length; i++) { r -= ws[i]; if (r <= 0) return c[i]; }
+  return c[c.length - 1];
+}
+const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+function fmtNum(x, sig){ if (!isFinite(x)) return "—"; const ax = Math.abs(x); if (sig || (ax !== 0 && (ax < 0.01 || ax >= 1e6))) return x.toExponential(3); return Number(x.toPrecision(4)).toLocaleString("en-US", { maximumFractionDigits: 4 }); }
+function checkNum(p, val){ const tol = Math.max(Math.abs(p.ans) * 0.03, p.abs || 0); return Math.abs(val - p.ans) <= tol; }
+function parseNum(s){ s = String(s).trim().replace(/,/g, "").replace(/\s/g, "").replace(/[×x]10\^?/i, "e").replace(/\*10\^/, "e"); if (!s) return NaN; return Number(s); }
+
+/* ---------- side ledger ---------- */
+function renderSide(){
+  let r = 0, w = 0, seen = 0; for (const k in S.items) { r += S.items[k].r; w += S.items[k].w; seen++; }
+  const total = MC.length + CARDS.length + EQ.length + NUM.length;
+  $("#totals").innerHTML = `<div><dt>Answered</dt><dd>${r + w}</dd></div><div><dt>Accuracy</dt><dd>${r + w ? Math.round(100 * r / (r + w)) + "%" : "—"}</dd></div>`;
+  $("#side-sum").textContent = `${S.sel.length}/${TOPICS.length} topics · ${r + w ? Math.round(100 * r / (r + w)) + "%" : "no answers yet"}`;
+  $("#ledger").innerHTML = TOPICS.map(t => {
+    const s = topicStat(t.id), weak = isWeakTopic(t.id), pct = s.acc == null ? 0 : Math.round(100 * s.acc);
+    return `<li><button class="trow" role="checkbox" aria-checked="${selected(t.id)}" data-t="${t.id}">
+      <span class="box"></span><span class="nm">${esc(t.name)}${weak ? '<span class="weak-flag">weak</span>' : ""}</span>
+      <span class="ct">${s.n ? pct + "% · " + s.n : "—"}</span>
+      <span class="meter"><i class="${weak ? "weak" : ""}" style="width:${pct}%"></i></span></button></li>`;
+  }).join("");
+  $("#mr").checked = !!S.mr;
+  renderFlagBox();
+}
+function flagCounts(){ const c = { mc: 0, card: 0, num: 0 }; for (const k in S.flags) c[S.flags[k].kind] = (c[S.flags[k].kind] || 0) + 1; return c; }
+function renderFlagBox(){
+  const box = $("#flagbox"); if (!box) return; const n = Object.keys(S.flags).length, c = flagCounts();
+  if (!n) { box.innerHTML = '<p class="note">Flag any question, card or problem you want to come back to or ask about. It shows up here, and flagged items come up more often.</p>'; return; }
+  const parts = [c.mc && `${c.mc} question${c.mc > 1 ? "s" : ""}`, c.card && `${c.card} card${c.card > 1 ? "s" : ""}`, c.num && `${c.num} problem type${c.num > 1 ? "s" : ""}`].filter(Boolean).join(", ");
+  box.innerHTML = `<p class="note" style="color:var(--ink-2)"><span class="flagged-mark">●</span> ${n} flagged: ${parts}</p>
+    <div class="row" style="gap:6px">${c.mc ? '<button class="chip" id="fl-review">Review flagged questions</button>' : ""}${c.card ? '<button class="chip" id="fl-cards">Flagged cards</button>' : ""}${c.num ? '<button class="chip" id="fl-probs">Flagged problems</button>' : ""}<button class="chip" id="fl-copy">Copy list for office hours</button></div><div id="fl-out"></div>`;
+  const rv = $("#fl-review"); if (rv) rv.onclick = () => { P.mode = "flagged"; P.recent = []; P.cur = null; setView("practice", true); };
+  const fc = $("#fl-cards"); if (fc) fc.onclick = () => { FC.flagOnly = true; setView("cards", true); RENDER.cards(true); };
+  const fp = $("#fl-probs"); if (fp) fp.onclick = () => { PR.flagOnly = true; PR.cur = null; setView("problems", true); };
+  $("#fl-copy").onclick = copyFlagged;
+}
+const plain = s => String(s).replace(/<\/?[a-z][^>]*>/gi, "").replace(/\\\(|\\\)/g, "").replace(/\s+/g, " ").trim();
+function copyFlagged(){
+  const lines = ["ME 461 – flagged for follow-up", ""];
+  Object.keys(S.flags).sort((a, b) => S.flags[a].at - S.flags[b].at).forEach((id, i) => {
+    const f = S.flags[id]; let txt = "";
+    if (f.kind === "mc") { const q = MC.find(x => x.id === id); if (!q) return; txt = `${i + 1}. [${TN[q.t].name}] ${plain(q.q)}\n   Answer: ${plain(q.ch[q.a])}\n   Source: ${srcItems(q.src).map(x => x.name + (x.loc ? ", " + x.loc : "")).join("; ")}`; }
+    else if (f.kind === "card") { const c = CARDS.find(x => x.id === id) || EQCARDS.find(x => x.id === id); if (!c) return; txt = `${i + 1}. [${TN[c.t].name}] Card: ${plain(c.eq ? c.eq.name : c.front)}`; }
+    else { const g = NUM.find(x => x.id === id) || (window.AAE_HW || []).find(x => x.id === id); if (!g) return; const r = NUMREF[g.id] || (g.eq ? { eq: g.eq, src: g.src } : null); txt = `${i + 1}. [${TN[g.t].name}] Problem type: ${g.title}${r ? `\n   Source: ${srcItems(r.src).map(x => x.name + (x.loc ? ", " + x.loc : "")).join("; ")}` : ""}`; }
+    if (f.note) txt += `\n   My question: ${f.note}`;
+    lines.push(txt, "");
+  });
+  const text = lines.join("\n"), out = $("#fl-out");
+  const fallback = () => { out.innerHTML = '<p class="note">Copy this text:</p><textarea class="copyout" id="fl-text" readonly></textarea>'; const ta = $("#fl-text"); ta.value = text; ta.focus(); ta.select(); };
+  try { navigator.clipboard.writeText(text).then(() => { out.innerHTML = '<p class="note" style="color:var(--ok-fg)">Copied to your clipboard.</p>'; }, fallback); } catch (e) { fallback(); }
+}
+$("#ledger").addEventListener("click", e => {
+  const b = e.target.closest(".trow"); if (!b) return; const t = b.dataset.t;
+  S.sel = selected(t) ? S.sel.filter(x => x !== t) : S.sel.concat(t); save(); renderSide(); filtersChanged();
+});
+$("#t-all").onclick = () => { S.sel = TOPICS.map(t => t.id); save(); renderSide(); filtersChanged(); };
+$("#t-none").onclick = () => { S.sel = []; save(); renderSide(); filtersChanged(); };
+$("#t-weak").onclick = () => { const w = TOPICS.filter(t => isWeakTopic(t.id)).map(t => t.id); if (!w.length) { flashNote("No weak topics yet. Answer a few more questions first."); return; } S.sel = w; save(); renderSide(); filtersChanged(); };
+$("#mr").onchange = e => { S.mr = e.target.checked; save(); };
+function restoreReset(){ $("#reset-box").innerHTML = '<button class="btn ghost" id="reset">Reset progress</button>'; bindReset(); }
+function bindReset(){ $("#reset").onclick = () => { $("#reset-box").innerHTML = `<div class="inline-confirm"><span>Erase all saved answers?</span><button class="btn" id="reset-yes">Erase</button><button class="btn ghost" id="reset-no">Keep</button></div>`; $("#reset-yes").onclick = () => { S.items = {}; save(); renderSide(); restoreReset(); }; $("#reset-no").onclick = restoreReset; }; }
+let noteTimer;
+function flashNote(msg){ const p = document.querySelector(".side .note"); if (!p) return; const old = p.dataset.old || p.textContent; p.dataset.old = old; p.textContent = msg; p.style.color = "var(--bad-fg)"; clearTimeout(noteTimer); noteTimer = setTimeout(() => { p.textContent = old; p.style.color = ""; }, 3500); }
+
+/* ---------- views ---------- */
+const RENDER = {};
+const VIEWS = ["practice", "cards", "problems", "exam", "equations"];
+let view = null;
+function setView(v, push){
+  if (!VIEWS.includes(v)) v = "practice";
+  view = v;
+  VIEWS.forEach(x => { $("#v-" + x).hidden = x !== v; $("#tab-" + x).setAttribute("aria-selected", x === v); });
+  if (push) { try { history.replaceState(null, "", "#" + v); } catch (e) {} }
+  RENDER[v](false);
+}
+document.querySelectorAll(".tab[data-view]").forEach(b => b.onclick = () => setView(b.dataset.view, true));
+function filtersChanged(){ if (view === "exam" && EX.state === "run") return; RENDER[view](true); }
+function sheet(name, right){ return `<div class="sheet"><span>ME 461/561 · <b>${name}</b></span><span>${right || ""}</span></div>`; }
+const noTopics = '<p class="empty">No topics selected. Pick at least one topic in the ledger.</p>';
+
+/* ----- Practice ----- */
+const P = { kinds: ["concept", "equation", "fact"], cur: null, order: null, picked: null, recent: [], n: 0, ok: 0, mode: "adaptive" };
+function practicePool(){
+  let pool = MC.filter(q => selected(q.t) && P.kinds.includes(q.k));
+  if (P.mode === "missed") pool = pool.filter(q => { const s = S.items[q.id]; return s && s.w > 0 && s.w >= s.r; });
+  if (P.mode === "flagged") pool = MC.filter(q => isFlagged(q.id));
+  return pool;
+}
+function nextPractice(){
+  const pool = practicePool(); const q = pickWeighted(pool, P.recent);
+  if (P.cur) openDeep.delete(P.cur.id);
+  P.cur = q; P.picked = null; if (!q) return;
+  P.order = shuffle([0, 1, 2, 3].slice(0, q.ch.length));
+  P.recent.push(q.id); const keep = Math.min(25, Math.floor(pool.length * 0.6)); while (P.recent.length > keep) P.recent.shift();
+}
+RENDER.practice = function(reset){
+  const el = $("#v-practice");
+  if (reset || !P.cur || (P.mode !== "flagged" && (!selected(P.cur.t) || !P.kinds.includes(P.cur.k)))) nextPractice();
+  const pool = practicePool();
+  const kindChips = Object.keys(KIND).map(k => `<button class="chip" aria-pressed="${P.kinds.includes(k)}" data-kind="${k}">${{ concept: "Concepts", equation: "Equations", fact: "Key facts" }[k]}</button>`).join("");
+  let body;
+  if (!S.sel.length) body = noTopics;
+  else if (!P.cur) body = `<p class="empty">${P.mode === "missed" ? "Nothing to review: no question in these topics is currently more missed than right. Switch back to Adaptive." : P.mode === "flagged" ? "No flagged questions yet. Use Flag for follow-up on any question to save it here." : "No questions match these filters."}</p>`;
+  else {
+    const q = P.cur, done = P.picked != null, ok = done && P.picked === q.a;
+    body = `<div class="card" id="pq">
+      <div class="meta"><span>${esc(TN[q.t].name)}</span><span>${KIND[q.k]}</span>${q.mr ? '<span class="mr">● High-yield</span>' : ""}</div>
+      <div class="qtext">${q.q}</div>
+      <ol class="choices">${P.order.map((oi, j) => {
+        let cls = ""; if (done) { if (oi === q.a) cls = "right"; else if (oi === P.picked) cls = "wrong"; }
+        return `<li><button class="choice ${cls}" data-oi="${oi}" ${done ? "disabled" : ""}><span class="k">${"ABCD"[j]}</span><span class="t">${q.ch[oi]}</span></button></li>`; }).join("")}</ol>
+      ${done ? `<div class="fb ${ok ? "ok" : "bad"}"><span class="verdict">${ok ? "Correct" : "Not quite"}</span><p class="ex">${q.ex}</p><span class="src">Source: ${esc(q.src)}</span></div>` : ""}
+      ${done && openDeep.has(q.id) ? deepHTML(q) : ""}
+      ${noteHTML(q.id)}
+      <div class="foot"><div class="tools">${flagBtn(q.id, q.t, "mc")}${done ? moreBtn(q.id) : ""}</div>
+        <div class="row"><span class="kbd">${done ? "Enter for next" : "Keys 1–4 or A–D"}</span><button class="btn" id="pnext" ${done ? "" : 'disabled'}>Next question</button></div></div>
+    </div>`;
+  }
+  el.innerHTML = `${sheet("Practice", `${P.n ? `Session <b>${P.ok}/${P.n}</b> · ${Math.round(100 * P.ok / P.n)}%` : `${pool.length} questions in play`}`)}
+    <div class="head"><h2>Practice questions</h2><p>Concepts, when and how to use each equation, and key facts and numbers from Chapters 1–6 and the homework. Questions you miss come back more often.</p></div>
+    <div class="row"><span class="lbl">Type</span>${kindChips}</div>
+    <div class="row"><span class="lbl">Order</span>
+      <button class="chip" aria-pressed="${P.mode === "adaptive"}" data-mode="adaptive">Adaptive</button>
+      <button class="chip" aria-pressed="${P.mode === "missed"}" data-mode="missed">Review my misses</button>
+      <button class="chip" aria-pressed="${P.mode === "flagged"}" data-mode="flagged">Flagged (${flagCounts().mc})</button></div>
+    ${body}`;
+  el.querySelectorAll("[data-kind]").forEach(b => b.onclick = () => { const k = b.dataset.kind; P.kinds = P.kinds.includes(k) ? P.kinds.filter(x => x !== k) : P.kinds.concat(k); if (!P.kinds.length) P.kinds = [k]; RENDER.practice(true); });
+  el.querySelectorAll("[data-mode]").forEach(b => b.onclick = () => { P.mode = b.dataset.mode; P.recent = []; RENDER.practice(true); });
+  el.querySelectorAll(".choice").forEach(b => b.onclick = () => answerPractice(+b.dataset.oi));
+  const nx = $("#pnext"); if (nx) nx.onclick = () => { nextPractice(); RENDER.practice(false); focusFirstChoice(); };
+  typeset(el);
+};
+function focusFirstChoice(){ const c = document.querySelector("#v-practice .choice"); if (c) c.focus({ preventScroll: true }); }
+function answerPractice(oi){
+  const q = P.cur; if (!q || P.picked != null) return;
+  P.picked = oi; P.n++; const ok = oi === q.a; if (ok) P.ok++;
+  rec(q.id, q.t, ok); RENDER.practice(false);
+  const nx = $("#pnext"); if (nx) nx.focus({ preventScroll: true });
+}
+
+/* ----- Flashcards ----- */
+const FC = { decks: ["fact", "eq"], list: [], i: 0, flipped: false, knew: 0, seen: 0, flagOnly: false };
+const EQCARDS = EQ.map(e => ({ id: "eqc-" + e.id, t: e.t, mr: e.mr, eq: e }));
+function buildDeck(){
+  let pool = [];
+  if (FC.decks.includes("fact")) pool = pool.concat(CARDS.filter(c => selected(c.t)));
+  if (FC.decks.includes("eq")) pool = pool.concat(EQCARDS.filter(c => selected(c.t)));
+  if (FC.flagOnly) pool = CARDS.concat(EQCARDS).filter(c => isFlagged(c.id));
+  FC.list = pool.map(c => ({ c, k: Math.random() * weight(c) })).sort((a, b) => b.k - a.k).map(x => x.c);
+  FC.i = 0; FC.flipped = false; FC.knew = 0; FC.seen = 0;
+}
+function cardFaces(c){
+  if (c.eq) {
+    const e = c.eq;
+    return { front: `<div class="meta"><span>${esc(TN[e.t].name)}</span><span>Equation</span>${e.mr ? '<span class="mr">● High-yield</span>' : ""}</div>
+        <h3>${esc(e.name)}</h3><p class="prompt">When do you use it, what does it assume, and what is the usual trap? Then sketch the form.</p>`,
+      back: `<h3>${esc(e.name)}</h3><div class="disp">\\[${e.tex}\\]</div><p class="ans" style="font-size:16px;margin:0"><b>Use:</b> ${e.use}${e.assume ? `<br><b>Assumes:</b> ${e.assume}` : ""}</p>` };
+  }
+  return { front: `<div class="meta"><span>${esc(TN[c.t].name)}</span><span>Key fact</span>${c.mr ? '<span class="mr">● High-yield</span>' : ""}</div><h3>${c.front}</h3><p class="prompt">Recall the answer, then flip.</p>`,
+    back: `<h3>${c.front}</h3><div class="ans">${c.back}</div>` };
+}
+RENDER.cards = function(reset){
+  const el = $("#v-cards");
+  if (reset || !FC.list.length) buildDeck();
+  const deckChips = `<button class="chip" aria-pressed="${FC.decks.includes("fact")}" data-deck="fact">Key facts (${CARDS.filter(c => selected(c.t)).length})</button>
+    <button class="chip" aria-pressed="${FC.decks.includes("eq")}" data-deck="eq">Equations (${EQCARDS.filter(c => selected(c.t)).length})</button>
+    <button class="chip" aria-pressed="${FC.flagOnly}" data-flagonly="1">Flagged only (${flagCounts().card})</button>`;
+  let body;
+  if (!S.sel.length) body = noTopics;
+  else if (!FC.list.length) body = `<p class="empty">${FC.flagOnly ? "No flagged cards yet. Flip a card and use Flag for follow-up to save it." : "No cards match these filters."}</p>`;
+  else if (FC.i >= FC.list.length) body = `<div class="card"><div class="head"><h2>Deck finished</h2><p>You knew ${FC.knew} of ${FC.seen}. The cards you missed move toward the front next time.</p></div><div class="row"><button class="btn" id="fc-again">Shuffle a new pass</button></div></div>`;
+  else {
+    const c = FC.list[FC.i], fa = cardFaces(c);
+    body = `<div class="flash ${FC.flipped ? "flipped" : ""}" id="flash" tabindex="0" role="button" aria-label="Flip card">
+        <div class="face front">${fa.front}<span class="hint">Click or press Space to flip</span></div>
+        <div class="face back">${fa.back}<span class="hint">Did you know it?</span></div></div>
+      <div class="foot"><span class="kbd">Card ${FC.i + 1} of ${FC.list.length} · knew ${FC.knew}/${FC.seen}</span>
+        <div class="row">${flagBtn(c.id, c.t, "card")}<button class="btn ghost" id="fc-miss" ${FC.flipped ? "" : "disabled"}>Missed it</button><button class="btn" id="fc-knew" ${FC.flipped ? "" : "disabled"}>Knew it</button></div></div>${noteHTML(c.id)}`;
+  }
+  el.innerHTML = `${sheet("Flashcards", FC.list.length ? `${FC.list.length} cards` : "")}
+    <div class="head"><h2>Flashcards</h2><p>Key facts and numbers to know cold, plus every equation on the sheet. You can bring a crib sheet, so for equation cards focus on <i>when</i> each one applies and what it assumes, then check the back.</p></div>
+    <div class="row"><span class="lbl">Deck</span>${deckChips}</div>${body}`;
+  const fo = el.querySelector("[data-flagonly]"); if (fo) fo.onclick = () => { FC.flagOnly = !FC.flagOnly; RENDER.cards(true); };
+  el.querySelectorAll("[data-deck]").forEach(b => b.onclick = () => { FC.flagOnly = false; const d = b.dataset.deck; FC.decks = FC.decks.includes(d) ? FC.decks.filter(x => x !== d) : FC.decks.concat(d); if (!FC.decks.length) FC.decks = [d]; RENDER.cards(true); });
+  const fl = $("#flash"); if (fl) fl.onclick = flipCard;
+  const m = $("#fc-miss"), k = $("#fc-knew"); if (m) m.onclick = () => gradeCard(false); if (k) k.onclick = () => gradeCard(true);
+  const ag = $("#fc-again"); if (ag) ag.onclick = () => RENDER.cards(true);
+  sizeFlash(); typeset(el);
+};
+function flipCard(){ FC.flipped = !FC.flipped; const fl = $("#flash"); if (!fl) return; fl.classList.toggle("flipped", FC.flipped); $("#fc-miss").disabled = !FC.flipped; $("#fc-knew").disabled = !FC.flipped; }
+function gradeCard(ok){ const c = FC.list[FC.i]; rec(c.id, c.t, ok); FC.seen++; if (ok) FC.knew++; FC.i++; FC.flipped = false; RENDER.cards(false); const fl = $("#flash"); if (fl) fl.focus({ preventScroll: true }); }
+function sizeFlash(){
+  const fl = $("#flash"); if (!fl) return;
+  const fit = () => { let h = 260; fl.querySelectorAll(".face").forEach(f => { h = Math.max(h, f.scrollHeight + 2); }); fl.style.minHeight = Math.min(h, 640) + "px"; };
+  fit(); mjq.then(fit);
+}
+
+/* ----- Problems (multi-part, homework style) ----- */
+const HWG = window.AAE_HW || [];
+const PR = { cur: null, vals: [], res: [], steps: new Set(), all: false, recent: [], flagOnly: false, focus: null };
+const hwPool = () => PR.flagOnly ? HWG.filter(g => isFlagged(g.id)) : HWG.filter(g => selected(g.t));
+function newProblem(same){
+  let g = same && PR.cur ? PR.cur.g : null;
+  if (!g) { const pool = hwPool(); g = pickWeighted(pool, PR.recent); if (!g) { PR.cur = null; return; }
+    PR.recent.push(g.id); while (PR.recent.length > Math.min(8, Math.floor(pool.length / 2))) PR.recent.shift(); }
+  if (PR.cur) openDeep.delete(PR.cur.g.id);
+  const p = g.gen(); PR.cur = { g, p }; PR.vals = p.parts.map(() => ""); PR.res = p.parts.map(() => null); PR.steps = new Set(); PR.all = false; PR.focus = 0;
+}
+const L = i => String.fromCharCode(97 + i);
+RENDER.problems = function(reset){
+  const el = $("#v-problems");
+  if (reset || !PR.cur || (!PR.flagOnly && !selected(PR.cur.g.t))) newProblem(false);
+  const pool = hwPool();
+  let body;
+  if (!S.sel.length && !PR.flagOnly) body = noTopics;
+  else if (!PR.cur) body = `<p class="empty">${PR.flagOnly ? "No flagged problems yet. Use Flag for follow-up on a problem to save it." : "No problems in these topics."}</p>`;
+  else {
+    const { g, p } = PR.cur, nOk = PR.res.filter(r => r && r.ok).length;
+    body = `<div class="card">
+      <div class="meta"><span>${esc(TN[g.t].name)}</span><span>Based on ${esc(g.based)}</span>${g.mr ? '<span class="mr">● High-yield</span>' : ""}</div>
+      <h3 class="ptitle">${esc(g.title)}</h3>
+      <div class="qtext">${p.setup}</div>
+      <ol class="parts">${p.parts.map((pt, i) => {
+        const r = PR.res[i], show = PR.all || PR.steps.has(i), locked = r && r.ok;
+        return `<li class="part ${r ? (r.ok ? "ok" : r.shown ? "" : "bad") : ""}">
+          <div class="ptop"><span class="plbl">(${L(i)})</span><span class="pq">${pt.q}</span></div>
+          <div class="ansrow"><input id="pa-${i}" data-pi="${i}" inputmode="decimal" autocomplete="off" aria-label="Answer to part ${L(i)}" placeholder="${pt.sig || (Math.abs(pt.ans) > 0 && Math.abs(pt.ans) < 0.01) ? "e.g. 3.75e-7" : "number"}" value="${esc(PR.vals[i])}" ${locked ? "disabled" : ""}>${pt.unit ? `<span class="unit">${esc(pt.unit)}</span>` : ""}
+            <button class="btn ghost sm" data-chk="${i}" ${locked ? "disabled" : ""}>Check</button>
+            ${r ? `<span class="pv ${r.ok ? "ok" : r.shown ? "" : "bad"}">${r.nan ? "Enter a number" : r.ok ? "Correct" : r.shown ? "Steps shown" : "Not quite, try again"}</span>` : ""}
+            <button class="linkbtn" data-stp="${i}">${show ? "Hide steps" : "Show steps"}</button></div>
+          ${show ? `<div class="psol"><span class="ans">Answer: <b>${fmtNum(pt.ans, pt.sig)}${pt.unit ? " " + esc(pt.unit) : ""}</b></span><ol class="steps">${pt.steps.map(x => `<li>${x}</li>`).join("")}</ol></div>` : ""}
+        </li>`; }).join("")}</ol>
+      ${openDeep.has(g.id) ? numDeepHTML(g) : ""}
+      ${noteHTML(g.id)}
+      <div class="foot"><div class="tools">${flagBtn(g.id, g.t, "num")}${moreBtn(g.id)}</div>
+        <div class="row"><span class="kbd">${nOk}/${p.parts.length} parts correct</span><button class="btn ghost" id="pr-all">${PR.all ? "Hide full solution" : "Show full solution"}</button><button class="btn ghost" id="pr-same">New numbers</button><button class="btn" id="pr-new">Next problem</button></div></div>
+    </div>`;
+  }
+  const nParts = pool.reduce((a, g) => a + (g._n || (g._n = g.gen().parts.length)), 0);
+  el.innerHTML = `${sheet("Problems", `${pool.length} problems · ${nParts} parts · new numbers every time`)}
+    <div class="head"><h2>Homework-style problems</h2><p>Multi-part problems modeled on HW 1, 2 and 4 and the reader&rsquo;s worked examples. Later parts build on earlier ones, as on the homework. Check each part (answers within 3% count, to allow for table and chart reading) or open the steps for any part. Answers come from the exact relations; keep your tables or the Flow Lab calculator open.</p></div>
+    <div class="row"><span class="lbl">Show</span><button class="chip" aria-pressed="${!PR.flagOnly}" data-pf="0">All selected topics</button><button class="chip" aria-pressed="${PR.flagOnly}" data-pf="1">Flagged only (${flagCounts().num})</button></div>${body}`;
+  el.querySelectorAll("[data-pf]").forEach(b => b.onclick = () => { PR.flagOnly = b.dataset.pf === "1"; PR.recent = []; RENDER.problems(true); });
+  el.querySelectorAll("input[data-pi]").forEach(inp => {
+    const i = +inp.dataset.pi;
+    inp.oninput = () => { PR.vals[i] = inp.value; };
+    inp.onkeydown = e => { if (e.key === "Enter") { e.preventDefault(); checkPart(i); } };
+  });
+  el.querySelectorAll("[data-chk]").forEach(b => b.onclick = () => checkPart(+b.dataset.chk));
+  el.querySelectorAll("[data-stp]").forEach(b => b.onclick = () => { const i = +b.dataset.stp; if (PR.steps.has(i)) PR.steps.delete(i); else { PR.steps.add(i); if (!PR.res[i]) { PR.res[i] = { ok: false, shown: true }; rec(PR.cur.g.id, PR.cur.g.t, false); } } keepScroll(() => RENDER.problems(false)); });
+  const all = $("#pr-all"); if (all) all.onclick = () => { PR.all = !PR.all; keepScroll(() => RENDER.problems(false)); };
+  const same = $("#pr-same"); if (same) same.onclick = () => { newProblem(true); RENDER.problems(false); focusPart(0); };
+  const nx = $("#pr-new"); if (nx) nx.onclick = () => { newProblem(false); RENDER.problems(false); window.scrollTo({ top: 0 }); focusPart(0); };
+  typeset(el);
+};
+function keepScroll(fn){ const y = window.scrollY; fn(); window.scrollTo(0, y); }
+function focusPart(i){ const n = document.getElementById("pa-" + i); if (n && !n.disabled) n.focus({ preventScroll: true }); }
+function checkPart(i){
+  const pt = PR.cur.p.parts[i], v = parseNum(PR.vals[i]);
+  if (!isFinite(v)) { PR.res[i] = { nan: true, ok: false }; keepScroll(() => RENDER.problems(false)); focusPart(i); return; }
+  const ok = checkNum(pt, v), first = !PR.res[i] || PR.res[i].nan;
+  PR.res[i] = { ok, v, shown: !!(PR.res[i] && PR.res[i].shown) && !ok };
+  if (first) rec(PR.cur.g.id, PR.cur.g.t, ok);
+  keepScroll(() => RENDER.problems(false));
+  if (ok) { const nxt = PR.cur.p.parts.findIndex((_, k) => k > i && !(PR.res[k] && PR.res[k].ok)); focusPart(nxt >= 0 ? nxt : i); } else focusPart(i);
+}
+
+/* ----- Mock exam ----- */
+const EX = { state: "setup", items: [], i: 0, ans: [], end: 0, tick: null, dur: 0, started: 0, confirm: false };
+function buildExam(N){
+  const tops = S.sel.length ? S.sel : TOPICS.map(t => t.id);
+  const nNum = Math.round(N * 0.2), nMC = N - nNum;
+  const pool = MC.filter(q => tops.includes(q.t)); const chosen = [];
+  // one per topic first, then weighted fill (midterm-review items count 2.5x)
+  shuffle(tops.slice()).forEach(t => { if (chosen.length >= nMC) return; const q = pickWeighted(pool.filter(x => x.t === t), chosen.map(c => c.id), 2.5); if (q) chosen.push(q); });
+  while (chosen.length < nMC && chosen.length < pool.length) { const q = pickWeighted(pool, chosen.map(c => c.id), 2.5); if (!q || chosen.includes(q)) break; chosen.push(q); }
+  const gpool = NUM.filter(g => tops.includes(g.t)); const gs = [];
+  while (gs.length < nNum && gpool.length) { const g = pickWeighted(gpool, gs.map(x => x.id), 2.5); gs.push(g); if (gs.length >= gpool.length) break; }
+  const items = chosen.map(q => ({ type: "mc", q, order: shuffle([0, 1, 2, 3]) })).concat(gs.map(g => ({ type: "num", g, p: g.gen() })));
+  return shuffle(items);
+}
+function startExam(N, mins){
+  EX.items = buildExam(N); EX.i = 0; EX.ans = EX.items.map(() => null); EX.dur = mins * 60; EX.started = Date.now(); EX.end = Date.now() + mins * 60000; EX.state = "run"; EX.confirm = false;
+  clearInterval(EX.tick); EX.tick = setInterval(tickExam, 1000); markLive(true); RENDER.exam(false);
+}
+function tickExam(){ const left = Math.max(0, Math.round((EX.end - Date.now()) / 1000)); const c = $("#clock"); if (c) { c.textContent = mmss(left); c.classList.toggle("low", left < 120); } if (left <= 0) submitExam(); }
+const mmss = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+function markLive(on){ const t = $("#tab-exam"); const d = t.querySelector(".live"); if (on && !d) t.insertAdjacentHTML("beforeend", '<span class="live" aria-label="exam running"></span>'); if (!on && d) d.remove(); }
+function itemCorrect(it, a){ if (a == null || a === "") return false; if (it.type === "mc") return a === it.q.a; const v = parseNum(a); return isFinite(v) && checkNum(it.p, v); }
+function submitExam(){
+  clearInterval(EX.tick); EX.state = "done"; EX.used = Math.min(EX.dur, Math.round((Date.now() - EX.started) / 1000)); markLive(false);
+  EX.items.forEach((it, k) => { const ok = itemCorrect(it, EX.ans[k]); if (it.type === "mc") rec(it.q.id, it.q.t, ok); else rec(it.g.id, it.g.t, ok); });
+  if (view === "exam") RENDER.exam(false);
+}
+RENDER.exam = function(){
+  const el = $("#v-exam");
+  if (EX.state === "setup") {
+    const nt = S.sel.length || TOPICS.length;
+    el.innerHTML = `${sheet("Mock exam", S.mr ? "high-yield weighting on" : "even weighting")}
+      <div class="head"><h2>Timed mock midterm</h2><p>A mixed set covering Chapters 1–6: about 80% multiple choice and 20% numeric problems, at least one question per selected topic, with high-yield material weighted higher. No feedback until you submit. Have your crib sheet and the Appendix A/B tables (or the Flow Lab calculator) ready, as on the real exam.</p></div>
+      ${S.sel.length ? "" : '<p class="note">No topics are selected, so the exam will use all of them.</p>'}
+      <div class="examopts">
+        <button class="opt" data-n="15" data-m="20"><b>Quick set</b><span>15 questions · 20 minutes</span></button>
+        <button class="opt" data-n="25" data-m="35"><b>Standard</b><span>25 questions · 35 minutes</span></button>
+        <button class="opt" data-n="40" data-m="60"><b>Full length</b><span>40 questions · 60 minutes</span></button>
+      </div><p class="note">Drawing from ${nt} topic${nt === 1 ? "" : "s"}. Change the selection in the topic ledger.</p>`;
+    el.querySelectorAll(".opt").forEach(b => b.onclick = () => startExam(+b.dataset.n, +b.dataset.m));
+    return;
+  }
+  if (EX.state === "run") {
+    const it = EX.items[EX.i], a = EX.ans[EX.i], left = Math.max(0, Math.round((EX.end - Date.now()) / 1000));
+    const done = EX.ans.filter(x => x != null && x !== "").length;
+    let qhtml;
+    if (it.type === "mc") {
+      qhtml = `<div class="meta"><span>Question ${EX.i + 1} of ${EX.items.length}</span><span>${esc(TN[it.q.t].name)}</span></div><div class="qtext">${it.q.q}</div>
+        <ol class="choices">${it.order.map((oi, j) => `<li><button class="choice" data-oi="${oi}" aria-pressed="${a === oi}" style="${a === oi ? "border-color:var(--accent);background:var(--accent-soft)" : ""}"><span class="k">${"ABCD"[j]}</span><span class="t">${it.q.ch[oi]}</span></button></li>`).join("")}</ol>`;
+    } else {
+      qhtml = `<div class="meta"><span>Question ${EX.i + 1} of ${EX.items.length}</span><span>${esc(TN[it.g.t].name)}</span><span>Numeric</span></div><div class="qtext">${it.p.q}</div>
+        <div class="ansrow"><label class="lbl" for="ex-in">Answer</label><input id="ex-in" inputmode="decimal" autocomplete="off" value="${esc(a || "")}"><span class="unit">${esc(it.p.unit)}</span></div>`;
+    }
+    el.innerHTML = `<div class="ebar"><span class="clock ${left < 120 ? "low" : ""}" id="clock">${mmss(left)}</span><span class="kbd">${done}/${EX.items.length} answered</span>
+        <button class="btn" id="ex-submit">Submit exam</button></div>
+      ${EX.confirm ? `<div class="inline-confirm"><span>${EX.items.length - done} question${EX.items.length - done === 1 ? " is" : "s are"} unanswered. Submit anyway?</span><button class="btn" id="ex-yes">Submit</button><button class="btn ghost" id="ex-no">Keep working</button></div>` : ""}
+      <div class="pills">${EX.items.map((x, k) => `<button class="pill ${EX.ans[k] != null && EX.ans[k] !== "" ? "done" : ""} ${k === EX.i ? "cur" : ""}" data-k="${k}" aria-label="Question ${k + 1}">${k + 1}</button>`).join("")}</div>
+      <div class="card">${qhtml}
+        <div class="foot"><button class="btn ghost" id="ex-prev" ${EX.i === 0 ? "disabled" : ""}>Previous</button><button class="btn" id="ex-next">${EX.i === EX.items.length - 1 ? "Review & submit" : "Next"}</button></div></div>
+      <div class="row"><button class="btn ghost" id="ex-quit">Abandon exam</button></div>`;
+    el.querySelectorAll(".pill").forEach(b => b.onclick = () => { EX.i = +b.dataset.k; RENDER.exam(); });
+    el.querySelectorAll(".choice").forEach(b => b.onclick = () => { EX.ans[EX.i] = +b.dataset.oi; RENDER.exam(); });
+    const inp = $("#ex-in"); if (inp) { inp.oninput = () => { EX.ans[EX.i] = inp.value; const pl = el.querySelector(`.pill[data-k="${EX.i}"]`); if (pl) pl.classList.toggle("done", !!inp.value); }; inp.onkeydown = e => { if (e.key === "Enter") { e.preventDefault(); goNext(); } }; }
+    $("#ex-prev").onclick = () => { EX.i = Math.max(0, EX.i - 1); RENDER.exam(); };
+    $("#ex-next").onclick = goNext;
+    $("#ex-submit").onclick = trySubmit;
+    if ($("#ex-yes")) { $("#ex-yes").onclick = submitExam; $("#ex-no").onclick = () => { EX.confirm = false; RENDER.exam(); }; }
+    $("#ex-quit").onclick = () => { clearInterval(EX.tick); EX.state = "setup"; markLive(false); RENDER.exam(); };
+    typeset(el);
+    return;
+  }
+  // results
+  const res = EX.items.map((it, k) => ({ it, a: EX.ans[k], ok: itemCorrect(it, EX.ans[k]) }));
+  const right = res.filter(r => r.ok).length, pct = Math.round(100 * right / res.length);
+  const byT = {}; res.forEach(r => { const t = r.it.type === "mc" ? r.it.q.t : r.it.g.t; (byT[t] = byT[t] || { r: 0, n: 0 }); byT[t].n++; if (r.ok) byT[t].r++; });
+  el.innerHTML = `${sheet("Mock exam · results", `time used <b>${mmss(EX.used)}</b> of ${mmss(EX.dur)}`)}
+    <div class="card"><div class="score"><span class="big">${pct}%</span><span>${right} of ${res.length} correct</span></div>
+      <div class="tbl"><table><thead><tr><th>Topic</th><th style="text-align:right">Correct</th><th style="text-align:right">Score</th></tr></thead><tbody>
+      ${Object.keys(byT).sort((a, b) => byT[a].r / byT[a].n - byT[b].r / byT[b].n).map(t => `<tr><td>${esc(TN[t].name)}</td><td class="n">${byT[t].r}/${byT[t].n}</td><td class="n" style="color:${byT[t].r / byT[t].n < 0.7 ? "var(--bad-fg)" : "var(--ok-fg)"}">${Math.round(100 * byT[t].r / byT[t].n)}%</td></tr>`).join("")}
+      </tbody></table></div>
+      <div class="row"><button class="btn" id="ex-new">New exam</button><button class="btn ghost" id="ex-weak">Practice the topics I missed</button></div></div>
+    <div class="head"><h2 style="font-size:21px">Review</h2><p>Misses are open. Each answer is now part of your topic stats.</p></div>
+    ${res.map((r, k) => {
+      let body, title;
+      if (r.it.type === "mc") { const q = r.it.q; title = q.q.replace(/<[^>]+>/g, "");
+        body = `<div class="qtext" style="font-size:16px">${q.q}</div><div>Your answer: ${r.a == null ? "<i>blank</i>" : q.ch[r.a]}</div><div>Correct: <b>${q.ch[q.a]}</b></div><p class="ex" style="margin:0">${q.ex}</p><span class="src">Source: ${esc(q.src)}</span>${openDeep.has(q.id) ? deepHTML(q) : ""}${noteHTML(q.id)}<div class="tools">${flagBtn(q.id, q.t, "mc")}${moreBtn(q.id)}</div>`; }
+      else { const p = r.it.p; title = r.it.g.title;
+        body = `<div class="qtext" style="font-size:16px">${p.q}</div><div>Your answer: ${r.a ? esc(r.a) : "<i>blank</i>"} · Correct: <b>${fmtNum(p.ans, p.sig)} ${esc(p.unit)}</b></div><ol class="steps">${p.steps.map(s => `<li>${s}</li>`).join("")}</ol>${openDeep.has(r.it.g.id) ? numDeepHTML(r.it.g) : ""}${noteHTML(r.it.g.id)}<div class="tools">${flagBtn(r.it.g.id, r.it.g.t, "num")}${moreBtn(r.it.g.id)}</div>`; }
+      const rid = r.it.type === "mc" ? r.it.q.id : r.it.g.id;
+      return `<details class="rev" ${!r.ok || openDeep.has(rid) || isFlagged(rid) ? "open" : ""}><summary><span class="tag ${r.ok ? "ok" : "bad"}">${k + 1} · ${r.ok ? "Right" : "Missed"}</span><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(title.slice(0, 140))}</span></summary><div class="body">${body}</div></details>`;
+    }).join("")}`;
+  $("#ex-new").onclick = () => { EX.state = "setup"; RENDER.exam(); };
+  $("#ex-weak").onclick = () => { const miss = [...new Set(res.filter(r => !r.ok).map(r => r.it.type === "mc" ? r.it.q.t : r.it.g.t))]; if (miss.length) { S.sel = miss; save(); renderSide(); } setView("practice", true); };
+  typeset(el);
+};
+function goNext(){ if (EX.i < EX.items.length - 1) { EX.i++; RENDER.exam(); } else trySubmit(); }
+function trySubmit(){ const blank = EX.ans.filter(x => x == null || x === "").length; if (blank && !EX.confirm) { EX.confirm = true; RENDER.exam(); window.scrollTo({ top: 0 }); return; } submitExam(); }
+
+/* ----- Equation sheet ----- */
+const EQS = { q: "" };
+RENDER.equations = function(){
+  const el = $("#v-equations");
+  const needle = EQS.q.trim().toLowerCase();
+  const list = EQ.filter(e => selected(e.t) && (!needle || (e.name + " " + e.use + " " + e.assume + " " + e.watch + " " + e.terms.map(t => t[1]).join(" ")).toLowerCase().includes(needle)));
+  const groups = TOPICS.filter(t => list.some(e => e.t === t.id)).map(t => `<div class="eqgroup"><h3>${esc(t.name)}</h3>${list.filter(e => e.t === t.id).map(e => `
+    <article class="eq" id="eq-${e.id}"><div class="top"><h4>${esc(e.name)}</h4>${e.mr ? '<span class="mrtag">● high-yield</span>' : ""}</div>
+      <div class="disp">\\[${e.tex}\\]</div>
+      <dl>${e.terms.length ? `<dt>Terms</dt><dd class="terms">${e.terms.map(x => `<span>\\(${x[0]}\\) ${esc(x[1])}</span>`).join("")}</dd>` : ""}
+        <dt>Use when</dt><dd>${e.use}</dd>
+        ${e.assume ? `<dt>Assumes</dt><dd>${e.assume}</dd>` : ""}
+        ${e.watch ? `<dt>Watch out</dt><dd>${e.watch}</dd>` : ""}</dl>
+      ${e.lab ? `<a class="lab" href="flow-lab.html#${e.lab}">Open in Flow Lab →</a>` : ""}
+    </article>`).join("")}</div>`).join("");
+  el.innerHTML = `${sheet("Equation sheet", `${list.length} of ${EQ.length} equations`)}
+    <div class="head"><h2>Equation sheet</h2><p>Every working equation from Chapters 1–6: what each term means, when to use it, what it assumes, and the usual mistakes. Use it to build your crib sheet.</p></div>
+    <div class="row"><input class="search" id="eq-search" type="search" placeholder="Search: A/A*, normal shock, Prandtl–Meyer, choked…" value="${esc(EQS.q)}" aria-label="Search equations"><button class="btn ghost" id="eq-tex">Copy as LaTeX</button>${CAN_PRINT ? '<button class="btn ghost" id="eq-print">Print crib sheet</button>' : ""}</div><div id="eq-texout"></div>
+    <div id="eq-list" style="display:flex;flex-direction:column;gap:6px">${S.sel.length ? (groups || '<p class="empty">No equations match that search.</p>') : noTopics}</div>`;
+  $("#eq-tex").onclick = () => copyTex(list);
+  const pb = $("#eq-print"); if (pb) pb.onclick = () => { document.body.classList.add("print-eq"); mjq.then(() => { window.print(); setTimeout(() => document.body.classList.remove("print-eq"), 500); }); };
+  const s = $("#eq-search"); s.oninput = () => { EQS.q = s.value; const pos = s.selectionStart; RENDER.equations(); const s2 = $("#eq-search"); s2.focus(); try { s2.setSelectionRange(pos, pos); } catch (e) {} };
+  typeset($("#eq-list"));
+};
+
+/* Printing only works when the page is opened directly (e.g. GitHub Pages), not inside an embedding frame */
+const CAN_PRINT = (() => { try { return window.self === window.top; } catch (e) { return false; } })();
+/* LaTeX export of the selected equations, for a crib sheet compiled outside the page */
+const UNI = { "θ":"\\theta","δ":"\\delta","ν":"\\nu","µ":"\\mu","μ":"\\mu","γ":"\\gamma","ρ":"\\rho","Δ":"\\Delta","α":"\\alpha","β":"\\beta","τ":"\\tau","η":"\\eta","ε":"\\epsilon","π":"\\pi","⊥":"\\perp","≥":"\\geq","≤":"\\leq","≈":"\\approx","→":"\\to","↔":"\\leftrightarrow","∞":"\\infty","×":"\\times","°":"^\\circ","ₜ":"_t","₁":"_1","₂":"_2","₃":"_3","₄":"_4","₅":"_5","ₑ":"_e","ₛ":"_s","ᵢ":"_i","²":"^2","³":"^3","ṁ":"\\dot m","∀":"\\forall","⊕":"\\oplus","√":"\\surd ","≠":"\\neq","·":"\\cdot","∝":"\\propto","−":"-","∫":"\\int" };
+const SUBS = { "ₜ":"t","₁":"1","₂":"2","₃":"3","₄":"4","₅":"5","ₑ":"e","ₛ":"s","ᵢ":"i" };
+function texText(str){
+  const parts = String(str).replace(/<\/?[a-z][^>]*>/gi, "").split(/(\\\(.*?\\\))/g);
+  return parts.map(seg => {
+    if (/^\\\(/.test(seg)) return "$" + seg.slice(2, -2) + "$";
+    let out = "";
+    seg = seg.replace(/[ₜ₁₂₃₄₅ₑₛᵢ]+/g, m => "\u0001" + [...m].map(c => SUBS[c]).join("") + "\u0002");
+    for (const ch of seg) {
+      if (ch === "\u0001") { out += "$_{"; continue; } if (ch === "\u0002") { out += "}$"; continue; }
+      if (ch === "\u20D7") continue;
+      if (UNI[ch]) out += "$" + UNI[ch] + "$";
+      else if (ch === "–") out += "--"; else if (ch === "—") out += "---";
+      else if ("&%#_{}".includes(ch)) out += "\\" + ch;
+      else if (ch === "~") out += "\\textasciitilde{}"; else if (ch === "^") out += "\\textasciicircum{}"; else if (ch === "\\") out += "\\textbackslash{}";
+      else out += ch;
+    }
+    return out.replace(/\$\$/g, "");
+  }).join("");
+}
+function buildTex(list){
+  const L = ["% ME 461 crib sheet, exported from the ME 461 Study Lab (course reader Ch 1-6)",
+    "\\documentclass[10pt]{article}", "\\usepackage[margin=0.4in,landscape]{geometry}", "\\usepackage{amsmath,amssymb,multicol}",
+    "\\setlength{\\parindent}{0pt}\\setlength{\\columnsep}{14pt}\\pagestyle{empty}", "\\begin{document}\\scriptsize", "\\begin{multicols}{3}"];
+  TOPICS.filter(t => list.some(e => e.t === t.id)).forEach(t => {
+    L.push("", "\\textbf{\\normalsize " + texText(t.name) + "}\\par\\smallskip");
+    list.filter(e => e.t === t.id).forEach(e => {
+      L.push("\\textbf{" + texText(e.name) + "}", "\\[" + e.tex + "\\]");
+      const note = [e.assume && ("Assumes: " + texText(e.assume)), e.watch && ("Watch: " + texText(e.watch))].filter(Boolean).join(" ");
+      if (note) L.push("{\\tiny " + note + "}\\par");
+      L.push("\\smallskip");
+    });
+  });
+  L.push("\\end{multicols}", "\\end{document}");
+  return L.join("\n");
+}
+function copyTex(list){
+  const text = buildTex(list), out = $("#eq-texout");
+  const fallback = () => { out.innerHTML = '<p class="note">Copy this LaTeX:</p><textarea class="copyout" id="eq-textxt" readonly></textarea>'; const ta = $("#eq-textxt"); ta.value = text; ta.focus(); ta.select(); };
+  try { navigator.clipboard.writeText(text).then(() => { out.innerHTML = `<p class="note" style="color:var(--ok-fg)">Copied ${list.length} equations as a LaTeX document (three columns, landscape). Search or deselect topics first to trim it.</p>`; }, fallback); } catch (e) { fallback(); }
+}
+
+/* ---------- flag / explain / jump handlers ---------- */
+$("#main").addEventListener("click", e => {
+  const f = e.target.closest("[data-flag]");
+  if (f) { e.preventDefault(); toggleFlag(f.dataset.flag, f.dataset.t, f.dataset.fkind); const y = window.scrollY; RENDER[view](false); window.scrollTo(0, y); return; }
+  const m = e.target.closest("[data-more]");
+  if (m) { e.preventDefault(); const id = m.dataset.more; if (openDeep.has(id)) openDeep.delete(id); else openDeep.add(id); const y = window.scrollY; RENDER[view](false); window.scrollTo(0, y); return; }
+  const g = e.target.closest("[data-goeq]");
+  if (g) { e.preventDefault(); const id = g.dataset.goeq, eq = EQBY[id]; if (eq && !selected(eq.t)) { S.sel = S.sel.concat(eq.t); save(); renderSide(); } EQS.q = ""; setView("equations", true);
+    const art = document.getElementById("eq-" + id); if (art) { art.scrollIntoView({ block: "start", behavior: "smooth" }); art.classList.add("hl"); setTimeout(() => art.classList.remove("hl"), 2500); } }
+});
+$("#main").addEventListener("input", e => {
+  const t = e.target.closest("[data-note]"); if (!t) return; const id = t.dataset.note; if (S.flags[id]) { S.flags[id].note = t.value; save(); }
+});
+
+/* ---------- keyboard ---------- */
+document.addEventListener("keydown", e => {
+  if (e.target.matches("input, textarea") || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (view === "practice" && P.cur) {
+    const k = e.key.toLowerCase(), idx = "1234".indexOf(k) >= 0 ? "1234".indexOf(k) : "abcd".indexOf(k);
+    if (P.picked == null && idx >= 0 && idx < P.order.length) { e.preventDefault(); answerPractice(P.order[idx]); }
+    else if (P.picked != null && (e.key === "Enter" || e.key === "ArrowRight") && !e.target.matches("button:not(#pnext)")) { e.preventDefault(); nextPractice(); RENDER.practice(false); focusFirstChoice(); }
+  } else if (view === "cards") {
+    if (e.key === " " && (e.target.id === "flash" || e.target === document.body)) { e.preventDefault(); flipCard(); }
+    else if (FC.flipped && e.key === "ArrowRight") gradeCard(true);
+    else if (FC.flipped && e.key === "ArrowLeft") gradeCard(false);
+  }
+});
+
+/* ---------- boot ---------- */
+bindReset(); renderSide();
+const side = $("#side"); side.open = window.matchMedia("(min-width: 861px)").matches;
+window.matchMedia("(min-width: 861px)").addEventListener("change", m => { if (m.matches) side.open = true; });
+const start = (location.hash || "").slice(1);
+setView(VIEWS.includes(start) ? start : "practice", false);
+})();
+</script>
+</body>
+</html>

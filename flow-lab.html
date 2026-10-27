@@ -1,0 +1,651 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ME 461 Flow Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=Barlow:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout: drafting-sheet instrument bench. Title-block header with tool tabs; each tool is a sheet with its controls on top, the drawing in the middle and a readout ledger beside it. Same palette and type as the ME 461 Study Lab. */
+:root{
+  color-scheme:light;
+  --bg:#e9edf1; --panel:#f6f7f9; --ink:#17202c; --ink-2:#465264; --muted:#667183; --rule:#d0d6de; --field:#ffffff;
+  --accent:#1c58b5; --accent-soft:#dfe7f4; --shock:#b4441a; --fan:#1f7a52; --grid:#dfe4ea; --wall:#3a4656;
+  --ok-bg:#dcefe4; --ok-fg:#165c37; --bad-bg:#f8e3cf; --bad-fg:#8a3d06; --info-bg:#dfe7f4; --info-fg:#1d4380; --mr:#a86a0c;
+  --f-display:"Barlow Semi Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0d1219; --panel:#121923; --ink:#e3e8ef; --ink-2:#a9b3c1; --muted:#7f8a9a; --rule:#253041; --field:#0a0f15;
+  --accent:#6ea6ff; --accent-soft:#172a46; --shock:#ff8a5c; --fan:#5fd39a; --grid:#1b2432; --wall:#b9c3d0;
+  --ok-bg:#163526; --ok-fg:#8fe0b2; --bad-bg:#3d2510; --bad-fg:#ffc08a; --info-bg:#172a46; --info-fg:#a9c8ff; --mr:#f3b545; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0d1219; --panel:#121923; --ink:#e3e8ef; --ink-2:#a9b3c1; --muted:#7f8a9a; --rule:#253041; --field:#0a0f15;
+  --accent:#6ea6ff; --accent-soft:#172a46; --shock:#ff8a5c; --fan:#5fd39a; --grid:#1b2432; --wall:#b9c3d0;
+  --ok-bg:#163526; --ok-fg:#8fe0b2; --bad-bg:#3d2510; --bad-fg:#ffc08a; --info-bg:#172a46; --info-fg:#a9c8ff; --mr:#f3b545; color-scheme:dark }
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 var(--f-body);-webkit-font-smoothing:antialiased}
+[hidden]{display:none!important}
+button,input,select{font:inherit;color:inherit}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.bar{display:flex;flex-wrap:wrap;align-items:stretch;gap:0 28px;background:var(--panel);border-bottom:1px solid var(--rule);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.brand{display:flex;align-items:baseline;gap:12px;padding-block:12px}
+.brand h1{margin:0;font:700 21px/1.1 var(--f-display);letter-spacing:.08em;text-transform:uppercase}
+.brand .course{font:500 12px/1 var(--f-mono);color:var(--muted);letter-spacing:.04em}
+.tabs{display:flex;gap:2px;overflow-x:auto;min-width:0;flex:1 1 auto;scrollbar-width:thin}
+.tab{background:none;border:0;border-bottom:2px solid transparent;padding:13px 12px 11px;cursor:pointer;white-space:nowrap;text-decoration:none;
+  font:600 14px/1.2 var(--f-display);letter-spacing:.07em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:7px}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.tab.back{margin-left:auto;color:var(--ink-2)}
+.tab .nt{text-transform:none;letter-spacing:.02em}
+.ledger .tbl{overflow-x:auto}
+.ledger table.sm{font-size:13.5px}
+.ledger table.sm td{padding:5px 5px;white-space:normal}
+
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:16px;padding-block:20px 56px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.sheet{display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px 12px;align-items:center;font:500 11.5px/1.2 var(--f-mono);color:var(--muted);letter-spacing:.05em;text-transform:uppercase;
+  border:1px solid var(--rule);padding:8px 10px;background:var(--panel)}
+.sheet b{color:var(--ink);font-weight:500}
+.gam{display:flex;gap:8px;align-items:center;text-transform:none;letter-spacing:0}
+.gam input{width:70px;font:500 13px/1 var(--f-mono);background:var(--field);border:1px solid var(--rule);border-radius:4px;padding:5px 7px}
+.head h2{margin:0 0 4px;font:700 27px/1.1 var(--f-display);letter-spacing:.01em;text-wrap:balance}
+.head p{margin:0;color:var(--ink-2);max-width:70ch}
+
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:900px){ .grid2{grid-template-columns:minmax(0,1fr)} }
+.card{background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.card.hl{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.card h3{margin:0;font:700 20px/1.15 var(--f-display);letter-spacing:.02em}
+.card .sub{margin:0;color:var(--ink-2);font-size:14.5px}
+.inrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.inrow label{font:600 13.5px/1 var(--f-display);letter-spacing:.04em;color:var(--muted)}
+.inrow select,.inrow input[type=number]{background:var(--field);border:1px solid var(--rule);border-radius:4px;padding:7px 9px;font:500 15px/1 var(--f-mono)}
+.inrow input[type=number]{width:120px;font-variant-numeric:tabular-nums}
+.inrow select{max-width:100%}
+table{border-collapse:collapse;width:100%;font-size:15px}
+td{padding:5px 8px;border-bottom:1px solid var(--rule)}
+td.k{color:var(--ink-2)}
+td.v{font-family:var(--f-mono);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.em td{font-weight:600;color:var(--ink)}
+.msg{font-size:14.5px;padding:8px 10px;border-radius:5px;background:var(--info-bg);color:var(--info-fg)}
+.msg.bad{background:var(--bad-bg);color:var(--bad-fg)}
+.msg.ok{background:var(--ok-bg);color:var(--ok-fg)}
+
+.tool{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start}
+@media (max-width:900px){ .tool{grid-template-columns:minmax(0,1fr)} }
+.stage{background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:14px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.ctrls{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 18px}
+.ctl{display:flex;flex-direction:column;gap:4px;min-width:0}
+.ctl .lab{display:flex;justify-content:space-between;gap:8px;font:600 13.5px/1.2 var(--f-display);letter-spacing:.04em;color:var(--muted)}
+.ctl .lab output{font:500 13px/1.2 var(--f-mono);letter-spacing:0;text-transform:none;color:var(--ink)}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.svgbox{overflow-x:auto}
+svg{display:block;max-width:100%;height:auto}
+.btns{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:transparent;border:1px solid var(--rule);border-radius:999px;padding:5px 12px;cursor:pointer;font-size:14px;color:var(--ink-2)}
+.chip:hover{border-color:var(--accent);color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--ink)}
+.ledger{background:var(--panel);border:1px solid var(--rule);border-radius:6px;padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.ledger h3{margin:0;font:600 12px/1 var(--f-display);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:10px}
+.ledger h3::after{content:"";flex:1;height:1px;background:var(--rule)}
+.pill{display:inline-block;font:600 14.5px/1.2 var(--f-display);letter-spacing:.03em;padding:6px 9px;border-radius:4px;background:var(--accent-soft);color:var(--ink)}
+.pill.bad{background:var(--bad-bg);color:var(--bad-fg)} .pill.ok{background:var(--ok-bg);color:var(--ok-fg)}
+.note{margin:0;font-size:13.5px;color:var(--muted)}
+canvas{display:block;width:100%;height:auto;border-radius:4px;background:var(--field)}
+
+/* svg classes */
+.ax{stroke:var(--ink-2);stroke-width:1;fill:none}
+.gr{stroke:var(--grid);stroke-width:1;fill:none}
+.tk{fill:var(--muted);font:11px var(--f-mono)}
+.tl{fill:var(--ink-2);font:600 12.5px var(--f-display);letter-spacing:.04em}
+.lbl{fill:var(--ink);font:12px var(--f-mono)}
+.lbls{fill:var(--ink-2);font:11px var(--f-mono)}
+.wall{stroke:var(--wall);stroke-width:2.5;fill:none}
+.wallfill{fill:var(--grid);stroke:none}
+.cl{stroke:var(--muted);stroke-width:1;stroke-dasharray:10 4 2 4;fill:none}
+.cur{stroke:var(--accent);stroke-width:2.5;fill:none}
+.ref{stroke:var(--muted);stroke-width:1.2;stroke-dasharray:5 4;fill:none}
+.fam{stroke:var(--muted);stroke-width:1;fill:none;opacity:.7}
+.shock{stroke:var(--shock);stroke-width:2.5;fill:none}
+.fan{stroke:var(--fan);stroke-width:1.4;fill:none}
+.fb{stroke:var(--ink-2);stroke-width:1.6;stroke-dasharray:6 4;fill:none}
+.dot{fill:var(--accent);stroke:var(--panel);stroke-width:2}
+.dot2{fill:var(--shock);stroke:var(--panel);stroke-width:2}
+.flow{stroke:var(--ink-2);stroke-width:1.2;fill:none}
+.arrh{fill:var(--ink-2)}
+.pbline{stroke:var(--mr);stroke-width:2;fill:none;stroke-dasharray:3 3}
+.pbt{fill:var(--mr);font:12px var(--f-mono)}
+.reg{fill:var(--accent-soft);stroke:none;opacity:.55}
+@media (prefers-reduced-motion: reduce){ *{scroll-behavior:auto!important} }
+</style>
+</head>
+<body>
+<header class="bar">
+  <div class="brand"><h1>Flow Lab</h1><span class="course">ME 461 · calculator &amp; visuals</span></div>
+  <nav class="tabs" aria-label="Tools">
+    <button class="tab" data-view="calc" id="tab-calc">Calculator</button>
+    <button class="tab" data-view="nozzle" id="tab-nozzle">C-D nozzle</button>
+    <button class="tab" data-view="tbm" id="tab-tbm"><span class="nt">θ–δ–M</span></button>
+    <button class="tab" data-view="cone" id="tab-cone">Mach cone</button>
+    <button class="tab" data-view="corner" id="tab-corner">Corner flow</button>
+    <button class="tab" data-view="jet" id="tab-jet">Jet cell</button>
+    <a class="tab back" href="index.html">← Study Lab</a>
+  </nav>
+</header>
+
+<div class="wrap">
+  <div class="sheet"><span>ME 461/561 · <b id="sheet-name">Calculator</b></span>
+    <span class="gam"><label for="gam">γ</label><input id="gam" type="number" step="0.01" min="1.05" max="1.8" value="1.4"><span id="gam-note">air</span></span></div>
+
+  <!-- ================= CALCULATOR ================= -->
+  <section id="v-calc" hidden>
+    <div class="head"><h2>Compressible-flow calculator</h2><p>The same quantities as the reader's Appendix A and B tables and the Appendix C charts, at any value instead of interpolated. Pick what you know, enter it, and read off the rest. Angles are in degrees.</p></div>
+    <div class="grid2">
+      <article class="card" id="calc-isen">
+        <h3>Isentropic flow</h3><p class="sub">Local state ↔ its stagnation and sonic reference (Appendix A).</p>
+        <div class="inrow"><label for="is-k">Given</label>
+          <select id="is-k"><option value="M">M</option><option value="TT">T/Tₜ</option><option value="PT">p/pₜ</option><option value="RT">ρ/ρₜ</option><option value="As">A/A* (subsonic)</option><option value="Ap">A/A* (supersonic)</option><option value="nu">ν, Prandtl–Meyer angle (°)</option><option value="mu">µ (°)</option></select>
+          <input id="is-v" type="number" step="any" value="2" aria-label="Isentropic input value"></div>
+        <div id="is-out"></div>
+      </article>
+      <article class="card" id="calc-ns">
+        <h3>Normal shock</h3><p class="sub">Actual state 1 ↔ actual state 2, shock-fixed frame (Appendix B).</p>
+        <div class="inrow"><label for="ns-k">Given</label>
+          <select id="ns-k"><option value="M1">M₁</option><option value="M2">M₂</option><option value="p21">p₂/p₁</option><option value="T21">T₂/T₁</option><option value="r21">ρ₂/ρ₁</option><option value="pt21">pₜ₂/pₜ₁</option><option value="pt2p1">pₜ₂/p₁ (Pitot)</option><option value="dVa1">ΔV/a₁</option></select>
+          <input id="ns-v" type="number" step="any" value="2" aria-label="Normal shock input value"></div>
+        <div id="ns-out"></div>
+      </article>
+      <article class="card" id="calc-obl">
+        <h3>Oblique shock</h3><p class="sub">θ = shock angle, δ = deflection (reader notation). Uses the full M₁.</p>
+        <div class="inrow"><label for="ob-m">M₁</label><input id="ob-m" type="number" step="any" value="3" aria-label="Upstream Mach number">
+          <select id="ob-k" aria-label="Second given"><option value="dw">δ, weak branch</option><option value="ds">δ, strong branch</option><option value="th">θ (shock angle)</option><option value="p21">p₂/p₁</option><option value="mn">M⊥₁</option></select>
+          <input id="ob-v" type="number" step="any" value="20" aria-label="Oblique shock second input"></div>
+        <div id="ob-out"></div>
+      </article>
+      <article class="card" id="calc-pm">
+        <h3>Prandtl–Meyer turn</h3><p class="sub">Simple isentropic turn: + expansion, − smooth compression.</p>
+        <div class="inrow"><label for="pm-m">M₁</label><input id="pm-m" type="number" step="any" value="1.8" aria-label="Upstream Mach number">
+          <label for="pm-d">Turn</label><input id="pm-d" type="number" step="any" value="5" aria-label="Turn angle in degrees"></div>
+        <div id="pm-out"></div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ================= NOZZLE ================= -->
+  <section id="v-nozzle" hidden>
+    <div class="head"><h2>Converging–diverging nozzle</h2><p>Hold the reservoir fixed and move the back pressure. Watch the regime change from venturi to internal shock, over-expanded, design and under-expanded. The dashed curves are the first- and third-critical isentropic solutions.</p></div>
+    <div class="tool">
+      <div class="stage">
+        <div class="ctrls">
+          <div class="ctl"><div class="lab"><label for="nz-a">Aₑ/Aₜ</label><output id="nz-ao"></output></div><input id="nz-a" type="range" min="1.1" max="5" step="0.002" value="2.494"></div>
+          <div class="ctl"><div class="lab"><label for="nz-p">p_b/pₜ</label><output id="nz-po"></output></div><input id="nz-p" type="range" min="0" max="1" step="0.0005" value="0.6"></div>
+        </div>
+        <div class="btns"><button class="chip" data-snap="1">1st critical</button><button class="chip" data-snap="2">2nd critical</button><button class="chip" data-snap="3">3rd critical (design)</button><button class="chip" data-snap="ex">Reader example (0.6)</button></div>
+        <div class="svgbox"><svg id="nz-svg" viewBox="0 0 760 470" role="img" aria-label="Nozzle shape and pressure distribution"></svg></div>
+      </div>
+      <aside class="ledger"><h3>Operating point</h3><div id="nz-pill"></div><table id="nz-tab"></table><p class="note" id="nz-note"></p></aside>
+    </div>
+  </section>
+
+  <!-- ================= THETA-DELTA-M ================= -->
+  <section id="v-tbm" hidden>
+    <div class="head"><h2>θ–δ–M explorer</h2><p>Deflection δ against shock angle θ. Each curve is one upstream Mach number; it rises from the Mach angle, peaks at δmax and returns to zero at a normal shock. A horizontal line at your δ cuts the bold curve at the weak and strong solutions.</p></div>
+    <div class="tool">
+      <div class="stage">
+        <div class="ctrls">
+          <div class="ctl"><div class="lab"><label for="tb-m">M₁</label><output id="tb-mo"></output></div><input id="tb-m" type="range" min="1.05" max="8" step="0.01" value="3"></div>
+          <div class="ctl"><div class="lab"><label for="tb-d">δ</label><output id="tb-do"></output></div><input id="tb-d" type="range" min="0" max="45" step="0.1" value="20"></div>
+        </div>
+        <div class="svgbox"><svg id="tb-svg" viewBox="0 0 760 440" role="img" aria-label="Theta-delta-Mach chart"></svg></div>
+        <div class="svgbox"><svg id="tb-wedge" viewBox="0 0 760 210" role="img" aria-label="Wedge with weak shock"></svg></div>
+      </div>
+      <aside class="ledger"><h3>Solutions</h3><div id="tb-pill"></div><table id="tb-tab"></table><p class="note">Dashed: maximum-deflection locus. Dotted: M₂ = 1 locus. Between them lies the small subsonic part of the weak branch.</p></aside>
+    </div>
+  </section>
+
+  <!-- ================= MACH CONE ================= -->
+  <section id="v-cone" hidden>
+    <div class="head"><h2>Moving source and the Mach cone</h2><p>A point source emits a pulse every tick; each pulse grows at the sound speed from where it was emitted. Above M = 1 the source outruns its own pulses and the envelope forms the Mach cone. Switch to accelerating to see why an instantaneous cone fails (HW 2 #3b).</p></div>
+    <div class="tool">
+      <div class="stage">
+        <div class="ctrls">
+          <div class="ctl"><div class="lab"><label for="mc-m">Source Mach number</label><output id="mc-mo"></output></div><input id="mc-m" type="range" min="0.2" max="3" step="0.01" value="2"></div>
+          <div class="ctl"><span class="lab">Motion</span><div class="btns"><button class="chip" id="mc-const" aria-pressed="true">Constant speed</button><button class="chip" id="mc-acc" aria-pressed="false">Accelerating 0.5 → 2.5</button><button class="chip" id="mc-play">Pause</button></div></div>
+        </div>
+        <canvas id="mc-cv" width="760" height="380" aria-label="Wavefronts from a moving source"></canvas>
+      </div>
+      <aside class="ledger"><h3>Readout</h3><table id="mc-tab"></table><p class="note">Inside the cone: zone of action. Outside: zone of silence for this source. The cone describes infinitesimal disturbances, not a finite shock.</p></aside>
+    </div>
+  </section>
+
+  <!-- ================= CORNER ================= -->
+  <section id="v-corner" hidden>
+    <div class="head"><h2>Supersonic flow at a corner</h2><p>Turn the wall into the flow for a compression corner (oblique shock) or away from it for an expansion fan. For compression you can switch to a smooth turn, where the Mach waves converge and the flow stays isentropic until they coalesce.</p></div>
+    <div class="tool">
+      <div class="stage">
+        <div class="ctrls">
+          <div class="ctl"><div class="lab"><label for="cn-m">M₁</label><output id="cn-mo"></output></div><input id="cn-m" type="range" min="1.1" max="5" step="0.01" value="2.4"></div>
+          <div class="ctl"><div class="lab"><label for="cn-d">Wall turn (− compression, + expansion)</label><output id="cn-do"></output></div><input id="cn-d" type="range" min="-40" max="40" step="0.5" value="-20"></div>
+        </div>
+        <div class="btns"><button class="chip" id="cn-sharp" aria-pressed="true">Sharp corner</button><button class="chip" id="cn-smooth" aria-pressed="false">Smooth compression</button></div>
+        <div class="svgbox"><svg id="cn-svg" viewBox="0 0 760 400" role="img" aria-label="Corner flow"></svg></div>
+      </div>
+      <aside class="ledger"><h3>Downstream state</h3><div id="cn-pill"></div><table id="cn-tab"></table><p class="note" id="cn-note"></p></aside>
+    </div>
+  </section>
+
+  <!-- ================= JET ================= -->
+  <section id="v-jet" hidden>
+    <div class="head"><h2>First cell of a 2D jet</h2><p>The upper half of a symmetric jet leaving a nozzle lip. The free boundary holds p = p_amb; the centerline acts like a wall. Set the exit Mach number and the pressure mismatch to follow the first waves (the HW 4 #1 pattern for an over-expanded jet).</p></div>
+    <div class="tool">
+      <div class="stage">
+        <div class="ctrls">
+          <div class="ctl"><div class="lab"><label for="jt-m">Exit Mach Mₑ</label><output id="jt-mo"></output></div><input id="jt-m" type="range" min="1.3" max="4" step="0.01" value="2.6"></div>
+          <div class="ctl"><div class="lab"><label for="jt-p">pₑ/p_amb</label><output id="jt-po"></output></div><input id="jt-p" type="range" min="-1.2" max="1.2" step="0.001" value="-0.7031"></div>
+        </div>
+        <div class="btns"><button class="chip" data-jet="hw4">HW 4 #1 (M 2.6, 50/101 kPa)</button><button class="chip" data-jet="match">Matched</button><button class="chip" data-jet="under">Under-expanded ×2</button></div>
+        <div class="svgbox"><svg id="jt-svg" viewBox="0 0 760 330" role="img" aria-label="Jet wave pattern"></svg></div>
+      </div>
+      <aside class="ledger"><h3>Regions</h3><div id="jt-pill"></div><div class="tbl"><table id="jt-tab" class="sm"></table></div><p class="note" id="jt-note"></p></aside>
+    </div>
+  </section>
+</div>
+
+<script src="gd.js"></script>
+<script>
+(function(){
+"use strict";
+const G = window.GD, $ = s => document.querySelector(s), D2R = Math.PI/180;
+if (!G) { document.querySelector(".wrap").insertAdjacentHTML("beforeend", '<p class="msg bad">The calculation library did not load. Reload the page to try again.</p>'); return; }
+const fx = (x, d = 4) => (x == null || !isFinite(x)) ? "—" : (Math.abs(x) >= 1e5 || (Math.abs(x) > 0 && Math.abs(x) < 1e-3)) ? x.toExponential(3) : Number(x.toFixed(d)).toString();
+const fd = (x, d = 2) => (x == null || !isFinite(x)) ? "—" : x.toFixed(d) + "°";
+const rows = list => `<table>${list.map(r => `<tr class="${r[2] ? "em" : ""}"><td class="k">${r[0]}</td><td class="v">${r[1]}</td></tr>`).join("")}</table>`;
+const NS = "http://www.w3.org/2000/svg";
+let g = 1.4;
+function gam(){ const v = parseFloat($("#gam").value); g = (isFinite(v) && v > 1.01 && v < 2) ? v : 1.4; $("#gam-note").textContent = Math.abs(g - 1.4) < 1e-9 ? "air" : Math.abs(g - 5/3) < 0.01 ? "monatomic" : "custom"; }
+
+/* ---------------- views ---------------- */
+const VIEWS = ["calc","nozzle","tbm","cone","corner","jet"], NAMES = { calc:"Calculator", nozzle:"C-D nozzle", tbm:"Oblique-shock chart", cone:"Mach cone", corner:"Corner flow", jet:"Jet cell" };
+const SUB = { "calc-isen":"calc", "calc-ns":"calc", "calc-obl":"calc", "calc-pm":"calc" };
+let view = null;
+function setView(v, sub){
+  if (!VIEWS.includes(v)) v = "calc"; view = v;
+  VIEWS.forEach(x => { $("#v-" + x).hidden = x !== v; $("#tab-" + x).setAttribute("aria-selected", x === v); });
+  $("#sheet-name").textContent = NAMES[v];
+  try { history.replaceState(null, "", "#" + (sub || v)); } catch (e) {}
+  render();
+  if (sub) { const el = document.getElementById(sub); if (el) { el.scrollIntoView({ block: "start" }); el.classList.add("hl"); setTimeout(() => el.classList.remove("hl"), 2400); } }
+  if (v === "cone") startCone(); else stopCone();
+}
+document.querySelectorAll(".tab[data-view]").forEach(b => b.onclick = () => setView(b.dataset.view));
+function render(){ ({ calc: renderCalc, nozzle: renderNozzle, tbm: renderTbm, cone: drawCone, corner: renderCorner, jet: renderJet })[view](); }
+$("#gam").addEventListener("input", () => { gam(); render(); });
+
+/* ---------------- calculator ---------------- */
+function renderCalc(){ calcIsen(); calcNs(); calcObl(); calcPm(); }
+function calcIsen(){
+  const k = $("#is-k").value, v = parseFloat($("#is-v").value); let M = NaN, err = "";
+  if (!isFinite(v)) err = "Enter a number.";
+  else if (k === "M") M = v < 0 ? NaN : v;
+  else if (k === "TT") M = v > 0 && v <= 1 ? G.M_from_TT(v, g) : NaN;
+  else if (k === "PT") M = v > 0 && v <= 1 ? G.M_from_PT(v, g) : NaN;
+  else if (k === "RT") M = v > 0 && v <= 1 ? G.M_from_RT(v, g) : NaN;
+  else if (k === "As" || k === "Ap") M = v >= 1 ? G.M_from_A(v, k === "Ap", g) : NaN;
+  else if (k === "nu") M = G.M_from_nu(v, g);
+  else if (k === "mu") M = v > 0 && v <= 90 ? G.M_from_mu(v) : NaN;
+  if (!err && !isFinite(M)) err = { TT:"T/Tₜ must be between 0 and 1.", PT:"p/pₜ must be between 0 and 1.", RT:"ρ/ρₜ must be between 0 and 1.", As:"A/A* must be at least 1.", Ap:"A/A* must be at least 1.", nu:`ν must be between 0 and ${G.nuMax(g).toFixed(2)}° for this γ.`, mu:"µ must be between 0 and 90°.", M:"M must be positive." }[k];
+  if (err) { $("#is-out").innerHTML = `<p class="msg bad">${err}</p>`; return; }
+  const s = G.isen(M, g), other = s.AA > 1 ? G.M_from_A(s.AA, M < 1, g) : NaN;
+  $("#is-out").innerHTML = rows([["M", fx(M,5), 1],["T/Tₜ", fx(s.TT,5)],["p/pₜ", fx(s.PT,5)],["ρ/ρₜ", fx(s.RT,5)],["A/A*", fx(s.AA,5)],["ν (Prandtl–Meyer)", M >= 1 ? fd(s.nu,3) : "— (M < 1)"],["µ (Mach angle)", M >= 1 ? fd(s.mu,3) : "— (M < 1)"],["pₜ/p", fx(1/s.PT,4)],["p/p*", fx(s.PT/G.pStarPt(g),5)],["Other root of A/A*", isFinite(other) ? fx(other,5) : "—"]]);
+}
+function calcNs(){
+  const k = $("#ns-k").value, v = parseFloat($("#ns-v").value); let M = NaN, err = "";
+  if (!isFinite(v)) err = "Enter a number.";
+  else if (k === "M1") M = v >= 1 ? v : NaN;
+  else if (k === "M2") { const lo = Math.sqrt((g-1)/(2*g)); M = v > lo && v <= 1 ? G.M1_from_M2(v, g) : NaN; if (!isFinite(M)) err = `M₂ must be between ${lo.toFixed(4)} and 1.`; }
+  else if (k === "p21") M = v >= 1 ? G.M1_from_p21(v, g) : NaN;
+  else if (k === "T21") M = v >= 1 ? G.M1_from_T21(v, g) : NaN;
+  else if (k === "r21") { const hi = (g+1)/(g-1); M = v >= 1 && v < hi ? G.M1_from_r21(v, g) : NaN; if (!isFinite(M)) err = `ρ₂/ρ₁ must be between 1 and ${hi.toFixed(3)}.`; }
+  else if (k === "pt21") M = v > 0 && v <= 1 ? G.M1_from_pt21(v, g) : NaN;
+  else if (k === "pt2p1") { const lo = 1/G.pStarPt(g); M = v >= lo ? G.M1_from_pt2p1(v, g) : NaN; if (!isFinite(M)) err = `pₜ₂/p₁ must be at least ${lo.toFixed(4)} (the M₁ = 1 value). For subsonic flow use the isentropic pₜ/p.`; }
+  else if (k === "dVa1") M = v >= 0 ? G.M1_from_dVa1(v, g) : NaN;
+  if (!err && !isFinite(M)) err = { M1:"M₁ must be at least 1 for a shock.", p21:"p₂/p₁ must be at least 1.", T21:"T₂/T₁ must be at least 1.", pt21:"pₜ₂/pₜ₁ must be between 0 and 1.", dVa1:"ΔV/a₁ must be positive." }[k] || "Out of range.";
+  if (err) { $("#ns-out").innerHTML = `<p class="msg bad">${err}</p>`; return; }
+  const s = G.ns(M, g);
+  $("#ns-out").innerHTML = rows([["M₁", fx(M,5), 1],["M₂", fx(s.M2,5)],["p₂/p₁", fx(s.p21,5)],["T₂/T₁", fx(s.T21,5)],["ρ₂/ρ₁ = V₁/V₂", fx(s.r21,5)],["pₜ₂/pₜ₁", fx(s.pt21,5)],["pₜ₂/p₁", fx(s.pt2p1,5)],["ΔV/a₁", fx(s.dVa1,5)],["Δs/R", fx(s.dsR,5)]]);
+}
+function calcObl(){
+  const M = parseFloat($("#ob-m").value), k = $("#ob-k").value, v = parseFloat($("#ob-v").value);
+  if (!isFinite(M) || M <= 1) { $("#ob-out").innerHTML = '<p class="msg bad">M₁ must be greater than 1.</p>'; return; }
+  if (!isFinite(v)) { $("#ob-out").innerHTML = '<p class="msg bad">Enter a number.</p>'; return; }
+  const dm = G.deltaMax(M, g), mu = G.mu(M); let th = NaN, err = "";
+  if (k === "dw" || k === "ds") { if (v < 0) err = "δ must be positive."; else if (v > dm.delta) err = `δ = ${v}° exceeds δmax = ${dm.delta.toFixed(2)}° at M₁ = ${M}. No attached straight shock exists: the shock detaches.`; else th = G.thetaFromDelta(M, v, k === "dw", g); }
+  else if (k === "th") { if (v < mu || v > 90) err = `θ must be between µ = ${mu.toFixed(2)}° and 90°.`; else th = v; }
+  else if (k === "p21") { const hi = G.ns(M, g).p21; if (v < 1 || v > hi) err = `p₂/p₁ must be between 1 and ${hi.toFixed(4)} (normal shock).`; else th = G.thetaFromP21(M, v, g); }
+  else if (k === "mn") { if (v < 1 || v > M) err = `M⊥₁ must be between 1 and M₁.`; else th = Math.asin(v / M) / D2R; }
+  if (err) { $("#ob-out").innerHTML = `<p class="msg bad">${err}</p>` + rows([["δmax", fd(dm.delta,3)],["θ at δmax", fd(dm.theta,3)],["µ (θmin)", fd(mu,3)]]); return; }
+  const o = G.oblique(M, th, g), branch = th > dm.theta ? "strong" : "weak";
+  $("#ob-out").innerHTML = rows([["θ (shock angle)", fd(o.theta,3), 1],["δ (deflection)", fd(o.delta,3), 1],["Branch", branch],["M⊥₁", fx(o.Mn1,5)],["M⊥₂", fx(o.Mn2,5)],["M₂", fx(o.M2,5) + (o.M2 < 1 ? " (subsonic)" : "")],["p₂/p₁", fx(o.p21,5)],["T₂/T₁", fx(o.T21,5)],["ρ₂/ρ₁", fx(o.r21,5)],["pₜ₂/pₜ₁", fx(o.pt21,5)],["δmax at this M₁", fd(dm.delta,3)],["µ (θmin)", fd(mu,3)]]);
+}
+function calcPm(){
+  const M = parseFloat($("#pm-m").value), d = parseFloat($("#pm-d").value);
+  if (!isFinite(M) || M < 1) { $("#pm-out").innerHTML = '<p class="msg bad">M₁ must be at least 1 (Prandtl–Meyer flow is supersonic).</p>'; return; }
+  if (!isFinite(d)) { $("#pm-out").innerHTML = '<p class="msg bad">Enter a turn angle in degrees.</p>'; return; }
+  const r = G.pmTurn(M, d, g);
+  if (!isFinite(r.M2)) { $("#pm-out").innerHTML = `<p class="msg bad">${r.nu2 < 0 ? `A ${-d}° smooth compression would take ν below 0 (ν₁ = ${r.nu1.toFixed(3)}°): the flow can't stay supersonic.` : `The turn exceeds the remaining expansion νmax − ν₁ = ${(G.nuMax(g) - r.nu1).toFixed(2)}°.`}</p>`; return; }
+  $("#pm-out").innerHTML = rows([["ν₁ (Prandtl–Meyer)", fd(r.nu1,3)],["ν₂ = ν₁ + turn", fd(r.nu2,3)],["M₂", fx(r.M2,5), 1],["p₂/p₁", fx(r.p21,5), 1],["T₂/T₁", fx(r.T21,5)],["ρ₂/ρ₁", fx(Math.pow(r.T21, 1/(g-1)),5)],["µ₁", fd(r.mu1,3)],["µ₂", fd(r.mu2,3)],["pₜ, Tₜ, s", "unchanged"]]);
+}
+["is-k","is-v","ns-k","ns-v","ob-m","ob-k","ob-v","pm-m","pm-d"].forEach(id => $("#" + id).addEventListener("input", renderCalc));
+
+/* ---------------- svg helpers ---------------- */
+function el(tag, attrs, text){ const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text != null) e.textContent = text; return e; }
+function pathD(pts){ return pts.filter(p => isFinite(p[0]) && isFinite(p[1])).map((p, i) => (i ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1)).join(" "); }
+function defs(svg){ const d = el("defs", {}); const m = el("marker", { id: "arr-" + svg.id, viewBox: "0 0 10 10", refX: "9", refY: "5", markerWidth: "7", markerHeight: "7", orient: "auto-start-reverse" }); m.appendChild(el("path", { d: "M0 0 L10 5 L0 10 z", class: "arrh" })); d.appendChild(m); svg.appendChild(d); }
+function clear(svg){ while (svg.firstChild) svg.removeChild(svg.firstChild); defs(svg); }
+
+/* ---------------- nozzle ---------------- */
+const XT = 0.32, AI = 2.6;
+function areaAt(x, Ae){ if (x <= XT) return 1 + (AI - 1) * (1 + Math.cos(Math.PI * x / XT)) / 2; const s = (x - XT) / (1 - XT); return 1 + (Ae - 1) * (1 - Math.cos(Math.PI * s)) / 2; }
+function xAtArea(A, Ae){ const k = (A - 1) / (Ae - 1); return XT + (1 - XT) * Math.acos(1 - 2 * Math.min(1, Math.max(0, k))) / Math.PI; }
+function nozzleProfile(Ae, pb){
+  const z = G.cdNozzle(Ae, pb, g), N = 220, xs = [], P = [], M = [];
+  let xsh = NaN;
+  if (z.regime === "internal shock" || z.regime === "1st critical") xsh = xAtArea(z.AsAt, Ae);
+  for (let i = 0; i <= N; i++) {
+    const x = i / N, A = areaAt(x, Ae); let m, p;
+    if (!z.choked) { const r = z.AtAstar; m = G.M_from_A(A / r, false, g); p = G.PT(m, g); }
+    else if (x <= XT) { m = G.M_from_A(A, false, g); p = G.PT(m, g); }
+    else if (isFinite(xsh) && x >= xsh) { m = G.M_from_A(A * z.ptRatio, false, g); p = G.PT(m, g) * z.ptRatio; }
+    else { m = G.M_from_A(A, true, g); p = G.PT(m, g); }
+    if (z.regime === "no flow") { m = 0; p = 1; }
+    xs.push(x); P.push(p); M.push(m);
+  }
+  return { z, xs, P, M, xsh };
+}
+function renderNozzle(){
+  const Ae = parseFloat($("#nz-a").value), pb = parseFloat($("#nz-p").value);
+  $("#nz-ao").textContent = Ae.toFixed(3); $("#nz-po").textContent = pb.toFixed(4);
+  const pr = nozzleProfile(Ae, pb), z = pr.z, svg = $("#nz-svg"); clear(svg);
+  const L = 70, Wd = 560, X = x => L + x * Wd;
+  // ---- nozzle drawing (top) ----
+  const cy = 95, rmax = Math.sqrt(Math.max(AI, 5)), sc = 70 / rmax, Rr = x => sc * Math.sqrt(areaAt(x, Ae));
+  const up = [], lo = []; for (let i = 0; i <= 120; i++) { const x = i / 120; up.push([X(x), cy - Rr(x)]); lo.push([X(x), cy + Rr(x)]); }
+  svg.appendChild(el("path", { d: pathD(up) + " L" + X(1) + " " + (cy - 80) + " L" + X(0) + " " + (cy - 80) + " Z", class: "wallfill" }));
+  svg.appendChild(el("path", { d: pathD(lo) + " L" + X(1) + " " + (cy + 80) + " L" + X(0) + " " + (cy + 80) + " Z", class: "wallfill" }));
+  svg.appendChild(el("path", { d: pathD(up), class: "wall" })); svg.appendChild(el("path", { d: pathD(lo), class: "wall" }));
+  svg.appendChild(el("line", { x1: X(0) - 10, y1: cy, x2: X(1) + 110, y2: cy, class: "cl" }));
+  svg.appendChild(el("text", { x: X(XT), y: cy + 88, class: "lbls", "text-anchor": "middle" }, "throat"));
+  svg.appendChild(el("text", { x: X(0), y: 12, class: "tl" }, "Nozzle (axisymmetric sketch)"));
+  if (isFinite(pr.xsh) && z.regime === "internal shock") { const xx = X(pr.xsh), r = Rr(pr.xsh); svg.appendChild(el("line", { x1: xx, y1: cy - r, x2: xx, y2: cy + r, class: "shock" })); svg.appendChild(el("text", { x: xx, y: cy - r - 6, class: "lbl", "text-anchor": "middle", fill: "var(--shock)" }, "normal shock")); }
+  // exit waves
+  const xe = X(1), re = Rr(1);
+  if (z.choked && z.regime !== "internal shock" && z.regime !== "1st critical") {
+    const pe = z.pe, Me = z.Me;
+    if (z.regime === "over-expanded" && pb / pe > 1.0005) { const a = G.thetaFromP21(Me, pb / pe, g) * D2R, len = re / Math.sin(a);
+      svg.appendChild(el("line", { x1: xe, y1: cy - re, x2: xe + len * Math.cos(a), y2: cy, class: "shock" }));
+      svg.appendChild(el("line", { x1: xe, y1: cy + re, x2: xe + len * Math.cos(a), y2: cy, class: "shock" })); }
+    if (z.regime === "under-expanded") { const M2 = G.M_from_PT(pb, g), m1 = G.mu(Me), dl = G.nu(M2, g) - G.nu(Me, g), m2 = G.mu(M2) - dl; for (let k = 0; k <= 4; k++) { const a = (m1 + (m2 - m1) * k / 4) * D2R; svg.appendChild(el("line", { x1: xe, y1: cy - re, x2: xe + 90 * Math.cos(a), y2: cy - re + 90 * Math.sin(a), class: "fan" })); svg.appendChild(el("line", { x1: xe, y1: cy + re, x2: xe + 90 * Math.cos(a), y2: cy + re - 90 * Math.sin(a), class: "fan" })); } }
+  }
+  // ---- pressure plot (bottom) ----
+  const top = 205, H = 230, Y = p => top + (1 - p) * H;
+  for (let p = 0; p <= 1.0001; p += 0.2) { svg.appendChild(el("line", { x1: X(0), y1: Y(p), x2: X(1), y2: Y(p), class: "gr" })); svg.appendChild(el("text", { x: X(0) - 8, y: Y(p) + 4, class: "tk", "text-anchor": "end" }, p.toFixed(1))); }
+  svg.appendChild(el("line", { x1: X(0), y1: Y(0), x2: X(1), y2: Y(0), class: "ax" })); svg.appendChild(el("line", { x1: X(0), y1: Y(0), x2: X(0), y2: Y(1), class: "ax" }));
+  svg.appendChild(el("line", { x1: X(XT), y1: Y(0), x2: X(XT), y2: Y(1), class: "gr" }));
+  svg.appendChild(el("text", { x: X(0), y: top - 10, class: "tl" }, "p / pₜ₁ along the nozzle"));
+  svg.appendChild(el("text", { x: X(0.5), y: Y(0) + 20, class: "tk", "text-anchor": "middle" }, "inlet → throat → exit"));
+  const sub = [], sup = []; for (let i = 0; i <= 120; i++) { const x = i / 120, A = areaAt(x, Ae); sub.push([X(x), Y(G.PT(G.M_from_A(A, false, g), g))]); sup.push([X(x), Y(G.PT(G.M_from_A(A, x > XT, g), g))]); }
+  svg.appendChild(el("path", { d: pathD(sub), class: "ref" })); svg.appendChild(el("path", { d: pathD(sup), class: "ref" }));
+  svg.appendChild(el("text", { x: X(1) + 6, y: Y(z.p1st) + 4, class: "lbls" }, "1st " + z.p1st.toFixed(3)));
+  svg.appendChild(el("text", { x: X(1) + 6, y: Y(z.p3rd) + 4, class: "lbls" }, "3rd " + z.p3rd.toFixed(3)));
+  svg.appendChild(el("line", { x1: X(1) - 4, y1: Y(z.p2nd), x2: X(1) + 4, y2: Y(z.p2nd), class: "ax" }));
+  svg.appendChild(el("text", { x: X(1) + 6, y: Y(z.p2nd) + 4, class: "lbls" }, "2nd " + z.p2nd.toFixed(3)));
+  // current curve, split at the shock
+  const pts = pr.xs.map((x, i) => [X(x), Y(pr.P[i])]);
+  if (isFinite(pr.xsh) && z.regime === "internal shock") { const k = pr.xs.findIndex(x => x >= pr.xsh); const pA = pts.slice(0, k), pB = pts.slice(k); const xs = X(pr.xsh); const pa = G.PT(z.Ms, g), pb2 = pa * G.ns(z.Ms, g).p21; pA.push([xs, Y(pa)]); pB.unshift([xs, Y(pb2)]); svg.appendChild(el("path", { d: pathD(pA), class: "cur" })); svg.appendChild(el("line", { x1: xs, y1: Y(pa), x2: xs, y2: Y(pb2), class: "shock" })); svg.appendChild(el("path", { d: pathD(pB), class: "cur" })); }
+  else svg.appendChild(el("path", { d: pathD(pts), class: "cur" }));
+  svg.appendChild(el("line", { x1: X(1), y1: Y(pb), x2: X(1) + 60, y2: Y(pb), class: "pbline" }));
+  svg.appendChild(el("text", { x: X(1) + 64, y: Y(pb) + 4, class: "pbt" }, "p_b"));
+  // ledger
+  const pill = { "subsonic": ["Venturi, unchoked", ""], "1st critical": ["1st critical", "ok"], "internal shock": ["Normal shock inside", "bad"], "over-expanded": ["Over-expanded", "bad"], "design (3rd critical)": ["Design: matched", "ok"], "under-expanded": ["Under-expanded", ""], "no flow": ["No flow", ""] }[z.regime] || [z.regime, ""];
+  $("#nz-pill").innerHTML = `<span class="pill ${pill[1]}">${pill[0]}</span>`;
+  const r = [["Choked", z.choked ? "yes" : "no"],["Exit Mach Mₑ", fx(z.Me,4), 1],["pₑ/pₜ₁", fx(z.choked ? z.pe : pb,5)],["1st critical p_b/pₜ", fx(z.p1st,5)],["2nd critical p_b/pₜ", fx(z.p2nd,5)],["3rd critical p_b/pₜ", fx(z.p3rd,5)]];
+  if (!z.choked) r.push(["ṁ / ṁ_choked", fx(z.AtAstar,4)], ["Throat Mach", fx(G.M_from_A(1 / z.AtAstar, false, g),4)]);
+  if (z.regime === "internal shock") r.push(["Shock area Aₛ/Aₜ", fx(z.AsAt,4), 1], ["M before / after shock", fx(z.Ms,4) + " / " + fx(z.Ms2,4)], ["pₜₑ/pₜ₁ (loss)", fx(z.ptRatio,5)]);
+  $("#nz-tab").innerHTML = r.map(x => `<tr class="${x[2] ? "em" : ""}"><td class="k">${x[0]}</td><td class="v">${x[1]}</td></tr>`).join("");
+  $("#nz-note").textContent = { "subsonic": "The throat isn't sonic, so the diverging section is a subsonic diffuser and the mass flow still responds to p_b.", "internal shock": "Isentropic to the shock, a normal shock, then subsonic diffusion to p_b. Lower p_b moves the shock toward the exit.", "over-expanded": "Supersonic to the exit with pₑ < p_b. Oblique shocks at the lip raise the jet pressure outside the nozzle.", "design (3rd critical)": "The exit pressure matches the receiver; no waves are needed outside.", "under-expanded": "pₑ > p_b. Expansion fans at the lip finish the expansion outside; nothing inside the nozzle changes.", "1st critical": "The throat has just reached M = 1.", "no flow": "p_b equals the reservoir pressure." }[z.regime] || "";
+}
+["nz-a","nz-p"].forEach(id => $("#" + id).addEventListener("input", renderNozzle));
+document.querySelectorAll("[data-snap]").forEach(b => b.onclick = () => { const Ae = parseFloat($("#nz-a").value), z = G.cdNozzle(Ae, 0.5, g); const v = { "1": z.p1st, "2": z.p2nd, "3": z.p3rd, ex: 0.6 }[b.dataset.snap]; if (b.dataset.snap === "ex") $("#nz-a").value = 2.494; $("#nz-p").value = v; renderNozzle(); });
+
+/* ---------------- theta-delta-M ---------------- */
+function renderTbm(){
+  const M = parseFloat($("#tb-m").value), d = parseFloat($("#tb-d").value);
+  $("#tb-mo").textContent = M.toFixed(2); $("#tb-do").textContent = d.toFixed(1) + "°";
+  const svg = $("#tb-svg"); clear(svg);
+  const L = 56, T = 24, W = 640, H = 360, X = th => L + th / 90 * W, Y = dl => T + (1 - dl / 46) * H;
+  for (let th = 0; th <= 90; th += 10) { svg.appendChild(el("line", { x1: X(th), y1: Y(0), x2: X(th), y2: Y(46), class: "gr" })); svg.appendChild(el("text", { x: X(th), y: Y(0) + 16, class: "tk", "text-anchor": "middle" }, th + "°")); }
+  for (let dl = 0; dl <= 45; dl += 5) { svg.appendChild(el("line", { x1: X(0), y1: Y(dl), x2: X(90), y2: Y(dl), class: "gr" })); svg.appendChild(el("text", { x: X(0) - 6, y: Y(dl) + 4, class: "tk", "text-anchor": "end" }, dl + "°")); }
+  svg.appendChild(el("text", { x: X(45), y: Y(0) + 34, class: "tl", "text-anchor": "middle" }, "Shock angle θ"));
+  svg.appendChild(el("text", { x: 12, y: Y(23), class: "tl", transform: `rotate(-90 12 ${Y(23)})`, "text-anchor": "middle" }, "Deflection δ"));
+  const curve = (m, cls) => { const pts = []; const mu = G.mu(m); for (let i = 0; i <= 200; i++) { const th = mu + (90 - mu) * i / 200; pts.push([X(th), Y(Math.max(0, G.deltaFromTheta(m, th, g)))]); } svg.appendChild(el("path", { d: pathD(pts), class: cls })); return pts; };
+  [1.2, 1.5, 2, 2.5, 3, 4, 5, 10].forEach(m => { if (Math.abs(m - M) < 0.02) return; const p = curve(m, "fam"); const dm = G.deltaMax(m, g); svg.appendChild(el("text", { x: X(dm.theta) + 3, y: Y(dm.delta) - 4, class: "lbls" }, "M " + m)); });
+  const loc = [], son = []; for (let i = 0; i <= 120; i++) { const m = 1.02 * Math.pow(30 / 1.02, i / 120), dm = G.deltaMax(m, g); loc.push([X(dm.theta), Y(dm.delta)]); const ts = G.thetaSonic(m, g); if (isFinite(ts)) son.push([X(ts), Y(G.deltaFromTheta(m, ts, g))]); }
+  svg.appendChild(el("path", { d: pathD(loc), class: "ref" })); svg.appendChild(el("path", { d: pathD(son), class: "ref", "stroke-dasharray": "1.5 3" }));
+  curve(M, "cur");
+  const dm = G.deltaMax(M, g), mu = G.mu(M);
+  svg.appendChild(el("line", { x1: X(0), y1: Y(d), x2: X(90), y2: Y(d), class: "pbline" }));
+  svg.appendChild(el("text", { x: X(90) + 6, y: Y(d) + 4, class: "pbt" }, d.toFixed(1) + "°"));
+  const tw = G.thetaFromDelta(M, d, true, g), ts = G.thetaFromDelta(M, d, false, g);
+  if (isFinite(tw)) svg.appendChild(el("circle", { cx: X(tw), cy: Y(d), r: 6, class: "dot" }));
+  if (isFinite(ts)) svg.appendChild(el("rect", { x: X(ts) - 6, y: Y(d) - 6, width: 12, height: 12, class: "dot2" }));
+  svg.appendChild(el("circle", { cx: X(dm.theta), cy: Y(dm.delta), r: 3.5, class: "dot2" }));
+  const att = isFinite(tw);
+  $("#tb-pill").innerHTML = att ? (d === 0 ? '<span class="pill">Mach wave / normal shock</span>' : '<span class="pill ok">Attached: two solutions</span>') : '<span class="pill bad">Detached: δ > δmax</span>';
+  const ow = att ? G.oblique(M, tw, g) : null, os = att ? G.oblique(M, ts, g) : null;
+  $("#tb-tab").innerHTML = [["µ = θmin", fd(mu,2)],["δmax", fd(dm.delta,2), 1],["θ at δmax", fd(dm.theta,2)],["Weak θ ●", att ? fd(tw,2) : "—", 1],["Weak M₂", ow ? fx(ow.M2,4) : "—"],["Weak p₂/p₁", ow ? fx(ow.p21,4) : "—"],["Weak pₜ₂/pₜ₁", ow ? fx(ow.pt21,4) : "—"],["Strong θ ■", att ? fd(ts,2) : "—", 1],["Strong M₂", os ? fx(os.M2,4) : "—"],["Strong p₂/p₁", os ? fx(os.p21,4) : "—"]].map(x => `<tr class="${x[2] ? "em" : ""}"><td class="k">${x[0]}</td><td class="v">${x[1]}</td></tr>`).join("");
+  // wedge sketch
+  const w = $("#tb-wedge"); clear(w);
+  const x0 = 260, y0 = 170, len = 420;
+  w.appendChild(el("path", { d: `M${x0} ${y0} L${x0 + len} ${y0 - len * Math.tan(Math.min(d, 44) * D2R)} L${x0 + len} ${y0} Z`, class: "wallfill" }));
+  w.appendChild(el("path", { d: `M40 ${y0} L${x0} ${y0} L${x0 + len} ${y0 - len * Math.tan(Math.min(d, 44) * D2R)}`, class: "wall" }));
+  for (let k = 0; k < 3; k++) { const yy = y0 - 30 - k * 40; w.appendChild(el("line", { x1: 50, y1: yy, x2: 150, y2: yy, class: "flow", "marker-end": "url(#arr-tb-wedge)" })); }
+  if (att && d > 0) { const a = tw * D2R, l2 = Math.min(240 / Math.sin(a), 520); w.appendChild(el("line", { x1: x0, y1: y0, x2: x0 + l2 * Math.cos(a), y2: y0 - l2 * Math.sin(a), class: "shock" })); w.appendChild(el("text", { x: x0 + 0.62 * l2 * Math.cos(a) - 8, y: y0 - 0.62 * l2 * Math.sin(a), class: "lbl", "text-anchor": "end" }, "θ = " + tw.toFixed(1) + "°")); }
+  else if (!att) { w.appendChild(el("path", { d: `M${x0 - 60} ${y0 - 150} Q${x0 - 40} ${y0 - 20} ${x0 - 22} ${y0}`, class: "shock" })); w.appendChild(el("text", { x: x0 - 70, y: y0 - 156, class: "lbl", "text-anchor": "middle" }, "detached bow shock")); }
+  w.appendChild(el("text", { x: x0 + 40, y: y0 - 6, class: "lbls" }, "δ = " + d.toFixed(1) + "°"));
+  w.appendChild(el("text", { x: 50, y: 18, class: "tl" }, "Wedge, weak solution"));
+  w.appendChild(el("text", { x: 50, y: y0 + 22, class: "lbls" }, "M₁ = " + M.toFixed(2)));
+}
+["tb-m","tb-d"].forEach(id => $("#" + id).addEventListener("input", renderTbm));
+
+/* ---------------- Mach cone (canvas) ---------------- */
+const MC = { mode: "const", run: true, t: 0, pulses: [], raf: 0, last: 0 };
+const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+if (reduce) MC.run = false;
+function coneState(t){ // returns source x (in units of a·s) and Mach at time t
+  if (MC.mode === "const") { const M = parseFloat($("#mc-m").value); return { x: M * t, M }; }
+  const T = 12, M0 = 0.5, M1 = 2.5, tt = Math.min(t, T), acc = (M1 - M0) / T; const M = M0 + acc * tt; const x = M0 * tt + 0.5 * acc * tt * tt + (t > T ? M1 * (t - T) : 0); return { x, M: t > T ? M1 : M };
+}
+function seedCone(){ MC.pulses = []; const span = MC.mode === "const" ? 9 : 13; MC.t = span; for (let k = 0; k <= span / 0.6; k++) { const te = k * 0.6; MC.pulses.push({ te, x: coneState(te).x }); } }
+function drawCone(){
+  const cv = $("#mc-cv"), ctx = cv.getContext("2d"), css = getComputedStyle(document.documentElement);
+  const dpr = window.devicePixelRatio || 1, Wc = cv.clientWidth || 760, Hc = Math.round(Wc * 0.5);
+  if (cv.width !== Math.round(Wc * dpr)) { cv.width = Math.round(Wc * dpr); cv.height = Math.round(Hc * dpr); }
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, Wc, Hc);
+  ctx.fillStyle = css.getPropertyValue("--field"); ctx.fillRect(0, 0, Wc, Hc);
+  const st = coneState(MC.t), xmax = Math.max(st.x, 1), scale = Math.min((Wc * 0.78) / (xmax + 2), Hc / 2 / (MC.t + 0.5) * 0.98 * 2.2);
+  const ox = Wc * 0.92 - st.x * scale, oy = Hc / 2;
+  ctx.strokeStyle = css.getPropertyValue("--grid"); ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, oy); ctx.lineTo(Wc, oy); ctx.stroke();
+  ctx.strokeStyle = css.getPropertyValue("--accent"); ctx.lineWidth = 1.2;
+  MC.pulses.forEach(p => { if (p.te > MC.t) return; const r = (MC.t - p.te) * scale; ctx.globalAlpha = Math.max(0.25, 1 - (MC.t - p.te) / 16); ctx.beginPath(); ctx.arc(ox + p.x * scale, oy, r, 0, 2 * Math.PI); ctx.stroke(); });
+  ctx.globalAlpha = 1;
+  if (MC.mode === "const" && st.M > 1) { const mu = Math.asin(1 / st.M), Ln = Wc; ctx.strokeStyle = css.getPropertyValue("--shock"); ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(ox + st.x * scale - Ln * Math.cos(mu), oy - Ln * Math.sin(mu)); ctx.lineTo(ox + st.x * scale, oy); ctx.lineTo(ox + st.x * scale - Ln * Math.cos(mu), oy + Ln * Math.sin(mu)); ctx.stroke(); }
+  ctx.fillStyle = css.getPropertyValue("--ink"); ctx.beginPath(); ctx.arc(ox + st.x * scale, oy, 5, 0, 2 * Math.PI); ctx.fill();
+  ctx.font = "12px " + css.getPropertyValue("--f-mono"); ctx.fillStyle = css.getPropertyValue("--ink-2");
+  ctx.fillText("M = " + st.M.toFixed(2), 12, 20);
+  if (MC.mode === "const" && st.M > 1) { ctx.fillText("zone of silence", 12, Hc - 14); ctx.fillText("zone of action", Math.max(12, ox + st.x * scale - 220), oy - 6); }
+  const mu = st.M > 1 ? Math.asin(1 / st.M) / D2R : NaN;
+  $("#mc-mo").textContent = parseFloat($("#mc-m").value).toFixed(2);
+  $("#mc-tab").innerHTML = [["Current M", st.M.toFixed(3), 1],["Mach angle µ", isFinite(mu) ? mu.toFixed(2) + "°" : "— (M ≤ 1)"],["Regime", st.M < 1 ? "subsonic: pulses run ahead" : st.M === 1 ? "sonic: fronts meet at the source" : "supersonic: source outruns pulses"],["Motion", MC.mode === "const" ? "uniform" : "accelerating (envelope curves)"]].map(x => `<tr class="${x[2] ? "em" : ""}"><td class="k">${x[0]}</td><td class="v" style="white-space:normal">${x[1]}</td></tr>`).join("");
+}
+function tickCone(ts){
+  if (!MC.run || view !== "cone") { MC.raf = 0; return; }
+  const dt = MC.last ? Math.min(0.05, (ts - MC.last) / 1000) : 0; MC.last = ts; MC.t += dt * 1.2;
+  const lastTe = MC.pulses.length ? MC.pulses[MC.pulses.length - 1].te : -1;
+  if (MC.t - lastTe >= 0.6) MC.pulses.push({ te: MC.t, x: coneState(MC.t).x });
+  const limit = MC.mode === "const" ? 14 : 20;
+  if (MC.t > limit) { seedCone(); MC.t = 0.01; MC.pulses = [{ te: 0, x: 0 }]; }
+  drawCone(); MC.raf = requestAnimationFrame(tickCone);
+}
+function startCone(){ drawCone(); if (MC.run && !MC.raf) { MC.last = 0; MC.raf = requestAnimationFrame(tickCone); } $("#mc-play").textContent = MC.run ? "Pause" : "Play"; }
+function stopCone(){ if (MC.raf) cancelAnimationFrame(MC.raf); MC.raf = 0; }
+$("#mc-m").addEventListener("input", () => { if (MC.mode !== "const") { MC.mode = "const"; $("#mc-const").setAttribute("aria-pressed", "true"); $("#mc-acc").setAttribute("aria-pressed", "false"); } seedCone(); drawCone(); });
+$("#mc-const").onclick = () => { MC.mode = "const"; $("#mc-const").setAttribute("aria-pressed", "true"); $("#mc-acc").setAttribute("aria-pressed", "false"); seedCone(); drawCone(); };
+$("#mc-acc").onclick = () => { MC.mode = "acc"; $("#mc-acc").setAttribute("aria-pressed", "true"); $("#mc-const").setAttribute("aria-pressed", "false"); seedCone(); drawCone(); };
+$("#mc-play").onclick = () => { MC.run = !MC.run; if (MC.run) startCone(); else { stopCone(); $("#mc-play").textContent = "Play"; } };
+window.addEventListener("resize", () => { if (view === "cone") drawCone(); });
+seedCone();
+
+/* ---------------- corner ---------------- */
+let cnSmooth = false;
+function renderCorner(){
+  const M = parseFloat($("#cn-m").value), d = parseFloat($("#cn-d").value);
+  $("#cn-mo").textContent = M.toFixed(2); $("#cn-do").textContent = (d > 0 ? "+" : "") + d.toFixed(1) + "°";
+  $("#cn-sharp").setAttribute("aria-pressed", String(!cnSmooth)); $("#cn-smooth").setAttribute("aria-pressed", String(cnSmooth));
+  const svg = $("#cn-svg"); clear(svg);
+  const cx = 300, cy = 300, Lw = 420, ang = -d * D2R; // compression (d<0) turns the wall up
+  const wall = [[20, cy], [cx, cy], [cx + Lw * Math.cos(ang), cy - Lw * Math.sin(ang)]];
+  const comp = d < 0, mag = Math.abs(d);
+  let rowsC = [], pill = "", note = "";
+  // smooth wall shape for compression
+  const R0 = 160;
+  if (comp && cnSmooth) {
+    const pts = [[20, cy]]; const xa = cx - R0 * Math.tan(mag * D2R / 2); pts.push([xa, cy]); for (let i = 0; i <= 30; i++) { const a = mag * D2R * i / 30; pts.push([xa + R0 * Math.sin(a), cy - R0 * (1 - Math.cos(a))]); } const e = pts[pts.length - 1]; pts.push([e[0] + 300 * Math.cos(mag * D2R), e[1] - 300 * Math.sin(mag * D2R)]);
+    svg.appendChild(el("path", { d: pathD(pts) + ` L${pts[pts.length - 1][0]} 400 L20 400 Z`, class: "wallfill" })); svg.appendChild(el("path", { d: pathD(pts), class: "wall" }));
+  } else { svg.appendChild(el("path", { d: pathD(wall) + ` L${wall[2][0]} 400 L20 400 Z`, class: "wallfill" })); svg.appendChild(el("path", { d: pathD(wall), class: "wall" })); }
+  for (let k = 0; k < 3; k++) { const yy = cy - 50 - k * 60; svg.appendChild(el("line", { x1: 30, y1: yy, x2: 130, y2: yy, class: "flow", "marker-end": "url(#arr-cn-svg)" })); }
+  svg.appendChild(el("text", { x: 30, y: 24, class: "lbl" }, "M₁ = " + M.toFixed(2)));
+  const mu1 = G.mu(M);
+  if (mag < 0.01) { pill = '<span class="pill">No turn</span>'; rowsC = [["Mach angle µ₁", fd(mu1)]]; }
+  else if (!comp) { // expansion fan
+    const r = G.pmTurn(M, mag, g);
+    if (!isFinite(r.M2)) { pill = '<span class="pill bad">Beyond νmax</span>'; note = `Only ${(G.nuMax(g) - r.nu1).toFixed(1)}° of expansion remains from this Mach number.`; }
+    else { const a1 = mu1, a2 = r.mu2 - mag; for (let k = 0; k <= 6; k++) { const a = (a1 + (a2 - a1) * k / 6) * D2R; svg.appendChild(el("line", { x1: cx, y1: cy, x2: cx + 300 * Math.cos(a), y2: cy - 300 * Math.sin(a), class: "fan" })); }
+      svg.appendChild(el("text", { x: cx + 180, y: 40, class: "lbl" }, "M₂ = " + r.M2.toFixed(3)));
+      pill = '<span class="pill ok">Expansion fan (isentropic)</span>';
+      rowsC = [["Prandtl–Meyer ν₁ → ν₂", fd(r.nu1) + " → " + fd(r.nu2)],["M₂", fx(r.M2,4), 1],["p₂/p₁", fx(r.p21,4), 1],["T₂/T₁", fx(r.T21,4)],["pₜ₂/pₜ₁", "1 (no loss)"],["First wave (to flow)", fd(mu1)],["Last wave (to new flow)", fd(r.mu2)]];
+      note = "Waves spread apart, so the expansion stays smooth. µ falls as M rises."; }
+  } else if (cnSmooth) { // smooth compression
+    const r = G.pmTurn(M, -mag, g);
+    if (!isFinite(r.M2)) { pill = '<span class="pill bad">Can\'t stay supersonic</span>'; note = `ν₁ = ${r.nu1.toFixed(2)}°, so a ${mag}° isentropic compression would need ν < 0.`; }
+    else { const xa = cx - R0 * Math.tan(mag * D2R / 2); for (let i = 0; i <= 8; i++) { const a = mag * D2R * i / 8, px = xa + R0 * Math.sin(a), py = cy - R0 * (1 - Math.cos(a)); const ri = G.pmTurn(M, -mag * i / 8, g); const wa = (ri.mu2 + mag * i / 8) * D2R; svg.appendChild(el("line", { x1: px, y1: py, x2: px + 360 * Math.cos(wa), y2: py - 360 * Math.sin(wa), class: "fan" })); }
+      pill = '<span class="pill ok">Smooth compression (isentropic)</span>';
+      rowsC = [["Prandtl–Meyer ν₁ → ν₂", fd(r.nu1) + " → " + fd(r.nu2)],["M₂", fx(r.M2,4), 1],["p₂/p₁", fx(r.p21,4), 1],["T₂/T₁", fx(r.T21,4)],["pₜ₂/pₜ₁", "1 (before coalescence)"]];
+      const th = G.thetaFromDelta(M, mag, true, g); if (isFinite(th)) { const o = G.oblique(M, th, g); rowsC.push(["Sharp corner instead: M₂", fx(o.M2,4)], ["Sharp corner: p₂/p₁", fx(o.p21,4)], ["Sharp corner: pₜ₂/pₜ₁", fx(o.pt21,4)]); }
+      note = "The waves converge and will coalesce into a shock away from the wall. This state holds in the smooth region near the wall."; }
+  } else { // oblique shock
+    const dm = G.deltaMax(M, g), th = G.thetaFromDelta(M, mag, true, g);
+    if (!isFinite(th)) { svg.appendChild(el("path", { d: `M${cx - 80} 30 Q${cx - 60} ${cy - 60} ${cx - 34} ${cy}`, class: "shock" })); svg.appendChild(el("text", { x: cx - 90, y: 24, class: "lbl", "text-anchor": "middle" }, "detached shock")); pill = '<span class="pill bad">Detached: δ > δmax</span>'; rowsC = [["δmax at M₁", fd(dm.delta)],["Required δ", fd(mag)]]; note = "No straight attached shock can turn the flow this far; a curved shock stands ahead of the corner with subsonic flow behind its normal part."; }
+    else { const o = G.oblique(M, th, g), a = th * D2R, l = 300; svg.appendChild(el("line", { x1: cx, y1: cy, x2: cx + l * Math.cos(a), y2: cy - l * Math.sin(a), class: "shock" })); svg.appendChild(el("text", { x: cx + l * Math.cos(a) * 0.7 - 10, y: cy - l * Math.sin(a) * 0.7, class: "lbl", "text-anchor": "end" }, "θ = " + th.toFixed(1) + "°")); svg.appendChild(el("text", { x: cx + 200, y: 40, class: "lbl" }, "M₂ = " + o.M2.toFixed(3)));
+      pill = o.M2 < 1 ? '<span class="pill bad">Weak shock, subsonic M₂</span>' : '<span class="pill ok">Attached oblique shock</span>';
+      rowsC = [["θ (weak)", fd(th), 1],["M⊥₁", fx(o.Mn1,4)],["M₂", fx(o.M2,4), 1],["p₂/p₁", fx(o.p21,4), 1],["T₂/T₁", fx(o.T21,4)],["pₜ₂/pₜ₁", fx(o.pt21,5)],["δmax", fd(dm.delta)]];
+      const r = G.pmTurn(M, -mag, g); if (isFinite(r.M2)) rowsC.push(["Smooth turn instead: p₂/p₁", fx(r.p21,4)]);
+      note = "Entropy rises across the shock, so pₜ falls. A smooth turn through the same angle would compress with no loss."; }
+  }
+  svg.appendChild(el("text", { x: cx + 6, y: cy + 22, class: "lbls" }, (comp ? "compression " : "expansion ") + mag.toFixed(1) + "°"));
+  $("#cn-pill").innerHTML = pill;
+  $("#cn-tab").innerHTML = rowsC.map(x => `<tr class="${x[2] ? "em" : ""}"><td class="k">${x[0]}</td><td class="v">${x[1]}</td></tr>`).join("");
+  $("#cn-note").textContent = note;
+}
+["cn-m","cn-d"].forEach(id => $("#" + id).addEventListener("input", renderCorner));
+$("#cn-sharp").onclick = () => { cnSmooth = false; renderCorner(); };
+$("#cn-smooth").onclick = () => { cnSmooth = true; renderCorner(); };
+
+/* ---------------- jet ---------------- */
+function renderJet(){
+  const Me = parseFloat($("#jt-m").value), lr = parseFloat($("#jt-p").value), pr = Math.exp(lr); // pe/pamb
+  $("#jt-mo").textContent = Me.toFixed(2); $("#jt-po").textContent = pr.toFixed(3);
+  const svg = $("#jt-svg"); clear(svg);
+  const x0 = 90, h = 200, yc = 290, Y = y => yc - y, X = x => x0 + x;
+  svg.appendChild(el("line", { x1: 20, y1: yc, x2: 740, y2: yc, class: "cl" }));
+  svg.appendChild(el("text", { x: 740, y: yc + 18, class: "lbls", "text-anchor": "end" }, "centerline (acts like a wall)"));
+  svg.appendChild(el("path", { d: `M20 ${Y(h) - 26} L${x0} ${Y(h) - 26} L${x0} ${Y(h)} L20 ${Y(h)} Z`, class: "wallfill" }));
+  svg.appendChild(el("path", { d: `M20 ${Y(h)} L${x0} ${Y(h)}`, class: "wall" }));
+  svg.appendChild(el("text", { x: 22, y: Y(h) - 32, class: "lbls" }, "nozzle lip"));
+  const ptpe = 1 / G.PT(Me, g); // pt/pe
+  let regions = [], pill = "", note = "";
+  const lab = (x, y, t) => svg.appendChild(el("text", { x: X(x), y: Y(y), class: "lbl", "text-anchor": "middle" }, t));
+  if (Math.abs(lr) < 0.004) {
+    svg.appendChild(el("line", { x1: X(0), y1: Y(h), x2: 740, y2: Y(h), class: "fb" }));
+    lab(250, h / 2, "1: M " + Me.toFixed(2) + ", p = p_amb");
+    pill = '<span class="pill ok">Matched: no waves</span>'; regions = [["1 exit", "1.000", Me.toFixed(3), "0°"]];
+    note = "The exit pressure equals ambient, so neither boundary condition is violated.";
+  } else if (pr < 1 && 1 / pr >= G.ns(Me, g).p21) { // ambient above the normal-shock limit
+    svg.appendChild(el("line", { x1: X(0), y1: Y(h), x2: X(0), y2: Y(0), class: "shock" }));
+    pill = '<span class="pill bad">Shock moves into the nozzle</span>'; regions = [["1 exit", pr.toFixed(3), Me.toFixed(3), "0°"]];
+    note = `p_amb/pₑ = ${(1 / pr).toFixed(3)} exceeds the normal-shock ratio ${G.ns(Me, g).p21.toFixed(3)} at Mₑ = ${Me.toFixed(2)}. Even a normal shock at the exit can't reach ambient, so the back pressure is above second critical and the shock stands inside the diverging section.`;
+  } else if (pr < 1) { // over-expanded
+    const thA = G.thetaFromP21(Me, 1 / pr, g), oA = G.oblique(Me, thA, g), dA = oA.delta, M2 = oA.M2;
+    const xA = h / Math.tan(thA * D2R);
+    svg.appendChild(el("line", { x1: X(0), y1: Y(h), x2: X(xA), y2: Y(0), class: "shock" }));
+    const fbEnd = x => h - x * Math.tan(dA * D2R);
+    let ok = M2 > 1, thB = ok ? G.thetaFromDelta(M2, dA, true, g) : NaN; ok = ok && isFinite(thB);
+    regions.push(["1 exit", pr.toFixed(3), Me.toFixed(3), "0°"]);
+    regions.push(["2 lip shock", "1.000", M2.toFixed(3), "−" + dA.toFixed(2) + "° in"]);
+    if (ok) {
+      const oB = G.oblique(M2, thB, g), up = (thB - dA) * D2R; // reflected shock angle above horizontal
+      const xB = (h + xA * Math.tan(up)) / (Math.tan(up) + Math.tan(dA * D2R)), yB = fbEnd(xB);
+      svg.appendChild(el("line", { x1: X(xA), y1: Y(0), x2: X(xB), y2: Y(yB), class: "shock" }));
+      const p3 = oB.p21, M3 = oB.M2, pt3 = (1 / G.PT(M3, g)) * p3; // pt3/pamb
+      const M4 = G.M_from_PT(1 / pt3, g), dl4 = G.nu(M4, g) - G.nu(M3, g);
+      // fan from the boundary point, reflecting down
+      const m3 = G.mu(M3), m4 = G.mu(M4) - dl4; for (let k = 0; k <= 4; k++) { const a = (m3 + (m4 - m3) * k / 4) * D2R; const l = yB / Math.sin(a); svg.appendChild(el("line", { x1: X(xB), y1: Y(yB), x2: X(xB + l * Math.cos(a)), y2: Y(0), class: "fan" })); }
+      svg.appendChild(el("path", { d: `M${X(0)} ${Y(h)} L${X(xB)} ${Y(yB)} L${Math.min(740, X(xB + 260))} ${Y(yB + 260 * Math.tan(dl4 * D2R))}`, class: "fb" }));
+      lab(xA * 0.35, h * 0.45, "1"); lab(xA * 0.75 + 20, h * 0.78, "2"); lab((xA + xB) / 2 + 30, yB * 0.35, "3"); lab(xB + 90, yB * 0.75, "4");
+      regions.push(["3 reflected shock", p3.toFixed(3), M3.toFixed(3), "0°"]);
+      regions.push(["4 boundary fan", "1.000", M4.toFixed(3), "+" + dl4.toFixed(2) + "° out"]);
+      pill = '<span class="pill bad">Over-expanded: starts with shocks</span>';
+      note = `Lip shock θ = ${thA.toFixed(2)}°, reflected shock θ = ${thB.toFixed(2)}° from the region-2 flow. Region 3 sits at ${p3.toFixed(3)} p_amb, above ambient, which is allowed because it doesn't touch the free boundary. The expansion at the boundary brings region 4 back to p_amb.`;
+    } else {
+      svg.appendChild(el("path", { d: `M${X(0)} ${Y(h)} L${X(xA * 0.9)} ${Y(fbEnd(xA * 0.9))}`, class: "fb" }));
+      pill = '<span class="pill bad">Regular reflection impossible</span>';
+      note = M2 <= 1 ? "The lip shock is so strong that region 2 is subsonic: expect a Mach disk instead of a regular reflection." : `The centerline must turn the region-2 flow back ${dA.toFixed(2)}°, but δmax(M₂ = ${M2.toFixed(2)}) = ${G.deltaMax(M2, g).delta.toFixed(2)}°. Expect a Mach reflection (Mach disk).`;
+    }
+  } else { // under-expanded
+    const M2 = G.M_from_PT(1 / (ptpe * pr), g), dl = G.nu(M2, g) - G.nu(Me, g);
+    const m1 = G.mu(Me), m2 = G.mu(M2) - dl;
+    for (let k = 0; k <= 5; k++) { const a = (m1 + (m2 - m1) * k / 5) * D2R; const l = h / Math.sin(a); svg.appendChild(el("line", { x1: X(0), y1: Y(h), x2: X(l * Math.cos(a)), y2: Y(0), class: "fan" })); }
+    const n3 = G.nu(M2, g) + dl, M3 = G.M_from_nu(n3, g);
+    const xc = h / Math.tan(m1 * D2R), xd = h / Math.tan(Math.max(5, m2) * D2R);
+    if (isFinite(M3)) { const p3 = G.PT(M3, g) * ptpe * pr; const mu2 = G.mu(M2), mu3 = G.mu(M3); for (let k = 0; k <= 5; k++) { const a = (mu2 + dl + (mu3 - mu2 - dl) * k / 5) * D2R; svg.appendChild(el("line", { x1: X(xc + (xd - xc) * k / 5), y1: Y(0), x2: X(xc + (xd - xc) * k / 5 + 1.6 * h / Math.tan(a)), y2: Y(1.6 * h), class: "fan" })); }
+      regions.push(["1 exit", pr.toFixed(3), Me.toFixed(3), "0°"], ["2 lip fan", "1.000", M2.toFixed(3), "+" + dl.toFixed(2) + "° out"], ["3 reflected fan", p3.toFixed(3), M3.toFixed(3), "0°"]);
+      note = `The lip fan turns the jet outward ${dl.toFixed(2)}° and drops the pressure to ambient. Reflecting from the centerline, the fan stays an expansion and overshoots to ${p3.toFixed(3)} p_amb. The free boundary then sends back compression waves, which can coalesce into the next cell's shock.`; }
+    else { regions.push(["1 exit", pr.toFixed(3), Me.toFixed(3), "0°"], ["2 lip fan", "1.000", M2.toFixed(3), "+" + dl.toFixed(2) + "° out"]); note = "The reflected fan would exceed the maximum Prandtl–Meyer angle."; }
+    svg.appendChild(el("path", { d: `M${X(0)} ${Y(h)} L${X(500)} ${Y(h + 500 * Math.tan(dl * D2R))}`, class: "fb" }));
+    lab(xc * 0.3, h * 0.4, "1"); lab(xc + 60, h * 0.85, "2"); lab(xd + 120, h * 0.3, "3");
+    pill = '<span class="pill">Under-expanded: starts with fans</span>';
+  }
+  svg.appendChild(el("text", { x: X(4), y: Y(h) - 8, class: "lbls" }, "free boundary: p = p_amb"));
+  $("#jt-pill").innerHTML = pill;
+  $("#jt-tab").innerHTML = `<tr><td class="k"><b>Region</b></td><td class="v">p/p_amb</td><td class="v">M</td><td class="v">Flow</td></tr>` + regions.map(r => `<tr><td class="k">${r[0]}</td><td class="v">${r[1]}</td><td class="v">${r[2]}</td><td class="v">${r[3]}</td></tr>`).join("");
+  $("#jt-note").textContent = note;
+}
+["jt-m","jt-p"].forEach(id => $("#" + id).addEventListener("input", renderJet));
+document.querySelectorAll("[data-jet]").forEach(b => b.onclick = () => { const k = b.dataset.jet; if (k === "hw4") { $("#jt-m").value = 2.6; $("#jt-p").value = Math.log(50 / 101); } else if (k === "match") $("#jt-p").value = 0; else $("#jt-p").value = Math.log(2); renderJet(); });
+
+/* ---------------- boot ---------------- */
+gam();
+const h0 = (location.hash || "").slice(1);
+if (SUB[h0]) setView(SUB[h0], h0); else setView(VIEWS.includes(h0) ? h0 : "calc");
+})();
+</script>
+</body></html>
