@@ -1,5 +1,5 @@
 /* ME 461/561 Gas Dynamics study bank. Built from J. A. Rodríguez, "A First Course in Compressible Flow" (course reader v0.2),
-   Chapters 1–6, and HW 1, 2 and 4 with solutions. Notation follows the reader: subscript t = stagnation, θ = shock angle,
+   Chapters 1–6, HW 1, 2 and 4 with solutions, and the HW 3 assignment. Notation follows the reader: subscript t = stagnation, θ = shock angle,
    δ = flow deflection, ν = Prandtl–Meyer angle, µ = Mach angle. Math uses \( \) inline and \[ \] display (typeset by MathJax). */
 (function () {
 "use strict";
@@ -14,6 +14,7 @@ const TOPICS = [
   { id: "area", name: "Area change & isentropic flow", short: "Area–Mach" },
   { id: "noz", name: "Nozzles, choking & performance", short: "Nozzles" },
   { id: "ns", name: "Normal shocks & shocks in nozzles", short: "Normal shocks" },
+  { id: "tun", name: "Supersonic wind tunnels & starting", short: "Wind tunnels" },
   { id: "mov", name: "Moving & reflected shocks", short: "Moving shocks" },
   { id: "obl", name: "Oblique shocks, Pitot & inlets", short: "Oblique shocks" },
   { id: "pm", name: "Prandtl–Meyer expansion", short: "Prandtl–Meyer" },
@@ -659,6 +660,52 @@ dd("ext-147",R`The nearly normal part of the bow shock ahead of a blunt nose pro
 dd("ext-148",R`For a double wedge of half-angle ε at incidence α, the upper front panel turns the flow by \(\varepsilon - \alpha\). That's a compression while α < ε and an expansion once α > ε. The lower front panel always compresses, by \(\varepsilon + \alpha\). Always work from the change in local flow direction at each corner.`,["plate","pmturn","tbm"]);
 dd("ext-150",R`Regular reflection needs the reflected shock to turn the flow back through the incident deflection, and that requires \(\delta \le \delta_{max}(M_2)\) behind the incident shock, exactly the HW 4 #3 condition. A large pressure mismatch at the lip makes the incident shock strong, lowers M₂, and the condition can fail, giving a Mach disk.`,["tbm","jetbc"]);
 
+/* ===== HW 3: CD nozzles with shocks, and supersonic wind-tunnel starting ===== */
+mc("noz","equation",1,R`A CD nozzle must deliver a given design exit pressure \(p_e\) from a reservoir at \(p_t\). How do you size the exit area?`,
+ [R`Get \(M_e\) from \(p_e/p_t\) on the isentrope, then \(A_e = A_t\,(A/A^*)_{M_e}\), since the choked throat is \(A^*\)`,R`\(A_e = A_t\,p_t/p_e\)`,R`\(A_e = A_t\,(p_t/p_e)^{1/\gamma}\)`,R`Get \(M_e\) from \(p_e/p_t\), then \(A_e = A_t/M_e\)`],
+ R`At design, the whole nozzle is isentropic and the throat is sonic, so \(A_t = A^*\). The pressure ratio fixes \(M_e\) (supersonic root), and the area–Mach relation turns that into \(A_e/A_t\).`,"HW3 #1a; Reader §4.9.1",
+ R`This is the reader's design-back-pressure example run in reverse: there, \(A_e/A_t\) was given and \(p_e\) found; here \(p_e\) is given and the area found. Once \(A_e\) is fixed, the other two critical pressures follow from the same area ratio: the subsonic root gives first critical, and a normal shock at \(M_e\) gives second critical.`,["aastar","ptp"]);
+mc("noz","concept",1,R`As \(p_b\) rises toward first critical, an internal normal shock moves upstream toward the throat. In the limit, does a finite-strength shock remain at the throat?`,
+ ["No: the Mach number just ahead of the shock falls to 1, so the shock's strength goes to zero and the flow becomes the isentropic first-critical solution","Yes: a normal shock with the full exit-pressure jump sits at the throat","Yes, but it turns into an oblique shock","No: the shock leaves the nozzle through the exit"],
+ R`The shock can only stand where the flow is supersonic. Moving toward the throat, the upstream Mach number drops to 1, and a Mach-1 normal shock produces no jump. The limiting flow is subsonic–sonic–subsonic and isentropic.`,"HW3 #1c; Reader §5.4.1",
+ R`This is also why the nozzle can be choked with \(p_b\) far above \(p^*\). In the first-critical flow, the throat is sonic at \(p^*\), and the subsonic diverging section recovers pressure all the way to the exit. A choked throat only requires M = 1 there, not \(p_b \le p^*\). The reader states the endpoints: shock strength goes to zero at the throat at first critical, and the shock sits at the exit at second critical.`,["aastar","nsp"]);
+mc("ns","equation",1,R`In a choked CD nozzle you know \(p_{t1}\) and the static pressure \(p_x\) just ahead of a normal shock. How do you find where the shock stands?`,
+ [R`\(M_x\) from \(p_x/p_{t1}\) (isentropic, supersonic), then \(A_x = A_t\,(A/A^*)_{M_x}\), with \(A^* = A_t\) upstream of the shock`,R`\(A_x = A_t\,p_{t1}/p_x\)`,R`Use the normal-shock table with \(p_y/p_x\) to get \(A_x\) directly`,R`\(A_x\) from the exit Mach number and \(A/A^*\)`],
+ R`Upstream of the shock, the flow is isentropic from the reservoir, so \(p_t = p_{t1}\) and \(A^*\) is the throat. The local pressure ratio gives \(M_x\), and the area–Mach relation gives the area.`,"HW3 #2a",
+ R`Then cross the shock with the tables (\(M_y\), \(p_{ty}/p_{tx}\)) and move to the downstream reference: \(A_y^* = A_t\,p_{t1}/p_{ty}\). The exit area and exit pressure come from the exit Mach number with \(A^*_y\) and \(p_{ty}\). If \(\dot m\) is given instead of \(A_t\), the choked-flow relation gives the throat area first.`,["ptp","aastar","ptastar","mdotmax"]);
+mc("ns","concept",1,R`A normal shock stands in the diverging section and the exit is subsonic. A colleague finds the exit Mach number from the subsonic root of the <b>geometric</b> \(A_e/A_t\). What goes wrong?`,
+ [R`Downstream of the shock \(A^* = A_t\,p_{t1}/p_{t2}\), larger than \(A_t\), so \(A_e/A_t\) overstates \(A/A^*\) and gives too low an \(M_e\)`,"Nothing; A* is always the geometric throat area","They should use the supersonic root, since the throat is choked",R`\(\gamma\) changes across the shock, so the area–Mach relation no longer applies`],
+ R`The area–Mach relation needs the local \(A^*\), and the shock raised it by \(p_{t1}/p_{t2}\). Using \(A_t\) assumes a lossless flow that doesn't exist here.`,"HW3 #2c; Reader §5.4.2",
+ R`The size of the error matches the shock's stagnation-pressure loss. With HW 3 #2's numbers, the true exit Mach is 0.50, but the geometric ratio gives about 0.457. The two only agree when the shock vanishes. This is the same \(p_tA^*\) invariant the reader uses to locate a shock from the exit conditions.`,["ptastar","aastar"]);
+mc("ns","equation",0,R`Air at \(p_t\), \(T_t\) flows through a choked nozzle at a known mass flow rate. The throat area is:`,
+ [R`\(A_t = \dfrac{\dot m\sqrt{T_t}}{p_t\sqrt{\gamma/R}\,\left(\frac{2}{\gamma+1}\right)^{\frac{\gamma+1}{2(\gamma-1)}}}\)`,R`\(A_t = \dot m/(\rho_tV)\)`,R`\(A_t = \dot m\sqrt{T_t}/p_t\)`,R`\(A_t = \dot m RT_t/p_t\)`],
+ R`Invert the choked-mass-flow relation. The throat is the sonic section, so it carries the maximum mass flux for the given stagnation state.`,"HW3 #2a; Reader §4.8.2",
+ R`The density and speed that set the flux are the sonic values \(\rho^*\) and \(a^*\), not stagnation values. The relation packages them: \(\dot m = A^*\rho^*a^*\). Use SI throughout: Pa, K and J/(kg K) give \(A_t\) in m².`,["mdotmax"]);
+mc("tun","concept",1,R`Why does a supersonic wind tunnel with a diffuser need a second throat <b>larger</b> than the first in order to start?`,
+ [R`During starting, a normal shock must pass through the test section; behind it \(p_t\) is lower, so the second throat must pass the same mass flow at lower \(p_t\): \(A_2 \ge A_1\,p_{t1}/p_{t2}\)`,"To slow the supersonic flow isentropically after the test section","So that the receiver pressure can be higher than the reservoir pressure","Because the second throat must equal the test-section area"],
+ R`Both throats pass the same \(\dot m \propto p_tA^*\). With the starting shock at the test-section Mach number \(M_T\), the second throat needs \(A_2/A_1 \ge (p_{t1}/p_{t2})_{NS}\) at \(M_T\). Otherwise it chokes first and holds the shock upstream.`,"HW3 #3b",
+ R`For a Mach 2 test section, the normal-shock \(p_{t2}/p_{t1}\) is 0.7209, so the second throat must be at least 1.387 times the first. If it's smaller, the tunnel stays "unstarted": the shock can't move into the test section no matter how low the receiver pressure goes.`,["start","nspt","ptastar"]);
+mc("tun","equation",1,R`A tunnel has a 10.0 cm² first throat and a Mach 2 test section (\(\gamma = 1.4\)). Using the normal-shock loss at the test-section Mach number, what is the smallest second-throat area that lets it start?`,
+ ["13.9 cm²","10.0 cm²","16.9 cm²","7.2 cm²"],
+ R`\(A_{2,min} = A_1/(p_{t2}/p_{t1})_{M=2} = 10.0/0.7209 = 13.87\) cm². 16.9 cm² is the test section itself, and 7.2 cm² comes from multiplying by the ratio instead of dividing.`,"HW3 #3b–c",
+ R`The worst case is the shock standing in the test section, where the Mach number (and so the loss) is largest. Once the shock has been swallowed, the flow through the second throat is supersonic and isentropic again, so the second throat can be closed back toward \(A_1\) without unstarting the tunnel.`,["start","nspt"]);
+mc("tun","concept",1,R`A tunnel's second throat is too small to start it. As \(p_b\) is lowered slowly from \(p_{t0}\), what limiting flow is reached?`,
+ [R`Both throats sonic, with a normal shock in the first diverging section where \(p_{t1}/p_{t2} = A_2/A_1\), and a subsonic test section`,"A supersonic test section with a subsonic second throat","Only the second throat is sonic; the first throat stays subsonic","The shock passes through the test section and out of the tunnel"],
+ R`Once the second throat chokes, it fixes \(p_{t2}A_2 = p_{t1}A_1\). That fixes the shock's loss, and so its position. Lowering \(p_b\) further only changes the flow downstream of the second throat.`,"HW3 #3b",
+ R`For HW 3's tunnel (\(A_1 = 10\), \(A_T = 16.875\), \(A_2 = 12\) cm²): \(p_{t2}/p_{t1} = 10/12\), so the shock has \(M_x \approx 1.75\) and stands where \(A \approx 13.9\) cm², before the test section. Behind it the test section runs subsonic (about M 0.47), and the flow reaccelerates to M = 1 at the second throat. This assumes \(A_2 > A_1\); if \(A_2 < A_1\), only the second throat can choke.`,["start","ptastar","nspt"]);
+mc("tun","concept",1,R`Assess the claim: "Once the first throat chokes, changes downstream cannot affect the flow anywhere inside the tunnel."`,
+ ["False: choking fixes ṁ and the flow upstream of the first throat, but downstream changes (second-throat area, back pressure) can still move a shock in the diverging section or start and unstart the tunnel","True: a sonic throat blocks all downstream information","True, but only when the test section is subsonic","False, because the first throat unchokes whenever the second throat moves"],
+ R`A sonic first throat isolates the flow upstream of it. Downstream, subsonic regions (behind a shock) can still communicate upstream as far as the throat, so the shock position responds to \(A_2\) and \(p_b\).`,"HW3 #3c",
+ R`Opening the second throat is exactly how you start the tunnel: it lowers the downstream \(p_t\) the second throat can accept, which pulls the shock downstream through the test section. Closing it too far (below the starting value before the shock is swallowed, or below \(A_1\) after) changes the internal flow too. The claim confuses "mass flow is fixed" with "nothing inside can change".`,["start","ptastar"]);
+mc("tun","concept",0,R`Why can't a normal shock sit stably in the <b>converging</b> part of a second throat with supersonic flow ahead of it?`,
+ ["If it moves downstream, the upstream Mach number drops, the shock weakens and loses less pₜ, so the second throat can pass more flow and the shock is pulled further downstream; it runs through the throat","Normal shocks can't form in converging ducts","Because the flow there is already subsonic","Because the second throat is always sonic"],
+ R`In a converging supersonic passage, M falls in the flow direction. The equilibrium is unstable: a small displacement changes the loss in the direction that pushes the shock further. In a diverging passage the effect reverses and the shock is stable.`,"HW3 #3; Reader §5.4",
+ R`Follow a small downstream nudge: lower \(M_x\), smaller loss, higher \(p_{t2}\), so the downstream throat can pass more than the supply delivers. Downstream pressure falls and the shock keeps moving. That's why a starting shock, once it enters the second converging section, is swallowed through the second throat.`,["start","nspt"]);
+mc("tun","concept",0,R`After a tunnel has started, why close the second throat back down toward the first-throat area?`,
+ ["It lowers the Mach number at the terminal shock in the diffuser, cutting the stagnation-pressure loss and the pressure ratio needed to run","It raises the test-section Mach number","It's required to keep the first throat choked","It moves the shock upstream into the test section"],
+ R`Once started, the flow is supersonic through the second throat with \(A^* = A_1\). A smaller \(A_2\) means a lower Mach number there and a weaker terminal shock, so less \(p_t\) is lost. It can't go below \(A_1\) (or the actual \(A^*\)) without unstarting.`,"HW3 #3c",
+ R`This is the hysteresis HW 3 #3 is built around. The second throat must open to at least \(A_1(p_{t1}/p_{t2})_{M_T}\) to swallow the starting shock, but can then close again (HW 3 ends at 12.0 cm² with a 10.0 cm² first throat) while the tunnel stays started. Ideally the diffuser shock would sit right at a sonic second throat with zero strength; real tunnels stop short of that for margin.`,["start","aastar"]);
+
 /* ---------------- Flashcards (concepts and what each relation does; no number recall) ---------------- */
 const CARDS = [];
 function card(t, mr, front, back) { CARDS.push({ id: "c-" + t + "-" + CARDS.length, t, mr: !!mr, front, back }); }
@@ -728,6 +775,14 @@ card("ext",1,"Wave reflections","Free boundary: compression ↔ expansion. Wall/
 card("ext",1,"Flat plate forces",R`\(L' = (p_3 - p_2)c\cos\alpha\), \(D' = (p_3 - p_2)c\sin\alpha\), \(L/D = \cot\alpha\). Wave drag exists without viscosity.`);
 card("ext",0,"Slip line","Pressure and direction match across it; speed and entropy need not.");
 card("ext",0,"Aerospike","Atmosphere provides the outer free boundary, so the effective expansion adapts with altitude (altitude compensation).");
+card("noz",1,"Shock approaching the throat",R`As \(p_b\) rises toward first critical, the shock's upstream Mach number falls to 1 and its strength to zero. The limit is the isentropic subsonic-branch flow, still choked.`);
+card("ns",1,"Shock location from the pressure ahead of it",R`\(M_x\) from \(p_x/p_{t1}\) on the supersonic branch, then \(A_x = A_t(A/A^*)_{M_x}\), since \(A^* = A_t\) upstream of the shock.`);
+card("ns",1,"A* after a shock",R`Downstream of a shock, use \(A_2^* = A_t\,p_{t1}/p_{t2}\), not \(A_t\). Using the geometric \(A_e/A_t\) gives too low an exit Mach number.`);
+card("tun",1,"Starting criterion",R`\(A_2/A_1 \ge (p_{t1}/p_{t2})_{NS}\) at the test-section Mach number: the second throat must pass the same \(\dot m\) behind the starting shock.`);
+card("tun",1,"Unstarted tunnel","Both throats sonic, a normal shock fixed in the first diverging section where pₜ₁/pₜ₂ = A₂/A₁, and a subsonic test section. Lowering p_b doesn't fix it.");
+card("tun",1,"Choked ≠ isolated","A choked first throat fixes ṁ and the flow upstream of it. Downstream changes (A₂, p_b) can still move shocks and start or unstart the tunnel.");
+card("tun",0,"Shock in a converging supersonic passage","Unstable: a downstream nudge weakens the shock, raises pₜ₂ and pulls it further, so it's swallowed through the throat. Shocks are stable only in diverging sections.");
+card("tun",0,"Starting hysteresis","Open the second throat past the starting value to swallow the shock, then close it back toward A₁ to cut diffuser losses. It must stay ≥ A* = A₁ to remain started.");
 
 /* ---------------- Equation sheet ----------------
    eq(id, topic, highYield, name, tex, terms[[sym, meaning]], use, assume, watch, labHash) */
@@ -862,6 +917,9 @@ eq("nspt","ns",1,"Stagnation-pressure ratio and entropy",R`\frac{p_{t2}}{p_{t1}}
  [],"Loss across a shock; inverting for M₁ in shock-in-nozzle problems.","Shock-fixed frame.","Static pressure rises while pₜ falls.","calc-ns");
 eq("approd","ns",1,"Locating a shock from the exit",R`\frac{A_ep_e}{A_t\,p_{t1}} = \frac{A_ep_e}{A_e^*p_{te}} = \frac{1}{M_e}\left(\frac{2}{\gamma+1}\right)^{\frac{\gamma+1}{2(\gamma-1)}}\left(1 + \frac{\gamma-1}{2}M_e^2\right)^{-1/2}`,
  [],"Normal shock inside a CD nozzle when pₑ = p_b is known (subsonic exit).","Choked throat, isentropic before and after the shock.","Then pₜₑ/pₜ₁ = pₑ/(pₜ₁ · pₑ/pₜₑ) gives the shock's pₜ ratio, hence its M₁.","nozzle");
+eq("start","tun",1,"Second-throat starting criterion (HW 3 #3)",R`\frac{A_2}{A_1} \ge \frac{A_2^*}{A_1^*} = \left(\frac{p_{t1}}{p_{t2}}\right)_{NS}\!(M_T),\qquad M_T:\ \frac{A_T}{A_1} = \left(\frac{A}{A^*}\right)_{\text{sup}}`,
+ [[R`A_1`,"first throat"],[R`A_T`,"test section"],[R`A_2`,"second throat"],[R`M_T`,"test-section Mach number"]],
+ "Smallest second throat that lets the starting normal shock pass through the test section.","Quasi-1D, isentropic except across one normal shock; the shock's worst position is the test section.",R`If \(A_2\) is smaller, the second throat chokes first and holds the shock where \(p_{t1}/p_{t2} = A_2/A_1\). After starting, \(A_2\) can be reduced toward \(A_1\).`,"tunnel");
 /* Ch 5 moving shocks */
 eq("galilean","mov",1,"Shock-frame transformation",R`V_1' = V_1 - V_s,\quad V_2' = V_2 - V_s,\quad M_1' = \frac{|V_1 - V_s|}{a_1}`,
  [[R`V_s`,"signed shock velocity (lab frame)"]],"Moving shocks: convert to the steady problem, solve, convert back.","Constant-speed planar shock between uniform states.","p, T, ρ and s are the same in both frames; V, M and stagnation properties are not.");
@@ -1066,6 +1124,22 @@ num("n-plate","ext",1,"Flat-plate lift per unit span",["plate","pmturn","tbm"],"
   const up = G.pmTurn(M,a), th = G.thetaFromDelta(M,a), lo = G.oblique(M,th), p2 = p1*up.p21, p3 = p1*lo.p21, L = (p3-p2)*1000*c*Math.cos(a*Math.PI/180);
   return { q:R`A flat plate of chord ${f(c,1)} m is at \(\alpha = ${a}°\) in air at \(M_1 = ${f(M,1)}\) and ${p1} kPa. Find the lift per unit span (shock–expansion theory).`, ans:L, unit:"N/m",
     steps:[R`Upper: \(\nu = ${f(up.nu1,3)}° + ${a}°\), \(M_2 = ${f(up.M2,4)}\), \(p_2 = ${f(p2,3)}\) kPa`,R`Lower: weak shock \(\theta = ${f(th,2)}°\), \(M_\perp = ${f(lo.Mn1,4)}\), \(p_3 = ${f(p3,3)}\) kPa`,R`\(L' = (p_3 - p_2)c\cos\alpha = (${f(p3-p2,3)}\times10^3)(${f(c,1)})\cos${a}° = ${f(L,0)}\) N/m`] };
+});
+
+num("n-throatA","noz",1,"Throat area from mass flow",["mdotmax"],"HW3 #2a; Reader §4.8.2",()=>{
+  const pt = rnd(3,20,0.5), Tt = rnd(280,600,10), m = rnd(1,10,0.5), A = m/G.mdotMax(pt*1e5, Tt, 1)*1e4;
+  return { q:R`A choked nozzle passes ${f(m,1)} kg/s of air (\(\gamma = 1.4\), \(R = 287\)) from a reservoir at ${f(pt,1)} bar and ${Tt} K. Find the throat area.`, ans:A, unit:"cm²",
+    steps:[R`\(A_t = \dot m\sqrt{T_t}/(0.040418\,p_t) = ${f(m,1)}\sqrt{${Tt}}/(0.040418\times${f(pt*1e5,0)})\)`,R`\(A_t = ${f(A,3)}\ \mathrm{cm^2}\)`] };
+});
+num("n-shockA","ns",1,"Shock location from the pressure ahead of it",["ptp","aastar"],"HW3 #2a",()=>{
+  const pt = rnd(5,20,0.5), M = rnd(1.3,2.6,0.05), px = Math.round(pt*G.PT(M)*100)/100, Mx = G.M_from_PT(px/pt), At = rnd(5,40,1), Ax = At*G.AA(Mx);
+  return { q:R`A choked CD nozzle with a ${At} cm² throat is fed by air at \(p_t = ${f(pt,1)}\) bar. The static pressure just ahead of a normal shock in the diverging section is ${f(px,2)} bar. Find the area where the shock stands.`, ans:Ax, unit:"cm²",
+    steps:[R`Isentropic up to the shock: \(p_x/p_t = ${f(px/pt,5)}\), supersonic branch, \(M_x = ${f(Mx,4)}\)`,R`\(A^* = A_t\) upstream of the shock, so \(A_x = ${At}\times(A/A^*)_{M_x} = ${At}\times${f(G.AA(Mx),4)} = ${f(Ax,3)}\ \mathrm{cm^2}\)`] };
+});
+num("n-start","tun",1,"Second-throat area needed to start a tunnel",["start","aastar","nspt"],"HW3 #3",()=>{
+  const A1 = rnd(5,30,0.5), MT = rnd(1.5,3.5,0.1), AT = A1*G.AA(MT), A2 = A1/G.ns(MT).pt21;
+  return { q:R`A supersonic wind tunnel has a ${f(A1,1)} cm² first throat and a ${f(AT,2)} cm² test section. Find the smallest second-throat area that lets it start (\(\gamma = 1.4\)).`, ans:A2, unit:"cm²",
+    steps:[R`Test section: \(A_T/A_1 = ${f(AT/A1,4)}\), supersonic root \(M_T = ${f(MT,3)}\)`,R`Normal shock at \(M_T\): \(p_{t2}/p_{t1} = ${f(G.ns(MT).pt21,5)}\)`,R`\(A_2 \ge A_1\,p_{t1}/p_{t2} = ${f(A2,3)}\ \mathrm{cm^2}\)`] };
 });
 
 window.AAE = { TOPICS, MC, CARDS, EQ, NUM };

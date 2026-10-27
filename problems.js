@@ -322,5 +322,57 @@ hw("hw-inlet","obl",0,"Two-ramp inlet vs. a single normal shock","Reader §5.10"
     ] };
 });
 
+/* ---------- HW 3 #1: sizing a CD nozzle and its critical back pressures ---------- */
+hw("hw3-design","noz",1,"Sizing a CD nozzle and its critical receiver pressures","HW 3 #1",["aastar","ptp","nsp","mdotmax","pstar"],"HW3 #1; Reader §4.9, §5.4.1",(o={})=>{
+  const pt = o.pt ?? rnd(5,30,1), TtC = o.TtC ?? rnd(0,300,5), At = o.At ?? rnd(5,40,1), pd = o.pd ?? Math.round(pt*rnd(0.04,0.25,0.01)*10)/10;
+  const Me = G.M_from_PT(pd/pt), Ar = G.AA(Me), Ae = At*Ar, s2 = G.ns(Me), p2 = pd*s2.p21, Msub = G.M_from_A(Ar,false), p1 = pt*G.PT(Msub), m = G.mdotMax(pt*1e5, TtC+273.15, At*1e-4);
+  return { setup: R`Air (\(\gamma = 1.4\), \(R = 287\)) is supplied from a large reservoir at \(p_t = ${pt}\) bar and \(T_t = ${TtC}\) °C to a CD nozzle with a ${At} cm² throat. Flow is isentropic except across a stationary normal shock, if present. The nozzle is designed for a receiver pressure of ${f(pd,1)} bar.`,
+    parts: [
+      { q: "Mass flow rate", ans: m, unit: "kg/s", steps: [R`\(T_t = ${f(TtC+273.15,2)}\) K`, R`\(\dot m = 0.040418\,A_tp_t/\sqrt{T_t} = ${f(m,4)}\) kg/s`] },
+      { q: "Design exit Mach number", ans: Me, unit: "", steps: [R`\(p_e/p_t = ${f(pd/pt,5)}\), so \(M_e = \sqrt{5[(p_t/p_e)^{2/7} - 1]} = ${f(Me,4)}\)`] },
+      { q: "Exit area for design operation", ans: Ae, unit: "cm²", steps: [R`Throat choked, so \(A_t = A^*\): \(A_e/A_t = (A/A^*)_{M_e} = ${f(Ar,4)}\)`, R`\(A_e = ${f(Ae,3)}\ \mathrm{cm^2}\)`] },
+      { q: "Receiver pressure that places a normal shock at the exit", ans: p2, unit: "bar", steps: [R`Shock at \(M_e = ${f(Me,4)}\): \(p_2/p_1 = ${f(s2.p21,4)}\)`, R`\(p_b = ${f(pd,3)}\times${f(s2.p21,4)} = ${f(p2,3)}\) bar`] },
+      { q: "Limiting receiver pressure as the shock approaches the throat", ans: p1, unit: "bar", steps: [R`The shock strength goes to zero at the throat, leaving the isentropic subsonic branch (first critical): \(M_e = ${f(Msub,4)}\)`, R`\(p_b = ${pt}\times${f(G.PT(Msub),5)} = ${f(p1,3)}\) bar, well above \(p^* = ${f(pt*G.pStarPt(),3)}\) bar, yet the throat is sonic`] }
+    ] };
+});
+
+/* ---------- HW 3 #2: shock location from the pressure ahead of it ---------- */
+hw("hw3-shockp","ns",1,"Normal shock from the pressure ahead of it","HW 3 #2",["mdotmax","ptp","aastar","nspt","ptastar"],"HW3 #2; Reader §5.4.2",(o={})=>{
+  let pt, Tt, px, Mx, Me, m, At, n, Ax, As2, Ae;
+  for (let k = 0; k < 100; k++) {
+    pt = o.pt ?? rnd(4,20,1); Tt = o.Tt ?? rnd(280,500,10); m = o.m ?? rnd(1,10,0.5); Me = o.Me ?? rnd(0.3,0.6,0.05);
+    px = o.px ?? Math.round(pt*G.PT(rnd(1.3,2.3,0.01))*10)/10; Mx = G.M_from_PT(px/pt);
+    At = m/G.mdotMax(pt*1e5, Tt, 1)*1e4; n = G.ns(Mx); Ax = At*G.AA(Mx); As2 = At/n.pt21; Ae = As2*G.AA(Me);
+    if (Mx > 1.05 && Ae > Ax * 1.02) break;
+  }
+  const pe = pt*n.pt21*G.PT(Me), wrong = G.M_from_A(Ae/At,false);
+  return { setup: R`A CD nozzle receives air (\(\gamma = 1.4\), \(R = 287\)) from a reservoir at ${pt} bar and ${Tt} K. The static pressure just before a stationary normal shock in the diverging section is ${f(px,1)} bar. The exit Mach number is ${f(Me,2)} and the mass flow rate is ${f(m,1)} kg/s. Flow is isentropic outside the shock.`,
+    parts: [
+      { q: "Geometric throat area", ans: At, unit: "cm²", steps: [R`Choked: \(A_t = \dot m\sqrt{T_t}/(0.040418\,p_t) = ${f(At,3)}\ \mathrm{cm^2}\)`] },
+      { q: "Mach number just ahead of the shock", ans: Mx, unit: "", steps: [R`Isentropic from the reservoir: \(p_x/p_t = ${f(px/pt,5)}\), supersonic branch, \(M_x = ${f(Mx,4)}\)`] },
+      { q: "Area at which the shock stands", ans: Ax, unit: "cm²", steps: [R`\(A_x = A_t(A/A^*)_{M_x} = ${f(At,3)}\times${f(G.AA(Mx),4)} = ${f(Ax,3)}\ \mathrm{cm^2}\)`] },
+      { q: R`Stagnation-pressure ratio across the shock, \(p_{t2}/p_{t1}\)`, ans: n.pt21, unit: "", steps: [R`Normal shock at \(M_x\): \(M_y = ${f(n.M2,4)}\), \(p_{t2}/p_{t1} = ${f(n.pt21,5)}\)`] },
+      { q: "Exit pressure", ans: pe, unit: "bar", steps: [R`\(p_{te} = ${pt}\times${f(n.pt21,5)} = ${f(pt*n.pt21,4)}\) bar`, R`\(p_e = p_{te}(p/p_t)_{M_e} = ${f(pe,4)}\) bar`] },
+      { q: "Exit area", ans: Ae, unit: "cm²", steps: [R`Downstream reference: \(A_2^* = A_t\,p_{t1}/p_{t2} = ${f(As2,3)}\ \mathrm{cm^2}\)`, R`\(A_e = A_2^*(A/A^*)_{M_e} = ${f(As2,3)}\times${f(G.AA(Me),4)} = ${f(Ae,3)}\ \mathrm{cm^2}\)`] },
+      { q: R`Exit Mach number a colleague would get from the subsonic root of the geometric \(A_e/A_t\)`, ans: wrong, unit: "", steps: [R`\(A_e/A_t = ${f(Ae/At,4)}\), subsonic root \(${f(wrong,4)}\), versus the true ${f(Me,2)}`, R`Invalid: after the shock \(A^* = A_t\,p_{t1}/p_{t2}\), not \(A_t\). The ${f(100*(1-wrong/Me),1)}% error comes entirely from the shock's \(p_t\) loss.`] }
+    ] };
+});
+
+/* ---------- HW 3 #3: wind-tunnel starting ---------- */
+hw("hw3-tunnel","tun",1,"Starting a supersonic wind tunnel","HW 3 #3",["start","aastar","nspt","ptastar"],"HW3 #3",(o={})=>{
+  const A1 = o.A1 ?? rnd(5,20,0.5), MT = o.MT ?? rnd(1.6,3,0.1), AT = o.AT ?? Math.round(A1*G.AA(MT)*1000)/1000, MTx = G.M_from_A(AT/A1,true);
+  const req = A1/G.ns(MTx).pt21, A2 = o.A2 ?? Math.round((A1 + (req - A1)*rnd(0.3,0.85,0.01))*10)/10;
+  const M2s = G.M_from_A(A2/A1,true), Mx = G.M1_from_pt21(A1/A2), Ax = A1*G.AA(Mx), MTu = G.M_from_A(AT/A2,false);
+  return { setup: R`A wind tunnel is fed from a large reservoir at fixed \(p_{t0}\), \(T_{t0}\). The first throat is \(A_1 = ${f(A1,1)}\) cm², the test section \(A_T = ${f(AT,3)}\) cm², and the adjustable second throat (the tunnel exit) is \(A_2 = ${f(A2,1)}\) cm². Air, \(\gamma = 1.4\); quasi-1D and isentropic except across at most one normal shock. Assume the receiver pressure is low enough for the flows described.`,
+    parts: [
+      { q: "Test-section Mach number in the supersonic (started) flow", ans: MTx, unit: "", steps: [R`\(A_T/A_1 = ${f(AT/A1,4)}\) with \(A^* = A_1\); supersonic root: \(M_T = ${f(MTx,4)}\)`] },
+      { q: "Second-throat Mach number in the started flow", ans: M2s, unit: "", steps: [R`The flow decelerates isentropically in the contraction but stays supersonic, since \(A_2 > A^* = A_1\)`, R`Supersonic root of \(A_2/A_1 = ${f(A2/A1,4)}\): \(M_2 = ${f(M2s,4)}\)`] },
+      { q: "Smallest second-throat area that lets the tunnel start", ans: req, unit: "cm²", steps: [R`The starting shock is strongest in the test section: \(p_{t2}/p_{t1} = ${f(G.ns(MTx).pt21,5)}\) at \(M_T\)`, R`\(A_{2,min} = A_1\,p_{t1}/p_{t2} = ${f(req,3)}\) cm² > ${f(A2,1)} cm², so this tunnel can't start by lowering \(p_b\) alone`] },
+      { q: "Mach number just ahead of the shock in the unstarted limiting flow", ans: Mx, unit: "", steps: [R`Both throats sonic: \(p_{t1}A_1 = p_{t2}A_2\), so \(p_{t2}/p_{t1} = A_1/A_2 = ${f(A1/A2,4)}\)`, R`Invert the normal-shock \(p_t\) ratio: \(M_x = ${f(Mx,4)}\)`] },
+      { q: "Area where that shock stands", ans: Ax, unit: "cm²", steps: [R`\(A_x = A_1(A/A^*)_{M_x} = ${f(Ax,3)}\) cm², ahead of the test section`] },
+      { q: "Test-section Mach number in the unstarted flow", ans: MTu, unit: "", steps: [R`Behind the shock \(A^* = A_2\): subsonic root of \(A_T/A_2 = ${f(AT/A2,4)}\), \(M_T = ${f(MTu,4)}\)`, R`Start by opening the second throat above ${f(req,2)} cm² to swallow the shock, then close it back to ${f(A2,1)} cm²; the started flow survives because \(A_2 > A_1\).`] }
+    ] };
+});
+
 window.AAE_HW = HW;
 })();

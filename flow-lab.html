@@ -139,6 +139,7 @@ canvas{display:block;width:100%;height:auto;border-radius:4px;background:var(--f
     <button class="tab" data-view="cone" id="tab-cone">Mach cone</button>
     <button class="tab" data-view="corner" id="tab-corner">Corner flow</button>
     <button class="tab" data-view="jet" id="tab-jet">Jet cell</button>
+    <button class="tab" data-view="tunnel" id="tab-tunnel">Wind tunnel</button>
     <a class="tab back" href="index.html">← Study Lab</a>
   </nav>
 </header>
@@ -259,6 +260,22 @@ canvas{display:block;width:100%;height:auto;border-radius:4px;background:var(--f
       <aside class="ledger"><h3>Regions</h3><div id="jt-pill"></div><div class="tbl"><table id="jt-tab" class="sm"></table></div><p class="note" id="jt-note"></p></aside>
     </div>
   </section>
+
+  <!-- ================= WIND TUNNEL ================= -->
+  <section id="v-tunnel" hidden>
+    <div class="head"><h2>Starting a supersonic wind tunnel</h2><p>First throat fixed at 10 cm². The page remembers the tunnel's history: slow startup from rest can only swallow the starting shock if the second throat is big enough. Open the second throat to start, then close it back down and watch the tunnel stay started (HW 3 #3).</p></div>
+    <div class="tool">
+      <div class="stage">
+        <div class="ctrls">
+          <div class="ctl"><div class="lab"><label for="wt-t">Test section A_T (cm²)</label><output id="wt-to"></output></div><input id="wt-t" type="range" min="11" max="45" step="0.025" value="16.875"></div>
+          <div class="ctl"><div class="lab"><label for="wt-2">Second throat A₂ (cm²)</label><output id="wt-2o"></output></div><input id="wt-2" type="range" min="7" max="35" step="0.1" value="12"></div>
+        </div>
+        <div class="btns"><button class="chip" id="wt-reset">Restart from rest at this A₂</button><button class="chip" id="wt-open">Open A₂ just enough to start</button><button class="chip" id="wt-hw">HW 3 #3 tunnel</button></div>
+        <div class="svgbox"><svg id="wt-svg" viewBox="0 0 760 470" role="img" aria-label="Wind tunnel geometry and Mach number distribution"></svg></div>
+      </div>
+      <aside class="ledger"><h3>Tunnel state</h3><div id="wt-pill"></div><table id="wt-tab"></table><p class="note" id="wt-note"></p></aside>
+    </div>
+  </section>
 </div>
 
 <script src="gd.js"></script>
@@ -275,7 +292,7 @@ let g = 1.4;
 function gam(){ const v = parseFloat($("#gam").value); g = (isFinite(v) && v > 1.01 && v < 2) ? v : 1.4; $("#gam-note").textContent = Math.abs(g - 1.4) < 1e-9 ? "air" : Math.abs(g - 5/3) < 0.01 ? "monatomic" : "custom"; }
 
 /* ---------------- views ---------------- */
-const VIEWS = ["calc","nozzle","tbm","cone","corner","jet"], NAMES = { calc:"Calculator", nozzle:"C-D nozzle", tbm:"Oblique-shock chart", cone:"Mach cone", corner:"Corner flow", jet:"Jet cell" };
+const VIEWS = ["calc","nozzle","tbm","cone","corner","jet","tunnel"], NAMES = { calc:"Calculator", nozzle:"C-D nozzle", tbm:"Oblique-shock chart", cone:"Mach cone", corner:"Corner flow", jet:"Jet cell", tunnel:"Wind tunnel" };
 const SUB = { "calc-isen":"calc", "calc-ns":"calc", "calc-obl":"calc", "calc-pm":"calc" };
 let view = null;
 function setView(v, sub){
@@ -288,7 +305,7 @@ function setView(v, sub){
   if (v === "cone") startCone(); else stopCone();
 }
 document.querySelectorAll(".tab[data-view]").forEach(b => b.onclick = () => setView(b.dataset.view));
-function render(){ ({ calc: renderCalc, nozzle: renderNozzle, tbm: renderTbm, cone: drawCone, corner: renderCorner, jet: renderJet })[view](); }
+function render(){ ({ calc: renderCalc, nozzle: renderNozzle, tbm: renderTbm, cone: drawCone, corner: renderCorner, jet: renderJet, tunnel: renderTunnel })[view](); }
 $("#gam").addEventListener("input", () => { gam(); render(); });
 
 /* ---------------- calculator ---------------- */
@@ -641,6 +658,70 @@ function renderJet(){
 }
 ["jt-m","jt-p"].forEach(id => $("#" + id).addEventListener("input", renderJet));
 document.querySelectorAll("[data-jet]").forEach(b => b.onclick = () => { const k = b.dataset.jet; if (k === "hw4") { $("#jt-m").value = 2.6; $("#jt-p").value = Math.log(50 / 101); } else if (k === "match") $("#jt-p").value = 0; else $("#jt-p").value = Math.log(2); renderJet(); });
+
+/* ---------------- wind tunnel ---------------- */
+const WT = { A1: 10, started: false };
+const WX = { t1: 0.18, ts: 0.38, te: 0.62, ex: 1 };
+function wtArea(x, AT, A2){ const A1 = WT.A1, AI = 2.5 * A1;
+  if (x <= WX.t1) return A1 + (AI - A1) * (1 + Math.cos(Math.PI * x / WX.t1)) / 2;
+  if (x <= WX.ts) { const u = (x - WX.t1) / (WX.ts - WX.t1); return A1 + (AT - A1) * (1 - Math.cos(Math.PI * u)) / 2; }
+  if (x <= WX.te) return AT;
+  const u = (x - WX.te) / (WX.ex - WX.te); return AT + (A2 - AT) * (1 - Math.cos(Math.PI * u)) / 2; }
+function wtReq(AT){ const MT = G.M_from_A(AT / WT.A1, true, g); return { MT, req: WT.A1 / G.ns(MT, g).pt21 }; }
+function wtResetState(){ const AT = parseFloat($("#wt-t").value), A2 = parseFloat($("#wt-2").value); WT.started = A2 >= wtReq(AT).req; }
+function renderTunnel(){
+  const AT = parseFloat($("#wt-t").value), A2 = parseFloat($("#wt-2").value), A1 = WT.A1, { MT, req } = wtReq(AT);
+  $("#wt-to").textContent = AT.toFixed(3); $("#wt-2o").textContent = A2.toFixed(1);
+  if (WT.started && A2 < A1) WT.started = false;            // can't stay started below A* = A1
+  if (!WT.started && A2 >= req) WT.started = true;          // shock swallowed
+  const mode = WT.started ? "started" : (A2 >= A1 ? "unstarted" : "unchoked");
+  let Mx = NaN, Ax = NaN, xs = NaN;
+  if (mode === "unstarted") { Mx = A2 > A1 * 1.0005 ? G.M1_from_pt21(A1 / A2, g) : 1; Ax = A1 * G.AA(Mx, g); const k = (Ax - A1) / (AT - A1); xs = WX.t1 + (WX.ts - WX.t1) * Math.acos(1 - 2 * Math.min(1, Math.max(0, k))) / Math.PI; }
+  const Mof = x => { const A = wtArea(x, AT, A2);
+    if (mode === "unchoked") return G.M_from_A(A / A2, false, g);
+    if (x <= WX.t1) return G.M_from_A(A / A1, false, g);
+    if (mode === "started") return G.M_from_A(A / A1, true, g);
+    return x < xs ? G.M_from_A(A / A1, true, g) : G.M_from_A(A / A2, false, g); };
+  const svg = $("#wt-svg"); clear(svg);
+  const L = 60, W = 600, X = x => L + x * W, cy = 100, Amax = Math.max(2.5 * A1, AT, A2), sc = 80 / Math.sqrt(Amax), Rr = x => sc * Math.sqrt(wtArea(x, AT, A2));
+  const up = [], lo = []; for (let i = 0; i <= 160; i++) { const x = i / 160; up.push([X(x), cy - Rr(x)]); lo.push([X(x), cy + Rr(x)]); }
+  svg.appendChild(el("path", { d: pathD(up) + ` L${X(1)} ${cy - 92} L${X(0)} ${cy - 92} Z`, class: "wallfill" }));
+  svg.appendChild(el("path", { d: pathD(lo) + ` L${X(1)} ${cy + 92} L${X(0)} ${cy + 92} Z`, class: "wallfill" }));
+  svg.appendChild(el("path", { d: pathD(up), class: "wall" })); svg.appendChild(el("path", { d: pathD(lo), class: "wall" }));
+  svg.appendChild(el("line", { x1: X(0) - 10, y1: cy, x2: X(1) + 60, y2: cy, class: "cl" }));
+  [[WX.t1, "first throat"], [(WX.ts + WX.te) / 2, "test section"], [WX.ex, "second throat"]].forEach(([x, t]) => svg.appendChild(el("text", { x: X(x), y: cy + 108, class: "lbls", "text-anchor": "middle" }, t)));
+  svg.appendChild(el("text", { x: X(0), y: 12, class: "tl" }, "Tunnel (sketch, height ∝ √A)"));
+  if (mode === "unstarted") { const r = Rr(xs); svg.appendChild(el("line", { x1: X(xs), y1: cy - r, x2: X(xs), y2: cy + r, class: "shock" })); svg.appendChild(el("text", { x: X(xs), y: cy - r - 6, class: "lbl", "text-anchor": "middle", fill: "var(--shock)" }, "normal shock")); }
+  // Mach plot
+  const top = 238, H = 190, Mmax = Math.max(2, Math.ceil((mode === "started" ? MT : Math.max(Mx || 1, 1.2)) + 0.3)), Y = m => top + (1 - m / Mmax) * H;
+  for (let m = 0; m <= Mmax + 1e-9; m += 0.5) { svg.appendChild(el("line", { x1: X(0), y1: Y(m), x2: X(1), y2: Y(m), class: "gr" })); svg.appendChild(el("text", { x: X(0) - 8, y: Y(m) + 4, class: "tk", "text-anchor": "end" }, m.toFixed(1))); }
+  svg.appendChild(el("line", { x1: X(0), y1: Y(1), x2: X(1), y2: Y(1), class: "ref" }));
+  svg.appendChild(el("text", { x: X(1) + 6, y: Y(1) + 4, class: "lbls" }, "M = 1"));
+  svg.appendChild(el("line", { x1: X(0), y1: Y(0), x2: X(1), y2: Y(0), class: "ax" })); svg.appendChild(el("line", { x1: X(0), y1: Y(0), x2: X(0), y2: Y(Mmax), class: "ax" }));
+  svg.appendChild(el("text", { x: X(0), y: top - 12, class: "tl" }, "Mach number along the tunnel"));
+  [WX.t1, WX.ts, WX.te].forEach(x => svg.appendChild(el("line", { x1: X(x), y1: Y(0), x2: X(x), y2: Y(Mmax), class: "gr" })));
+  // started-flow reference (dashed) when unstarted
+  if (mode !== "started" && A2 >= A1) { const ref = []; for (let i = 0; i <= 200; i++) { const x = i / 200, A = wtArea(x, AT, A2); ref.push([X(x), Y(x <= WX.t1 ? G.M_from_A(A / A1, false, g) : G.M_from_A(A / A1, true, g))]); } svg.appendChild(el("path", { d: pathD(ref), class: "ref" })); svg.appendChild(el("text", { x: X(0.5), y: Y(MT) - 6, class: "lbls", "text-anchor": "middle" }, "started flow (not reached)")); }
+  const pts = []; for (let i = 0; i <= 240; i++) { const x = i / 240; pts.push([X(x), Y(Mof(x))]); }
+  if (mode === "unstarted") { const k = pts.findIndex((p, i) => i / 240 >= xs); const a = pts.slice(0, k), b = pts.slice(k); a.push([X(xs), Y(Mx)]); b.unshift([X(xs), Y(G.ns(Mx, g).M2)]); svg.appendChild(el("path", { d: pathD(a), class: "cur" })); svg.appendChild(el("line", { x1: X(xs), y1: Y(Mx), x2: X(xs), y2: Y(G.ns(Mx, g).M2), class: "shock" })); svg.appendChild(el("path", { d: pathD(b), class: "cur" })); }
+  else svg.appendChild(el("path", { d: pathD(pts), class: "cur" }));
+  // ledger
+  const M2 = Mof(1), MTnow = Mof((WX.ts + WX.te) / 2);
+  $("#wt-pill").innerHTML = mode === "started" ? '<span class="pill ok">Started: supersonic test section</span>' : mode === "unstarted" ? '<span class="pill bad">Unstarted: shock held upstream</span>' : '<span class="pill bad">First throat not choked</span>';
+  const r = [["Design test-section M", fx(MT,4)],["A₂ needed to start", fx(req,3) + " cm²", 1],["Test-section M now", fx(MTnow,4), 1],["Second-throat M", fx(M2,4)]];
+  if (mode === "unstarted") r.push(["Shock: Mₓ", fx(Mx,4)], ["Shock area", fx(Ax,3) + " cm²"], ["pₜ₂/pₜ₁ = A₁/A₂", fx(A1 / A2,4)]);
+  r.push(["Sonic sections", mode === "started" ? "first throat" : mode === "unstarted" ? "both throats" : "second throat"]);
+  $("#wt-tab").innerHTML = r.map(x => `<tr class="${x[2] ? "em" : ""}"><td class="k">${x[0]}</td><td class="v">${x[1]}</td></tr>`).join("");
+  $("#wt-note").textContent = mode === "started" ? (A2 < req ? `Started earlier with a larger second throat. It stays started down to A₂ = A₁ = ${A1} cm²; below that it unstarts. A smaller A₂ means a weaker diffuser shock.` : "The second throat is big enough for the starting shock to pass through the test section and be swallowed.")
+    : mode === "unstarted" ? `The second throat chokes first and fixes pₜ₁A₁ = pₜ₂A₂, so the shock stays at ${fx(Ax,2)} cm² no matter how low p_b goes. Open A₂ past ${fx(req,2)} cm² to start.`
+    : "A₂ is smaller than A₁, so the second throat is the only sonic section and the whole tunnel runs subsonic.";
+}
+$("#wt-t").addEventListener("input", () => { wtResetState(); renderTunnel(); });
+$("#wt-2").addEventListener("input", renderTunnel);
+$("#wt-reset").onclick = () => { wtResetState(); renderTunnel(); };
+$("#wt-open").onclick = () => { const AT = parseFloat($("#wt-t").value); $("#wt-2").value = Math.ceil(wtReq(AT).req * 10 + 0.5) / 10; renderTunnel(); };
+$("#wt-hw").onclick = () => { $("#wt-t").value = 16.875; $("#wt-2").value = 12; wtResetState(); renderTunnel(); };
+wtResetState();
 
 /* ---------------- boot ---------------- */
 gam();

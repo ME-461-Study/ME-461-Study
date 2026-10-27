@@ -1,10 +1,10 @@
 # ME 461 Study Lab
 
 A self-contained study site for ME 461/561 Gas Dynamics (Oregon State, Fall 2026), covering Chapters 1–6 of
-J. A. Rodríguez's course reader *A First Course in Compressible Flow* and Homework 1, 2 and 4.
+J. A. Rodríguez's course reader *A First Course in Compressible Flow* and Homeworks 1–4.
 
 - `index.html`: the Study Lab (practice questions, flashcards, homework-style problems, timed mock exam, equation sheet)
-- `flow-lab.html`: the Flow Lab (isentropic / normal-shock / oblique-shock / Prandtl–Meyer calculator and interactive visuals)
+- `flow-lab.html`: the Flow Lab (isentropic / normal-shock / oblique-shock / Prandtl–Meyer calculator and interactive nozzle, oblique-shock, Mach cone, corner, jet and wind-tunnel tools)
 - `gd.js`: the gas-dynamics relations both pages use
 - `bank.js`: questions, flashcards, equation sheet and single-answer exam problems
 - `problems.js`: randomized multi-part homework-style problems
@@ -20,7 +20,7 @@ It's plain static HTML and JavaScript with no build step and no server code. Mat
 3. After a minute or two the site is live at `https://<your-username>.github.io/<repository-name>/`.
 
 Direct links to a tab work with a hash, for example `…/index.html#problems`, `…/index.html#equations`,
-`…/flow-lab.html#nozzle` or `…/flow-lab.html#calc-ns`.
+`…/flow-lab.html#nozzle`, `…/flow-lab.html#tunnel` or `…/flow-lab.html#calc-ns`.
 
 ## Notes
 
