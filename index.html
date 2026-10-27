@@ -566,13 +566,13 @@ function cardFaces(c){
         <h3>${esc(e.name)}</h3><p class="prompt">When do you use it, what does it assume, and what is the usual trap? Then sketch the form.</p>`,
       back: `<h3>${esc(e.name)}</h3><div class="disp">\\[${e.tex}\\]</div><p class="ans" style="font-size:16px;margin:0"><b>Use:</b> ${e.use}${e.assume ? `<br><b>Assumes:</b> ${e.assume}` : ""}</p>` };
   }
-  return { front: `<div class="meta"><span>${esc(TN[c.t].name)}</span><span>Key fact</span>${c.mr ? '<span class="mr">● High-yield</span>' : ""}</div><h3>${c.front}</h3><p class="prompt">Recall the answer, then flip.</p>`,
+  return { front: `<div class="meta"><span>${esc(TN[c.t].name)}</span><span>Concept</span>${c.mr ? '<span class="mr">● High-yield</span>' : ""}</div><h3>${c.front}</h3><p class="prompt">Explain it in your own words, then flip.</p>`,
     back: `<h3>${c.front}</h3><div class="ans">${c.back}</div>` };
 }
 RENDER.cards = function(reset){
   const el = $("#v-cards");
   if (reset || !FC.list.length) buildDeck();
-  const deckChips = `<button class="chip" aria-pressed="${FC.decks.includes("fact")}" data-deck="fact">Key facts (${CARDS.filter(c => selected(c.t)).length})</button>
+  const deckChips = `<button class="chip" aria-pressed="${FC.decks.includes("fact")}" data-deck="fact">Concepts (${CARDS.filter(c => selected(c.t)).length})</button>
     <button class="chip" aria-pressed="${FC.decks.includes("eq")}" data-deck="eq">Equations (${EQCARDS.filter(c => selected(c.t)).length})</button>
     <button class="chip" aria-pressed="${FC.flagOnly}" data-flagonly="1">Flagged only (${flagCounts().card})</button>`;
   let body;
@@ -588,7 +588,7 @@ RENDER.cards = function(reset){
         <div class="row">${flagBtn(c.id, c.t, "card")}<button class="btn ghost" id="fc-miss" ${FC.flipped ? "" : "disabled"}>Missed it</button><button class="btn" id="fc-knew" ${FC.flipped ? "" : "disabled"}>Knew it</button></div></div>${noteHTML(c.id)}`;
   }
   el.innerHTML = `${sheet("Flashcards", FC.list.length ? `${FC.list.length} cards` : "")}
-    <div class="head"><h2>Flashcards</h2><p>Key facts and numbers to know cold, plus every equation on the sheet. You can bring a crib sheet, so for equation cards focus on <i>when</i> each one applies and what it assumes, then check the back.</p></div>
+    <div class="head"><h2>Flashcards</h2><p>Concept cards, plus a card for every equation on the sheet. You can bring a crib sheet, so the cards test what each relation does, when it applies and what it assumes, not numbers to memorize.</p></div>
     <div class="row"><span class="lbl">Deck</span>${deckChips}</div>${body}`;
   const fo = el.querySelector("[data-flagonly]"); if (fo) fo.onclick = () => { FC.flagOnly = !FC.flagOnly; RENDER.cards(true); };
   el.querySelectorAll("[data-deck]").forEach(b => b.onclick = () => { FC.flagOnly = false; const d = b.dataset.deck; FC.decks = FC.decks.includes(d) ? FC.decks.filter(x => x !== d) : FC.decks.concat(d); if (!FC.decks.length) FC.decks = [d]; RENDER.cards(true); });

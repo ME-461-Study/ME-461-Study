@@ -659,13 +659,12 @@ dd("ext-147",R`The nearly normal part of the bow shock ahead of a blunt nose pro
 dd("ext-148",R`For a double wedge of half-angle ε at incidence α, the upper front panel turns the flow by \(\varepsilon - \alpha\). That's a compression while α < ε and an expansion once α > ε. The lower front panel always compresses, by \(\varepsilon + \alpha\). Always work from the change in local flow direction at each corner.`,["plate","pmturn","tbm"]);
 dd("ext-150",R`Regular reflection needs the reflected shock to turn the flow back through the incident deflection, and that requires \(\delta \le \delta_{max}(M_2)\) behind the incident shock, exactly the HW 4 #3 condition. A large pressure mismatch at the lip makes the incident shock strong, lowers M₂, and the condition can fail, giving a Mach disk.`,["tbm","jetbc"]);
 
-/* ---------------- Flashcards (key facts and numbers to know cold) ---------------- */
+/* ---------------- Flashcards (concepts and what each relation does; no number recall) ---------------- */
 const CARDS = [];
 function card(t, mr, front, back) { CARDS.push({ id: "c-" + t + "-" + CARDS.length, t, mr: !!mr, front, back }); }
 
 card("thermo",1,"Isentropic means…",R`Adiabatic <b>and</b> internally reversible: \(dS_e = 0\) and \(dS_i = 0\). Adiabatic alone isn't enough.`);
 card("thermo",0,"Polytropic exponents",R`\(pV^n = C\): \(n = 0\) isobaric, \(n = 1\) isothermal, \(n = \gamma\) reversible adiabatic, \(n \to \infty\) isochoric. Real processes: \(1 < n < \gamma\).`);
-card("thermo",1,"Air constants",R`\(R = 287\ \mathrm{J/(kg\,K)}\), \(\gamma = 1.4\), \(C_p = 1004.5\), \(C_v = 717.5\ \mathrm{J/(kg\,K)}\). \(\hat R = 8314\ \mathrm{J/(kmol\,K)}\).`);
 card("thermo",0,"γ by molecule type",R`Monatomic: \(u = \tfrac32RT\), \(\gamma = 5/3\). Diatomic: \(u = \tfrac52RT\), \(\gamma = 7/5\). Nonlinear triatomic (H₂O): \(u = 3RT\), \(\gamma = 4/3\).`);
 card("thermo",1,"Perfect gas u and h",R`Functions of T only: \(du = C_v\,dT\), \(dh = C_p\,dT\) for any process. Pressure never enters h.`);
 card("thermo",0,"Sign convention",R`Heat <b>into</b> the system is positive; work done <b>by</b> the system is positive. Turbine \(\dot W_s > 0\), compressor \(\dot W_s < 0\).`);
@@ -674,7 +673,7 @@ card("thermo",0,"State postulate (\"0₂ law\")","Two independent intensive prop
 card("rtt",1,"RTT in words","Rate of change for the control mass = accumulation inside the CV + net outward flux through the CS. Choose η = 1, e, s or V⃗.");
 card("rtt",1,"Stored vs. transported energy",R`Stored in the CV: \(e = u + V^2/2 + gz\). Carried across the CS: \(h + V^2/2 + gz\) (u plus flow work pv).`);
 card("rtt",1,"Tank-filling results (insulated, rigid)",R`\(m_2u_2 - m_1u_1 = h_0\Delta m\). Evacuated start: \(T_2 = \gamma T_0\). Mass doubling from \(T_1 = T_0\): \(T_2 = (\gamma+1)T_0/2\).`);
-card("rtt",0,"Unit trap in the SFEE",R`\(V^2/2\) comes out in J/kg. Divide by 1000 before adding to h in kJ/kg. (300 m/s gives 45 kJ/kg.)`);
+card("rtt",0,"Unit trap in the SFEE",R`\(V^2/2\) comes out in J/kg. Divide by 1000 before adding it to h in kJ/kg.`);
 card("rtt",0,"Laminar pipe mass flow",R`\(\dot m = \rho A V_m/2\) for the parabolic profile.`);
 card("ent",1,"Entropy split",R`\(dS = dS_e + dS_i\). \(dS_e = \delta Q/T_b\) (exchange at the boundary), \(dS_i \ge 0\) (production). Shaft work carries no entropy.`);
 card("ent",0,"Entropy sources","Friction, mixing, heat transfer across a finite ΔT, and shocks.");
@@ -686,11 +685,11 @@ card("stag",1,"Stagnation state definition","State reached by bringing the flow 
 card("stag",1,"What stays constant?",R`Adiabatic, no work: \(h_t\) (and \(T_t\)) constant, even with friction or shocks. Also no losses: \(p_t\) constant.`);
 card("stag",1,"Stagnation-pressure loss",R`\(p_{t2}/p_{t1} = e^{-\Delta s/R}\). Adiabatic, no work, constant R (not constant \(c_p\)).`);
 card("stag",0,"What can change pₜ?",R`Heat transfer, irreversibility, shaft work: \(dp_t/\rho_t + (T_t - T)ds_e + T_t\,ds_i + \delta w_s = 0\).`);
-card("stag",1,"HW 2 #2 second-law check",R`If a dataset gives \(p_{t2} > p_{t1}\) in an adiabatic device, \(\Delta s < 0\), which is impossible. The energy balance can't catch it, since h = h(T).`);
-card("sound",1,"Sound speed",R`\(a^2 = (\partial p/\partial\rho)_s\). Perfect gas: \(a = \sqrt{\gamma RT}\) (static T). Air at 300 K: 347 m/s.`);
-card("sound",1,"Newton's isothermal error",R`\(a_T/a_s = 1/\sqrt\gamma = 0.845\): 15.5% low for air.`);
+card("stag",1,"Second-law check on a dataset",R`If a dataset gives \(p_{t2} > p_{t1}\) in an adiabatic device, \(\Delta s < 0\), which is impossible. The energy balance can't catch it, since h = h(T).`);
+card("sound",1,"Sound speed",R`\(a^2 = (\partial p/\partial\rho)_s\). Perfect gas: \(a = \sqrt{\gamma RT}\), using the static T. Isentropic because a small acoustic wave has no heat transfer or losses.`);
+card("sound",1,"Why Newton's sound speed was wrong",R`He assumed an isothermal wave, \(a_T = \sqrt{RT}\). The real wave is isentropic, \(a_s = \sqrt{\gamma RT}\), so his value is low by a factor of \(1/\sqrt\gamma\).`);
 card("sound",1,"Signal speeds in a moving gas",R`Downstream \(V + a\), upstream \(V - a\). At \(M \ge 1\), both point downstream: no upstream communication.`);
-card("sound",1,"Mach angle",R`\(\mu = \sin^{-1}(1/M)\). M = 2: 30°. M → 1: 90°. Undefined for M < 1.`);
+card("sound",1,"Mach angle",R`\(\mu = \sin^{-1}(1/M)\): the half-angle of the envelope of small disturbances. It approaches 90° as M → 1, narrows as M grows, and is undefined for M < 1.`);
 card("sound",1,"Boom geometry (HW 2 #3a)",R`\(M = \sqrt{1 + (L/H)^2} = \sqrt{1 + (V\Delta t/H)^2}\).`);
 card("sound",0,"Zones","Inside the Mach cone: zone of action. Outside: zone of silence (relative to that source).");
 card("sound",0,"Why shocks form","Compression raises T (and a) and moves the gas forward, so later parts catch up. Expansions spread into fans instead.");
@@ -699,21 +698,15 @@ card("area",1,"Sign table",R`Converging, M < 1: p↓ ρ↓ V↑. Converging, M >
 card("area",1,"Sonic point",R`M = 1 requires dA = 0 (necessary for smooth passage). A throat is not automatically sonic.`);
 card("area",1,"A* is a reference",R`\(A^* = \dot m/(\rho^*a^*)\). Equals the throat only when choked. \(p_{t1}A_1^* = p_{t2}A_2^*\): losses raise A*.`);
 card("area",1,"Two roots of A/A*","For A/A* > 1 there's a subsonic and a supersonic root. Inlet conditions and geometry pick the branch.");
-card("area",0,"Isentropic values at M = 1",R`\(T^*/T_t = 0.8333\), \(p^*/p_t = 0.5283\), \(\rho^*/\rho_t = 0.6339\) (γ = 1.4).`);
-card("area",0,"Isentropic values at M = 2",R`\(T/T_t = 0.5556\), \(p/p_t = 0.1278\), \(\rho/\rho_t = 0.2300\), \(A/A^* = 1.6875\), \(\nu = 26.38°\), \(\mu = 30°\).`);
-card("area",0,"Isentropic values at M = 3",R`\(T/T_t = 0.3571\), \(p/p_t = 0.0272\), \(A/A^* = 4.235\), \(\nu = 49.76°\), \(\mu = 19.47°\).`);
 card("area",0,"Losses in the working equations",R`\(T_2/T_1\): no Δs term. \(p_2/p_1\): \(\times e^{-\Delta s/R}\). \(A_2/A_1\): \(\times e^{+\Delta s/R}\).`);
-card("noz",1,"Critical pressure ratio (air)",R`\(p^*/p_t = 0.5283\), i.e. \(p_t/p^* = 1.893\). Converging nozzle chokes when \(p_b/p_t \le 0.5283\).`);
-card("noz",1,"Choked mass flow",R`\(\dot m_{max} = A^*\dfrac{p_t}{\sqrt{T_t}}\sqrt{\dfrac{\gamma}{R}}\left(\dfrac{2}{\gamma+1}\right)^{\frac{\gamma+1}{2(\gamma-1)}}\). Air: \(0.0404\,p_tA^*/\sqrt{T_t}\) (SI).`);
+card("noz",1,"Critical pressure ratio",R`\(p^*/p_t = \left(\frac{2}{\gamma+1}\right)^{\gamma/(\gamma-1)}\) is the pressure ratio at a sonic throat. A converging nozzle chokes once \(p_b/p_t\) falls to it; lowering \(p_b\) further changes nothing inside.`);
+card("noz",1,"Choked mass flow",R`\(\dot m_{max} = A^*\dfrac{p_t}{\sqrt{T_t}}\sqrt{\dfrac{\gamma}{R}}\left(\dfrac{2}{\gamma+1}\right)^{\frac{\gamma+1}{2(\gamma-1)}}\). Set by \(p_t\), \(T_t\) and the throat: back pressure can't raise it, and a higher \(T_t\) lowers it.`);
 card("noz",1,"CD nozzle critical conditions","1st: throat first sonic, subsonic elsewhere. 2nd: normal shock at the exit. 3rd: design, isentropic supersonic exit matched to p_b.");
 card("noz",1,"Regimes by back pressure","Above 1st: venturi. 1st–2nd: internal normal shock. 2nd–3rd: over-expanded, external shocks. Below 3rd: under-expanded, external fans.");
-card("noz",1,"Running example (Aₑ/Aₜ = 2.494)",R`\(p_b/p_t\): 1st 0.9607 (\(M_e\) 0.240), 2nd 0.4356, 3rd 0.0642 (\(M_e\) 2.440).`);
-card("noz",0,"First choking of a CD nozzle",R`Happens at \(p_b/p_t\) much higher than 0.5283 (0.961 for \(A_e/A_t\) = 2.494). The throat is at 0.5283, but the diffuser recovers pressure.`);
+card("noz",0,"First choking of a CD nozzle",R`Happens at a back pressure well above \(p^*\). The throat is at \(p^*\), but the subsonic diverging section recovers pressure before the exit, so use the subsonic root of \(A_e/A^*\).`);
 card("noz",0,"Efficiencies",R`Nozzle \(\eta_n = (h_1 - h_2)/(h_1 - h_{2s})\): same exit pressure. Diffuser \(\eta_d = (p_2 - p_1)/(p_{2s} - p_1)\): same exit speed. Recovery \(\eta_r = p_{t2}/p_{t1}\).`);
 card("ns",1,"Normal shock: what's conserved",R`\(\rho V\), \(p + \rho V^2\), \(h + V^2/2\) (so \(T_t\)). p, ρ, T, s rise; V, M, \(p_t\) fall.`);
-card("ns",1,"Normal shock at M₁ = 2",R`\(M_2 = 0.5774\), \(p_2/p_1 = 4.5\), \(\rho_2/\rho_1 = 2.667\), \(T_2/T_1 = 1.6875\), \(p_{t2}/p_{t1} = 0.7209\), \(p_{t2}/p_1 = 5.640\).`);
-card("ns",0,"Normal shock at M₁ = 3",R`\(M_2 = 0.4752\), \(p_2/p_1 = 10.33\), \(\rho_2/\rho_1 = 3.857\), \(T_2/T_1 = 2.679\), \(p_{t2}/p_{t1} = 0.3283\).`);
-card("ns",0,"Strong-shock limits (γ = 1.4)",R`\(\rho_2/\rho_1 \to 6\), \(M_2 \to 0.378\); p and T ratios unbounded.`);
+card("ns",0,"Strong-shock limits",R`As \(M_1 \to \infty\), \(\rho_2/\rho_1 \to (\gamma+1)/(\gamma-1)\) and \(M_2 \to \sqrt{(\gamma-1)/(2\gamma)}\), while the p and T ratios grow without bound. Density compression is capped.`);
 card("ns",1,"Table jobs","Isentropic table: a state ↔ its own reference. Shock table: actual state 1 ↔ actual state 2.");
 card("ns",1,"Shock in a nozzle",R`\(A_3 \approx A_4\), but \(A_4^* = A_3^*p_{t3}/p_{t4}\). Locate it with \(A_ep_e/(A_tp_{t1}) = A_ep_e/(A_e^*p_{te})\) → \(M_e\) → \(p_{te}/p_{t1}\) → \(M_{shock}\).`);
 card("ns",0,"Weak-shock scaling",R`\(\Delta p/p \propto M_1^2 - 1\); \(\Delta s/R \approx \frac{2\gamma}{3(\gamma+1)^2}(M_1^2-1)^3\).`);
@@ -724,18 +717,14 @@ card("mov",0,"Lab-frame energy jump",R`\(h_{t2} - h_{t1} = V_s(V_2 - V_1)\).`);
 card("obl",1,"Oblique shock rule",R`Tangential velocity unchanged. Use \(M_{\perp1} = M_1\sin\theta\) in the normal-shock relations, then \(M_2 = M_{\perp 2}/\sin(\theta - \delta)\).`);
 card("obl",1,"Angle notation trap","Reader: θ = shock angle, δ = deflection. Many texts: β = shock angle, θ = deflection.");
 card("obl",1,"Weak vs. strong","Strong (larger θ): subsonic M₂, more loss, needs downstream support. Weak: usually supersonic M₂ (except near δmax); typical for external flow.");
-card("obl",0,"δmax values (γ = 1.4)","M = 1.5: 12.1°. M = 2: 23.0°. M = 3: 34.1°. M = 5: 41.1°. M → ∞: 45.6°.");
-card("obl",1,"Regular reflection limit (HW 4 #3)",R`Need \(\delta \le \delta_{max}(M_2)\) behind the incident shock. For \(M_1 = 3\): \(\delta_{lim} \approx 21.46°\). Above that: Mach reflection.`);
+card("obl",1,"Regular reflection condition",R`The reflected shock must turn the flow back by δ, so it needs \(\delta \le \delta_{max}(M_2)\) behind the incident shock. A supersonic \(M_2\) alone isn't enough; when the condition fails, expect a Mach reflection.`);
 card("obl",1,"Pitot in supersonic flow",R`Reads \(p_{t2}\) behind its normal bow shock. Get \(M_1\) from \(p_{t2}/p_1\) (Appendix B, last pressure column). Needs a separate static tap.`);
-card("obl",0,"HW 4 #2b trap",R`For an oblique shock, \(p_{t2}/p_{t1}\) at \(M_\perp\) is correct, but \(p_{t1}/p_1\) uses the full \(M_1\). Never read the \(p_{t2}/p_1\) column at \(M_\perp\).`);
+card("obl",0,"Oblique-shock stagnation-pressure trap",R`For an oblique shock, \(p_{t2}/p_{t1}\) at \(M_\perp\) is correct, but \(p_{t1}/p_1\) uses the full \(M_1\). Never read the \(p_{t2}/p_1\) column at \(M_\perp\).`);
 card("obl",0,"Inlet recovery",R`\(p_{t,out}/p_{t,in} = \prod_j (p_{t,after}/p_{t,before})_j = \exp(-\sum\Delta s_j/R)\). Several weak shocks beat one normal shock.`);
 card("pm",1,"Prandtl–Meyer turning",R`\(\delta = \nu(M_2) - \nu(M_1)\): + expansion, − smooth compression. \(s\), \(p_t\), \(T_t\) constant.`);
-card("pm",0,R`Prandtl–Meyer \(\nu\) values (\(\gamma = 1.4\))`,"M = 1.5: 11.91°. M = 2: 26.38°. M = 2.4: 36.75°. M = 3: 49.76°. Max: 130.45°.");
 card("pm",1,"Concave vs convex walls","Concave: compression waves converge → can coalesce into a shock. Convex: expansion waves diverge → fan.");
-card("pm",0,"Example: sonic + 28°",R`\(\nu = 28°\) → \(M \approx 2.06\). Another 12° → \(\nu = 40°\) → \(M \approx 2.54\).`);
 card("ext",1,"Boundary conditions","Free boundary: p = p_amb, shape adjusts. Wall or symmetry line: flow tangent, pressure can be anything.");
 card("ext",1,"Wave reflections","Free boundary: compression ↔ expansion. Wall/centerline: compression → compression, expansion → expansion.");
-card("ext",1,"HW 4 #1 jet numbers",R`\(M_A = 2.6\), \(p_A = 50\) kPa, \(p_{atm} = 101\) kPa → \(\delta \approx 11°\), \(M_B \approx 2.12\), \(p_C \approx 182\) kPa.`);
 card("ext",1,"Flat plate forces",R`\(L' = (p_3 - p_2)c\cos\alpha\), \(D' = (p_3 - p_2)c\sin\alpha\), \(L/D = \cot\alpha\). Wave drag exists without viscosity.`);
 card("ext",0,"Slip line","Pressure and direction match across it; speed and entropy need not.");
 card("ext",0,"Aerospike","Atmosphere provides the outer free boundary, so the effective expansion adapts with altitude (altitude compensation).");
