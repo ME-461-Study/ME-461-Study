@@ -24,7 +24,13 @@ Direct links to a tab work with a hash, for example `…/index.html#problems`, `
 
 ## Notes
 
-- Progress, flags and notes are saved in each visitor's own browser (`localStorage`), per device. Nothing is sent anywhere.
+- Progress, flags and notes are saved in each visitor's own browser (`localStorage`), per device. Nothing is sent anywhere,
+  except chat questions (below).
+- **Ask Claude** (the button on every question, problem, card and equation, plus the floating chat button) sends the item
+  you're looking at, your answer and your question to Claude. On GitHub Pages this needs your own Anthropic API key
+  (from console.anthropic.com, billed to your account). The key is stored only in your browser and sent only to
+  `api.anthropic.com`. Don't save it on a shared computer. Without a key, **Copy as prompt** copies the item and your
+  question so you can paste them into a normal Claude chat. To change the model, edit `API_MODEL` in `index.html`.
 - **Print crib sheet** on the Equation sheet tab prints the selected equations in two compact columns.
   **Copy as LaTeX** copies a complete three-column `.tex` document you can compile yourself.
 - If the repository is public, anyone with the link can see the site. Course materials are summarized, not reproduced,

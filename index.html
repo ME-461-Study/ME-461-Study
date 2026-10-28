@@ -257,6 +257,46 @@ details.rev .body{padding:0 14px 14px;display:flex;flex-direction:column;gap:8px
   body.print-eq .eq dl{font-size:8.5px;gap:1px 6px} body.print-eq .eq dt{font-size:7.5px}
 }
 
+/* ---------- Ask Claude chat ---------- */
+.fab{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:max(16px,env(safe-area-inset-bottom,0px));z-index:40;display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#fff;border:0;border-radius:999px;padding:12px 18px;cursor:pointer;font:600 14px/1 var(--f-display);letter-spacing:.08em;text-transform:uppercase;box-shadow:0 6px 20px rgba(10,20,40,.25)}
+.fab svg{width:16px;height:16px}
+.fab:hover{filter:brightness(1.08)}
+body.exam-live .fab, body.chat-open .fab{display:none}
+.chat{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:max(16px,env(safe-area-inset-bottom,0px));z-index:50;width:min(440px,calc(100vw - 32px));height:min(640px,calc(100dvh - 32px));display:flex;flex-direction:column;background:var(--panel);color:var(--ink);border:1px solid var(--rule);border-radius:8px;box-shadow:0 14px 44px rgba(10,20,40,.28);overflow:hidden}
+.chat[hidden]{display:none}
+.chat .ch-head{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--rule);background:var(--bg)}
+.chat .ch-head h2{margin:0;font:700 17px/1 var(--f-display);letter-spacing:.02em;flex:1}
+.chat .ch-x{background:none;border:0;color:var(--ink-2);cursor:pointer;font-size:22px;line-height:1;padding:2px 6px;border-radius:4px}
+.chat .ch-x:hover{color:var(--ink);background:var(--accent-soft)}
+.chat .ch-ctx{display:flex;align-items:flex-start;gap:8px;padding:8px 12px;border-bottom:1px solid var(--rule);font-size:13px;color:var(--ink-2);background:var(--accent-soft)}
+.chat .ch-ctx b{color:var(--info-fg);font:600 11.5px/1.3 var(--f-display);letter-spacing:.08em;text-transform:uppercase;flex:none;padding-top:1px}
+.chat .ch-ctx span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.chat .ch-log{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;overscroll-behavior:contain}
+.chat .msg{max-width:92%;padding:9px 12px;border-radius:8px;font-size:15px;line-height:1.5;overflow-wrap:anywhere}
+.chat .msg.u{align-self:flex-end;background:var(--ink);color:var(--panel);white-space:pre-wrap}
+.chat .msg.a{align-self:flex-start;background:var(--field);border:1px solid var(--rule)}
+.chat .msg.a p{margin:0 0 .6em}.chat .msg.a p:last-child{margin-bottom:0}
+.chat .msg.a ul,.chat .msg.a ol{margin:.2em 0 .6em;padding-left:1.3em}
+.chat .msg.a pre{background:var(--bg);padding:8px;border-radius:4px;overflow-x:auto;font:12.5px/1.4 var(--f-mono)}
+.chat .msg.a code{font:13px var(--f-mono)}
+.chat .msg.a mjx-container[display="true"]{overflow-x:auto;overflow-y:hidden;max-width:100%}
+.chat .msg.err{align-self:stretch;background:var(--bad-bg);color:var(--bad-fg);font-size:13.5px}
+.chat .msg.think{color:var(--muted);font-style:italic}
+.chat .ch-empty{color:var(--muted);font-size:14px;line-height:1.5;margin:auto 4px}
+.chat .ch-sugg{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chat .ch-sugg button{background:var(--field);border:1px solid var(--rule);border-radius:999px;padding:6px 11px;font:500 13px/1.2 var(--f-body);color:var(--ink);cursor:pointer;text-align:left}
+.chat .ch-sugg button:hover{border-color:var(--accent);color:var(--accent)}
+.chat form{display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--rule);align-items:flex-end}
+.chat textarea{flex:1;min-height:40px;max-height:140px;resize:none;border:1px solid var(--rule);border-radius:5px;background:var(--field);color:var(--ink);padding:9px 10px;font:15px/1.4 var(--f-body)}
+.chat textarea:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.chat .ch-foot{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;padding:0 12px 10px;font-size:12px;color:var(--muted)}
+.chat .ch-key{display:flex;flex-direction:column;gap:8px;padding:10px 12px;border-top:1px solid var(--rule);font-size:13px;color:var(--ink-2);line-height:1.45}
+.chat .ch-key input{border:1px solid var(--rule);border-radius:5px;background:var(--field);color:var(--ink);padding:8px 10px;font:13px var(--f-mono)}
+.chat .ch-key .row{display:flex;gap:8px;flex-wrap:wrap}
+@media (max-width:600px){
+  .chat{left:0;right:0;bottom:0;width:auto;height:88dvh;border-radius:12px 12px 0 0;border-bottom:0;padding-bottom:env(safe-area-inset-bottom,0px)}
+}
+@media print{ .fab,.chat{display:none!important} }
 </style>
 </head>
 <body>
@@ -302,6 +342,16 @@ details.rev .body{padding:0 14px 14px;display:flex;flex-direction:column;gap:8px
     </div>
   </details>
 </div>
+
+<button class="fab" id="ask-fab" type="button" aria-haspopup="dialog"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 3.5A1.5 1.5 0 0 1 3.5 2h9A1.5 1.5 0 0 1 14 3.5v6a1.5 1.5 0 0 1-1.5 1.5H7l-3.5 3v-3h0A1.5 1.5 0 0 1 2 9.5z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>Ask Claude</button>
+<section class="chat" id="chat" role="dialog" aria-label="Ask Claude" hidden>
+  <div class="ch-head"><h2>Ask Claude</h2><button class="btn ghost sm" id="ch-new" type="button">New chat</button><button class="ch-x" id="ch-close" type="button" aria-label="Close chat">×</button></div>
+  <div class="ch-ctx" id="ch-ctx" hidden><b>About</b><span id="ch-ctx-t"></span><button class="ch-x" id="ch-ctx-x" type="button" aria-label="Stop attaching this item" style="font-size:17px;padding:0 4px">×</button></div>
+  <div class="ch-log" id="ch-log" aria-live="polite"></div>
+  <div class="ch-key" id="ch-key" hidden></div>
+  <form id="ch-form"><textarea id="ch-in" rows="1" placeholder="Ask about this answer…" aria-label="Your question"></textarea><button class="btn" id="ch-send" type="submit">Send</button></form>
+  <div class="ch-foot"><span id="ch-mode"></span><button class="linkbtn" id="ch-copy" type="button">Copy as prompt</button></div>
+</section>
 
 <script>
 window.MathJax = {
@@ -453,8 +503,8 @@ function copyFlagged(){
   const lines = ["ME 461 – flagged for follow-up", ""];
   Object.keys(S.flags).sort((a, b) => S.flags[a].at - S.flags[b].at).forEach((id, i) => {
     const f = S.flags[id]; let txt = "";
-    if (f.kind === "mc") { const q = MC.find(x => x.id === id); if (!q) return; txt = `${i + 1}. [${TN[q.t].name}] ${plain(q.q)}\n   Answer: ${plain(q.ch[q.a])}\n   Source: ${srcItems(q.src).map(x => x.name + (x.loc ? ", " + x.loc : "")).join("; ")}`; }
-    else if (f.kind === "card") { const c = CARDS.find(x => x.id === id) || EQCARDS.find(x => x.id === id); if (!c) return; txt = `${i + 1}. [${TN[c.t].name}] Card: ${plain(c.eq ? c.eq.name : c.front)}`; }
+    if (f.kind === "mc") { const q = MC.find(x => x.id === id); if (!q) return; txt = `${i + 1}. [${TN[q.t].name}] ${toText(q.q)}\n   Answer: ${toText(q.ch[q.a])}\n   Source: ${srcItems(q.src).map(x => x.name + (x.loc ? ", " + x.loc : "")).join("; ")}`; }
+    else if (f.kind === "card") { const c = CARDS.find(x => x.id === id) || EQCARDS.find(x => x.id === id); if (!c) return; txt = `${i + 1}. [${TN[c.t].name}] Card: ${toText(c.eq ? c.eq.name : c.front)}`; }
     else { const g = NUM.find(x => x.id === id) || (window.AAE_HW || []).find(x => x.id === id); if (!g) return; const r = NUMREF[g.id] || (g.eq ? { eq: g.eq, src: g.src } : null); txt = `${i + 1}. [${TN[g.t].name}] Problem type: ${g.title}${r ? `\n   Source: ${srcItems(r.src).map(x => x.name + (x.loc ? ", " + x.loc : "")).join("; ")}` : ""}`; }
     if (f.note) txt += `\n   My question: ${f.note}`;
     lines.push(txt, "");
@@ -526,7 +576,7 @@ RENDER.practice = function(reset){
       ${done ? `<div class="fb ${ok ? "ok" : "bad"}"><span class="verdict">${ok ? "Correct" : "Not quite"}</span><p class="ex">${q.ex}</p><span class="src">Source: ${esc(q.src)}</span></div>` : ""}
       ${done && openDeep.has(q.id) ? deepHTML(q) : ""}
       ${noteHTML(q.id)}
-      <div class="foot"><div class="tools">${flagBtn(q.id, q.t, "mc")}${done ? moreBtn(q.id) : ""}</div>
+      <div class="foot"><div class="tools">${flagBtn(q.id, q.t, "mc")}${done ? moreBtn(q.id) : ""}${askBtn("mc:" + q.id)}</div>
         <div class="row"><span class="kbd">${done ? "Enter for next" : "Keys 1–4 or A–D"}</span><button class="btn" id="pnext" ${done ? "" : 'disabled'}>Next question</button></div></div>
     </div>`;
   }
@@ -589,7 +639,7 @@ RENDER.cards = function(reset){
         <div class="face front">${fa.front}<span class="hint">Click or press Space to flip</span></div>
         <div class="face back">${fa.back}<span class="hint">Did you know it?</span></div></div>
       <div class="foot"><span class="kbd">Card ${FC.i + 1} of ${FC.list.length} · knew ${FC.knew}/${FC.seen}</span>
-        <div class="row">${flagBtn(c.id, c.t, "card")}<button class="btn ghost" id="fc-miss" ${FC.flipped ? "" : "disabled"}>Missed it</button><button class="btn" id="fc-knew" ${FC.flipped ? "" : "disabled"}>Knew it</button></div></div>${noteHTML(c.id)}`;
+        <div class="row">${flagBtn(c.id, c.t, "card")}${askBtn("card:" + c.id)}<button class="btn ghost" id="fc-miss" ${FC.flipped ? "" : "disabled"}>Missed it</button><button class="btn" id="fc-knew" ${FC.flipped ? "" : "disabled"}>Knew it</button></div></div>${noteHTML(c.id)}`;
   }
   el.innerHTML = `${sheet("Flashcards", FC.list.length ? `${FC.list.length} cards` : "")}
     <div class="head"><h2>Flashcards</h2><p>Concept cards, plus a card for every equation on the sheet. You can bring a crib sheet, so the cards test what each relation does, when it applies and what it assumes, not numbers to memorize.</p></div>
@@ -646,7 +696,7 @@ RENDER.problems = function(reset){
         </li>`; }).join("")}</ol>
       ${openDeep.has(g.id) ? numDeepHTML(g) : ""}
       ${noteHTML(g.id)}
-      <div class="foot"><div class="tools">${flagBtn(g.id, g.t, "num")}${moreBtn(g.id)}</div>
+      <div class="foot"><div class="tools">${flagBtn(g.id, g.t, "num")}${moreBtn(g.id)}${askBtn("pr")}</div>
         <div class="row"><span class="kbd">${nOk}/${p.parts.length} parts correct</span><button class="btn ghost" id="pr-all">${PR.all ? "Hide full solution" : "Show full solution"}</button><button class="btn ghost" id="pr-same">New numbers</button><button class="btn" id="pr-new">Next problem</button></div></div>
     </div>`;
   }
@@ -699,7 +749,7 @@ function startExam(N, mins){
 }
 function tickExam(){ const left = Math.max(0, Math.round((EX.end - Date.now()) / 1000)); const c = $("#clock"); if (c) { c.textContent = mmss(left); c.classList.toggle("low", left < 120); } if (left <= 0) submitExam(); }
 const mmss = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
-function markLive(on){ const t = $("#tab-exam"); const d = t.querySelector(".live"); if (on && !d) t.insertAdjacentHTML("beforeend", '<span class="live" aria-label="exam running"></span>'); if (!on && d) d.remove(); }
+function markLive(on){ document.body.classList.toggle("exam-live", !!on); if (on && typeof closeChat === "function" && !$("#chat").hidden) closeChat(); const t = $("#tab-exam"); const d = t.querySelector(".live"); if (on && !d) t.insertAdjacentHTML("beforeend", '<span class="live" aria-label="exam running"></span>'); if (!on && d) d.remove(); }
 function itemCorrect(it, a){ if (a == null || a === "") return false; if (it.type === "mc") return a === it.q.a; const v = parseNum(a); return isFinite(v) && checkNum(it.p, v); }
 function submitExam(){
   clearInterval(EX.tick); EX.state = "done"; EX.used = Math.min(EX.dur, Math.round((Date.now() - EX.started) / 1000)); markLive(false);
@@ -764,9 +814,9 @@ RENDER.exam = function(){
     ${res.map((r, k) => {
       let body, title;
       if (r.it.type === "mc") { const q = r.it.q; title = q.q.replace(/<[^>]+>/g, "");
-        body = `<div class="qtext" style="font-size:16px">${q.q}</div><div>Your answer: ${r.a == null ? "<i>blank</i>" : q.ch[r.a]}</div><div>Correct: <b>${q.ch[q.a]}</b></div><p class="ex" style="margin:0">${q.ex}</p><span class="src">Source: ${esc(q.src)}</span>${openDeep.has(q.id) ? deepHTML(q) : ""}${noteHTML(q.id)}<div class="tools">${flagBtn(q.id, q.t, "mc")}${moreBtn(q.id)}</div>`; }
+        body = `<div class="qtext" style="font-size:16px">${q.q}</div><div>Your answer: ${r.a == null ? "<i>blank</i>" : q.ch[r.a]}</div><div>Correct: <b>${q.ch[q.a]}</b></div><p class="ex" style="margin:0">${q.ex}</p><span class="src">Source: ${esc(q.src)}</span>${openDeep.has(q.id) ? deepHTML(q) : ""}${noteHTML(q.id)}<div class="tools">${flagBtn(q.id, q.t, "mc")}${moreBtn(q.id)}${askBtn("ex:" + k)}</div>`; }
       else { const p = r.it.p; title = r.it.g.title;
-        body = `<div class="qtext" style="font-size:16px">${p.q}</div><div>Your answer: ${r.a ? esc(r.a) : "<i>blank</i>"} · Correct: <b>${fmtNum(p.ans, p.sig)} ${esc(p.unit)}</b></div><ol class="steps">${p.steps.map(s => `<li>${s}</li>`).join("")}</ol>${openDeep.has(r.it.g.id) ? numDeepHTML(r.it.g) : ""}${noteHTML(r.it.g.id)}<div class="tools">${flagBtn(r.it.g.id, r.it.g.t, "num")}${moreBtn(r.it.g.id)}</div>`; }
+        body = `<div class="qtext" style="font-size:16px">${p.q}</div><div>Your answer: ${r.a ? esc(r.a) : "<i>blank</i>"} · Correct: <b>${fmtNum(p.ans, p.sig)} ${esc(p.unit)}</b></div><ol class="steps">${p.steps.map(s => `<li>${s}</li>`).join("")}</ol>${openDeep.has(r.it.g.id) ? numDeepHTML(r.it.g) : ""}${noteHTML(r.it.g.id)}<div class="tools">${flagBtn(r.it.g.id, r.it.g.t, "num")}${moreBtn(r.it.g.id)}${askBtn("ex:" + k)}</div>`; }
       const rid = r.it.type === "mc" ? r.it.q.id : r.it.g.id;
       return `<details class="rev" ${!r.ok || openDeep.has(rid) || isFlagged(rid) ? "open" : ""}><summary><span class="tag ${r.ok ? "ok" : "bad"}">${k + 1} · ${r.ok ? "Right" : "Missed"}</span><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(title.slice(0, 140))}</span></summary><div class="body">${body}</div></details>`;
     }).join("")}`;
@@ -790,7 +840,7 @@ RENDER.equations = function(){
         <dt>Use when</dt><dd>${e.use}</dd>
         ${e.assume ? `<dt>Assumes</dt><dd>${e.assume}</dd>` : ""}
         ${e.watch ? `<dt>Watch out</dt><dd>${e.watch}</dd>` : ""}</dl>
-      ${e.lab ? `<a class="lab" href="flow-lab.html#${e.lab}">Open in Flow Lab →</a>` : ""}
+      <div class="row" style="gap:16px">${e.lab ? `<a class="lab" href="flow-lab.html#${e.lab}">Open in Flow Lab →</a>` : ""}<button class="linkbtn" data-ask="eq:${e.id}">Ask Claude →</button></div>
     </article>`).join("")}</div>`).join("");
   el.innerHTML = `${sheet("Equation sheet", `${list.length} of ${EQ.length} equations`)}
     <div class="head"><h2>Equation sheet</h2><p>Every working equation from Chapters 1–6: what each term means, when to use it, what it assumes, and the usual mistakes. Use it to build your crib sheet.</p></div>
@@ -851,6 +901,8 @@ function copyTex(list){
 $("#main").addEventListener("click", e => {
   const f = e.target.closest("[data-flag]");
   if (f) { e.preventDefault(); toggleFlag(f.dataset.flag, f.dataset.t, f.dataset.fkind); const y = window.scrollY; RENDER[view](false); window.scrollTo(0, y); return; }
+  const ak = e.target.closest("[data-ask]");
+  if (ak) { e.preventDefault(); openChat(ak.dataset.ask); return; }
   const m = e.target.closest("[data-more]");
   if (m) { e.preventDefault(); const id = m.dataset.more; if (openDeep.has(id)) openDeep.delete(id); else openDeep.add(id); const y = window.scrollY; RENDER[view](false); window.scrollTo(0, y); return; }
   const g = e.target.closest("[data-goeq]");
@@ -874,6 +926,260 @@ document.addEventListener("keydown", e => {
     else if (FC.flipped && e.key === "ArrowLeft") gradeCard(false);
   }
 });
+
+/* ---------- Ask Claude chat ----------
+   Inside Claude the page asks through the viewer's own account (the `sample` capability).
+   Opened anywhere else (GitHub Pages) it can use the student's own Anthropic API key, kept in this browser only.
+   "Copy as prompt" always works: it copies the item and the question for pasting into any Claude chat. */
+const CH = { ctx: null, turns: [], busy: false, ctl: null, backend: null, sample: null, ready: false };
+const KEYSTORE = "me461-api-key";
+const API_MODEL = "claude-sonnet-5-5";
+const RULES = String.raw`You are a patient tutor for ME 461/561 Gas Dynamics (Oregon State), helping a student prepare for a midterm on Chapters 1–6 of the course reader: thermodynamics review, control-volume analysis, stagnation states and the speed of sound, isentropic flow with area change and nozzles, normal shocks (stationary, moving and reflected, wind-tunnel starting), oblique shocks, Prandtl–Meyer expansions and simple external flows. Perfect gas, air with γ = 1.4 and R = 287 J/(kg·K) unless stated.
+Notation the course uses: subscript t = stagnation (total), * = sonic reference state, θ = shock angle, δ = flow deflection, ν = Prandtl–Meyer angle, µ = Mach angle, f = Darcy friction factor. On the exam the student has their own crib sheet plus the isentropic and normal-shock tables.
+How to answer:
+- Answer the student's actual question directly first, then explain the reasoning: which relation applies, why, and what it assumes.
+- If the student picked a wrong answer or entered a wrong number, work out the most likely mistake (wrong state, wrong root of A/A*, using the geometric throat after a shock, M instead of M⊥, degrees vs radians, absolute vs gauge, etc.) and say so.
+- If the student has not answered the item yet, give hints and do not reveal the answer unless they ask for it.
+- Keep it short: a few short paragraphs or a short list. Show only the key steps of any calculation, with numbers.
+- Write math in LaTeX using \( … \) inline and \[ … \] for displays. Never use $ signs. Markdown bold and lists are fine; no tables or headings.
+- If the item itself looks wrong, say so plainly.`;
+
+const tpl = document.createElement("template");
+function toText(html){ tpl.innerHTML = String(html == null ? "" : html); return tpl.content.textContent.replace(/[ \t]+\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim(); }
+const ABCD = "ABCD";
+function short(t, n){ if (t.length <= n) return t; let c = t.slice(0, n); const o = c.lastIndexOf("\\("), cl = c.lastIndexOf("\\)"); if (o > cl) c = c.slice(0, o); return c.trimEnd() + "…"; }
+function mcCtx(q, order, picked, answered, extra){
+  const ord = order || q.ch.map((_, i) => i);
+  const lines = [`Multiple-choice question (topic: ${TN[q.t].name}):`, toText(q.q), "", "Choices:"];
+  ord.forEach((oi, j) => lines.push(`${ABCD[j]}. ${toText(q.ch[oi])}`));
+  const letter = oi => ABCD[ord.indexOf(oi)];
+  if (answered) {
+    lines.push("", `Correct answer: ${letter(q.a)}. ${toText(q.ch[q.a])}`);
+    lines.push(picked == null ? "The student left it blank." : picked === q.a ? `The student chose ${letter(picked)} (correct).` : `The student chose ${letter(picked)}. ${toText(q.ch[picked])} (wrong).`);
+    lines.push("", "Explanation shown to the student: " + toText(q.ex));
+    const dd = DEEP[q.id]; if (dd) lines.push("Longer explanation: " + toText(dd.d));
+    if (dd && dd.eq) dd.eq.map(id => EQBY[id]).filter(Boolean).forEach(e => lines.push(`Related equation, ${e.name}: ${e.tex}`));
+  } else lines.push("", "The student has NOT answered yet.", `(For you only, do not reveal unless asked: the correct answer is ${letter(q.a)}. Explanation: ${toText(q.ex)})`);
+  lines.push(`Source: ${q.src}`);
+  if (extra) lines.push(extra);
+  return lines.join("\n");
+}
+function partsCtx(g, p, vals, res){
+  const lines = [`Multi-part homework-style problem "${g.title}" (topic: ${TN[g.t].name}; based on ${g.based}):`, toText(p.setup), ""];
+  p.parts.forEach((pt, i) => {
+    lines.push(`(${L(i)}) ${toText(pt.q)}`);
+    lines.push(`    Correct answer: ${fmtNum(pt.ans, pt.sig)}${pt.unit ? " " + pt.unit : ""} (answers within 3% count)`);
+    const r = res && res[i], v = vals && vals[i];
+    lines.push(r && r.ok ? `    Student: ${v} (correct)` : r && r.shown && !(v && String(v).trim()) ? "    Student: opened the steps without answering" : v && String(v).trim() ? `    Student entered: ${v}${r ? " (wrong)" : " (not checked yet)"}` : "    Student: not attempted yet (give hints before revealing this part)");
+    lines.push("    Worked steps: " + pt.steps.map(toText).join(" | "));
+  });
+  return lines.join("\n");
+}
+function numCtx(g, p, a){
+  return [`Numeric exam question (topic: ${TN[g.t].name}, "${g.title}"):`, toText(p.q),
+    `Correct answer: ${fmtNum(p.ans, p.sig)} ${p.unit || ""} (within 3% counts)`,
+    a ? `Student entered: ${a}${itemCorrect({ type: "num", p }, a) ? " (correct)" : " (wrong)"}` : "Student left it blank.",
+    "Worked steps: " + p.steps.map(toText).join(" | ")].join("\n");
+}
+function cardCtx(c){
+  if (c.eq) { const e = c.eq; return [`Equation flashcard (topic: ${TN[e.t].name}): ${e.name}`, `Equation: ${e.tex}`, "Use: " + toText(e.use), e.assume ? "Assumes: " + toText(e.assume) : "", e.watch ? "Watch out: " + toText(e.watch) : ""].filter(Boolean).join("\n"); }
+  return [`Concept flashcard (topic: ${TN[c.t].name}):`, "Front: " + toText(c.front), "Back: " + toText(c.back)].join("\n");
+}
+function eqCtx(e){
+  return [`Equation-sheet entry (topic: ${TN[e.t].name}): ${e.name}`, `Equation: ${e.tex}`,
+    e.terms.length ? "Terms: " + e.terms.map(x => `${x[0]} = ${x[1]}`).join("; ") : "",
+    "Use when: " + toText(e.use), e.assume ? "Assumes: " + toText(e.assume) : "", e.watch ? "Watch out: " + toText(e.watch) : ""].filter(Boolean).join("\n");
+}
+/* ref -> {label, text}; refs: mc:<id>, pr, card:<id>, ex:<k>, eq:<id> */
+function resolveCtx(ref){
+  const [kind, id] = String(ref).split(/:(.*)/s);
+  if (kind === "mc") { const q = MC.find(x => x.id === id); if (!q) return null;
+    const cur = P.cur && P.cur.id === id; return { label: "Practice: " + short(toText(q.q), 110), text: mcCtx(q, cur ? P.order : null, cur ? P.picked : null, cur ? P.picked != null : true) }; }
+  if (kind === "pr" && PR.cur) return { label: "Problem: " + PR.cur.g.title, text: partsCtx(PR.cur.g, PR.cur.p, PR.vals, PR.res) };
+  if (kind === "card") { const c = CARDS.concat(EQCARDS).find(x => x.id === id); if (!c) return null; return { label: "Flashcard: " + short(toText(c.eq ? c.eq.name : c.front), 110), text: cardCtx(c) }; }
+  if (kind === "ex" && EX.state === "done") { const k = +id, it = EX.items[k]; if (!it) return null;
+    return it.type === "mc" ? { label: `Exam Q${k + 1}: ` + short(toText(it.q.q), 100), text: mcCtx(it.q, it.order, EX.ans[k], true, "This was on a timed mock exam the student just finished.") }
+      : { label: `Exam Q${k + 1}: ` + it.g.title, text: numCtx(it.g, it.p, EX.ans[k]) }; }
+  if (kind === "eq") { const e = EQBY[id]; if (!e) return null; return { label: "Equation: " + e.name, text: eqCtx(e) }; }
+  return null;
+}
+function viewRef(){
+  if (view === "practice" && P.cur) return "mc:" + P.cur.id;
+  if (view === "problems" && PR.cur) return "pr";
+  if (view === "cards" && FC.list[FC.i]) return "card:" + FC.list[FC.i].id;
+  return null;
+}
+function askBtn(ref){ return `<button class="tbtn" data-ask="${esc(ref)}"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 3.5A1.5 1.5 0 0 1 3.5 2h9A1.5 1.5 0 0 1 14 3.5v6a1.5 1.5 0 0 1-1.5 1.5H7l-3.5 3v-3A1.5 1.5 0 0 1 2 9.5z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>Ask Claude</button>`; }
+
+/* --- minimal Markdown with protected TeX --- */
+function md(src){
+  const math = [];
+  let s = String(src).replace(/\\\[[\s\S]*?\\\]|\\\([\s\S]*?\\\)/g, m => { math.push(m); return `\u0000${math.length - 1}\u0000`; });
+  s = s.replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c]));
+  const code = [];
+  s = s.replace(/```[^\n]*\n?([\s\S]*?)(```|$)/g, (_, b) => { code.push(`<pre>${b.replace(/\n$/, "")}</pre>`); return `\u0001${code.length - 1}\u0001`; });
+  const inline = t => t.replace(/`([^`\n]+)`/g, "<code>$1</code>").replace(/\*\*([^*\n]+)\*\*/g, "<b>$1</b>").replace(/(^|[^*\w])\*([^*\s][^*\n]*?)\*(?!\w)/g, "$1<i>$2</i>").replace(/^#{1,6}\s+(.*)$/gm, "<b>$1</b>");
+  const out = s.split(/\n{2,}/).map(block => {
+    if (/^\u0001\d+\u0001$/.test(block.trim())) return block.trim();
+    const lines = block.split("\n");
+    if (lines.every(l => /^\s*([-*•]|\d+[.)])\s+/.test(l) || !l.trim())) {
+      const ordered = /^\s*\d/.test(lines[0]);
+      return `<${ordered ? "ol" : "ul"}>${lines.filter(l => l.trim()).map(l => `<li>${inline(l.replace(/^\s*([-*•]|\d+[.)])\s+/, ""))}</li>`).join("")}</${ordered ? "ol" : "ul"}>`;
+    }
+    return `<p>${inline(block).replace(/\n/g, "<br>")}</p>`;
+  }).join("");
+  return out.replace(/\u0001(\d+)\u0001/g, (_, i) => code[+i]).replace(/\u0000(\d+)\u0000/g, (_, i) => math[+i].replace(/[&<>]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;" }[c])));
+}
+
+/* --- backends --- */
+function getKey(){ try { return localStorage.getItem(KEYSTORE) || ""; } catch (e) { return ""; } }
+function setKey(k){ try { if (k) localStorage.setItem(KEYSTORE, k); else localStorage.removeItem(KEYSTORE); } catch (e) {} }
+const IN_CLAUDE = !!(window.claude && typeof window.claude.use === "function");
+function pickBackend(){ CH.backend = CH.sample ? "sample" : (!IN_CLAUDE && getKey()) ? "api" : null; renderMode(); }
+if (IN_CLAUDE) {
+  window.claude.use("sample").then(fn => { CH.sample = fn || null; CH.ready = true; pickBackend(); }, () => { CH.ready = true; pickBackend(); });
+} else { CH.ready = true; }
+async function askAPI(turns, onText, signal){
+  const r = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", signal,
+    headers: { "content-type": "application/json", "x-api-key": getKey(), "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" },
+    body: JSON.stringify({ model: API_MODEL, max_tokens: 1500, stream: true, system: RULES, messages: turns }) });
+  if (!r.ok) { let m = ""; try { m = (await r.json()).error.message; } catch (e) {} throw { code: r.status === 401 ? "bad_key" : r.status === 429 ? "rate_limited" : "upstream_error", message: m || "HTTP " + r.status }; }
+  const rd = r.body.getReader(), dec = new TextDecoder(); let buf = "", text = "";
+  for (;;) {
+    const { value, done } = await rd.read(); if (done) break;
+    buf += dec.decode(value, { stream: true }); const ev = buf.split("\n\n"); buf = ev.pop();
+    for (const e of ev) { const d = e.split("\n").find(l => l.startsWith("data:")); if (!d) continue; let j; try { j = JSON.parse(d.slice(5)); } catch (x) { continue; }
+      if (j.type === "content_block_delta" && j.delta && j.delta.type === "text_delta") { text += j.delta.text; onText(text); }
+      if (j.type === "error") throw { code: "upstream_error", message: j.error && j.error.message, text }; }
+  }
+  if (!text.trim()) throw { code: "empty_completion" };
+  return text;
+}
+function ask(turns, onText, signal){
+  if (CH.backend === "sample") {
+    const input = [{ role: "user", content: RULES + "\n\n" + turns[0].content }].concat(turns.slice(1));
+    return CH.sample(input, { cache: false, signal, onText: u => onText(u.text) }).then(r => r.text);
+  }
+  return askAPI(turns, onText, signal);
+}
+const ERR = {
+  not_granted: "Claude wasn't allowed for this page. Use “Copy as prompt” to ask in a regular Claude chat instead.",
+  sampling_disabled: "Claude isn't available on this account here. Use “Copy as prompt” instead.",
+  rate_limited: "Too many questions too quickly, or the usage limit was reached. Wait a bit, then try again.",
+  session_expired: "You've been signed out of Claude. Sign in again, then retry.",
+  refused: "Claude declined that one. Try rewording the question.",
+  empty_completion: "No answer came back. Try rewording or asking for less.",
+  bad_key: "That API key was rejected. Check it under “API key”, or use “Copy as prompt”.",
+  upstream_error: "The connection dropped. Try again."
+};
+
+/* --- UI --- */
+const chatEl = $("#chat"), log = $("#ch-log"), inp = $("#ch-in"), sendBtn = $("#ch-send");
+function renderMode(){
+  const m = $("#ch-mode"), keyBox = $("#ch-key");
+  if (CH.backend === "sample") { m.textContent = "Answers use your Claude account."; keyBox.hidden = true; }
+  else if (CH.backend === "api") { m.innerHTML = `Using your API key (${esc(API_MODEL)}). <button class="linkbtn" id="ch-keyedit" type="button">API key</button>`; keyBox.hidden = true; $("#ch-keyedit").onclick = showKeyBox; }
+  else if (!CH.ready) { m.textContent = "Connecting…"; }
+  else if (IN_CLAUDE) { m.textContent = "Claude isn't reachable from this view."; keyBox.hidden = true; }
+  else { m.textContent = ""; showKeyBox(); }
+  sendBtn.disabled = !CH.backend && !CH.busy;
+  inp.disabled = !CH.backend;
+}
+function showKeyBox(){
+  const box = $("#ch-key"); box.hidden = false;
+  box.innerHTML = `<span>Outside Claude, chat needs your own <b>Anthropic API key</b> (from console.anthropic.com). It's kept in this browser only and sent only to Anthropic. Don't save it on a shared computer.</span>
+    <input id="ch-keyin" type="password" autocomplete="off" placeholder="sk-ant-…" value="${esc(getKey())}" aria-label="Anthropic API key">
+    <div class="row"><button class="btn sm" id="ch-keysave" type="button">Save key</button>${getKey() ? '<button class="btn ghost sm" id="ch-keyclear" type="button">Remove key</button>' : ""}${CH.backend ? '<button class="btn ghost sm" id="ch-keyhide" type="button">Done</button>' : ""}</div>
+    <span>No key? “Copy as prompt” copies this item and your question to paste into any Claude chat.</span>`;
+  $("#ch-keysave").onclick = () => { const v = $("#ch-keyin").value.trim(); if (!v) return; setKey(v); box.hidden = true; pickBackend(); inp.focus(); };
+  const cl = $("#ch-keyclear"); if (cl) cl.onclick = () => { setKey(""); pickBackend(); };
+  const hd = $("#ch-keyhide"); if (hd) hd.onclick = () => { box.hidden = true; };
+}
+const SUGG = {
+  mc: ["Why is my answer wrong?", "Why is the correct answer right?", "Which equation applies here, and why?", "Give me a similar question to try"],
+  pr: ["Where did I go wrong?", "Give me a hint for the next part", "Walk me through the method", "Which table values do I need?"],
+  card: ["Explain this more simply", "When would this show up on the exam?", "What's the usual mistake with this?"],
+  ex: ["Why is my answer wrong?", "Explain the correct answer", "What should I review for this?"],
+  eq: ["When do I use this?", "Walk through a quick example", "What's the usual trap with this?"],
+  none: ["When does a converging–diverging nozzle choke?", "Weak vs strong oblique shocks?", "Why does stagnation pressure drop across a shock?"]
+};
+function renderLog(){
+  if (!CH.turns.length) {
+    const kind = CH.ctx ? CH.ctx.ref.split(":")[0] : "none";
+    const SEES = { mc: "the question, the choices, the correct answer, your pick and the explanation", pr: "the problem, every part's answer and worked steps, and what you've entered so far", ex: "the question, the correct answer, your answer and the worked solution", card: "both sides of the card", eq: "the equation, its terms, when to use it and what it assumes" };
+    log.innerHTML = `<div class="ch-empty">${CH.ctx ? `Ask anything about this item. Claude sees ${SEES[kind]}.` : "Ask anything about Chapters 1–6. To ask about a specific question, use the “Ask Claude” button on it."}
+      <div class="ch-sugg">${SUGG[kind].map(s => `<button type="button">${esc(s)}</button>`).join("")}</div></div>`;
+    log.querySelectorAll(".ch-sugg button").forEach(b => b.onclick = () => { if (!CH.backend) { inp.value = b.textContent; return; } send(b.textContent); });
+    return;
+  }
+  log.innerHTML = CH.turns.map((t, i) => t.role === "user" ? `<div class="msg u">${esc(i === 0 && CH.ctx ? t.shown : t.shown || t.content)}</div>` : `<div class="msg a">${md(t.content)}</div>`).join("");
+  typeset(log);
+}
+function setCtx(ref){
+  const c = ref ? resolveCtx(ref) : null;
+  CH.ctx = c ? { ref, label: c.label, text: c.text } : null;
+  $("#ch-ctx").hidden = !CH.ctx; $("#ch-ctx-t").textContent = CH.ctx ? CH.ctx.label : ""; if (CH.ctx) typeset($("#ch-ctx-t"));
+  inp.placeholder = CH.ctx ? "Ask about this item…" : "Ask a gas-dynamics question…";
+}
+function openChat(ref){
+  if (EX.state === "run") return;
+  const fresh = ref !== undefined && (!CH.ctx || CH.ctx.ref !== ref || ref === "pr");
+  if (fresh || !CH.turns.length) { stopAsk(); CH.turns = []; setCtx(ref === undefined ? viewRef() : ref); }
+  chatEl.hidden = false; document.body.classList.add("chat-open"); renderMode(); renderLog(); log.scrollTop = log.scrollHeight;
+  if (window.matchMedia("(min-width: 601px)").matches || ref !== undefined) setTimeout(() => { if (!inp.disabled) inp.focus(); }, 30);
+}
+function closeChat(){ chatEl.hidden = true; document.body.classList.remove("chat-open"); $("#ask-fab").focus({ preventScroll: true }); }
+function stopAsk(){ if (CH.ctl) CH.ctl.abort(); }
+async function send(text){
+  text = String(text || "").trim(); if (!text || CH.busy || !CH.backend) return;
+  if (CH.ctx && CH.ctx.ref === "pr") { const c = resolveCtx("pr"); if (c) CH.ctx.text = c.text; }   /* problem answers may have changed */
+  const first = !CH.turns.length;
+  const content = first ? (CH.ctx ? `Here is the item I'm looking at in my study app:\n\n${CH.ctx.text}\n\nMy question: ${text}` : text) : text;
+  CH.turns.push({ role: "user", content, shown: text });
+  inp.value = ""; autoSize(); renderLog();
+  const bubble = document.createElement("div"); bubble.className = "msg a think"; bubble.textContent = "Thinking…"; log.appendChild(bubble); log.scrollTop = log.scrollHeight;
+  CH.busy = true; CH.ctl = new AbortController(); sendBtn.textContent = "Stop"; sendBtn.disabled = false;
+  /* keep the first turn (item + question) and the most recent exchanges */
+  const hist = CH.turns.length > 13 ? [CH.turns[0]].concat(CH.turns.slice(-12)) : CH.turns;
+  const payload = hist.map(t => ({ role: t.role, content: t.content }));
+  let shown = "";
+  try {
+    const out = await ask(payload, t => { shown = t; bubble.classList.remove("think"); bubble.innerHTML = md(t); const nearBottom = log.scrollHeight - log.scrollTop - log.clientHeight < 80; if (nearBottom) log.scrollTop = log.scrollHeight; }, CH.ctl.signal);
+    CH.turns.push({ role: "assistant", content: out });
+  } catch (e) {
+    const code = (e && e.code) || (e && e.name === "AbortError" ? "cancelled" : "upstream_error");
+    const keep = e && e.text != null ? e.text : shown;
+    if (keep && code !== "refused") CH.turns.push({ role: "assistant", content: keep + (code === "cancelled" ? "\n\n*(stopped)*" : "") });
+    else CH.turns.pop();
+    if (code === "not_granted" || code === "sampling_disabled" || code === "not_declared" || code === "capability_disabled" || code === "capability_removed") { CH.sample = null; pickBackend(); }
+    if (code === "bad_key") showKeyBox();
+    renderLog();
+    if (!keep) inp.value = text;
+    if (code !== "cancelled") { const m = document.createElement("div"); m.className = "msg err"; m.textContent = ERR[code] || ERR.upstream_error; log.appendChild(m); }
+  } finally {
+    CH.busy = false; CH.ctl = null; sendBtn.textContent = "Send"; renderMode(); renderLog_after(); }
+}
+function renderLog_after(){ const errs = [...log.querySelectorAll(".msg.err")]; renderLog(); errs.forEach(e => log.appendChild(e)); log.scrollTop = log.scrollHeight; if (!inp.disabled) inp.focus({ preventScroll: true }); }
+function autoSize(){ inp.style.height = "auto"; inp.style.height = Math.min(140, inp.scrollHeight) + "px"; }
+function promptText(){
+  const q = inp.value.trim() || "(my question)";
+  const history = CH.turns.slice(1).map(t => `${t.role === "user" ? "Me" : "Tutor"}: ${t.role === "user" ? t.content : t.content}`).join("\n\n");
+  return `${RULES}\n\n${CH.ctx ? "Here is the item I'm looking at in my study app:\n\n" + CH.ctx.text + "\n\n" : ""}${CH.turns.length ? "First question: " + CH.turns[0].shown + "\n\n" + (history ? history + "\n\n" : "") + "Follow-up: " : "My question: "}${q}`;
+}
+$("#ch-form").onsubmit = e => { e.preventDefault(); if (CH.busy) stopAsk(); else send(inp.value); };
+inp.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); if (!CH.busy) send(inp.value); } });
+inp.addEventListener("input", autoSize);
+$("#ask-fab").onclick = () => openChat(CH.turns.length ? undefined : viewRef());
+$("#ch-close").onclick = closeChat;
+$("#ch-new").onclick = () => { stopAsk(); CH.turns = []; setCtx(viewRef()); renderLog(); inp.focus(); };
+$("#ch-ctx-x").onclick = () => { setCtx(null); if (!CH.turns.length) renderLog(); };
+$("#ch-copy").onclick = () => {
+  const t = promptText(), b = $("#ch-copy");
+  const done = ok => { b.textContent = ok ? "Copied. Paste into Claude" : "Copy failed"; setTimeout(() => { b.textContent = "Copy as prompt"; }, 2500); };
+  try { navigator.clipboard.writeText(t).then(() => done(true), () => { const ta = document.createElement("textarea"); ta.value = t; document.body.appendChild(ta); ta.select(); let ok = false; try { ok = document.execCommand("copy"); } catch (e) {} ta.remove(); done(ok); }); } catch (e) { done(false); }
+};
+chatEl.addEventListener("keydown", e => { if (e.key === "Escape") { e.stopPropagation(); closeChat(); } });
+renderMode();
 
 /* ---------- boot ---------- */
 bindReset(); renderSide();
