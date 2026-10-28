@@ -132,6 +132,11 @@ main{min-width:0;display:flex;flex-direction:column;gap:16px}
 .pv.ok{color:var(--ok-fg)} .pv.bad{color:var(--bad-fg)}
 .psol{padding-left:34px;display:flex;flex-direction:column;gap:6px;min-width:0}
 .psol .ans{font-size:15px}
+.part.inter{background:transparent;border-style:dashed;border-left-style:solid;border-left-color:var(--bar)}
+.part.inter .pq .lbl{margin-right:6px}
+.psol .chain{display:block;padding:4px 0 8px;border-bottom:1px dashed var(--rule)}
+.psol .chain .lbl{display:inline;margin-right:6px}
+.psol .chain .steps{margin-top:4px}
 @media (max-width:520px){ .part .ansrow,.psol{padding-left:0} }
 /* exam */
 .examopts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
@@ -669,7 +674,11 @@ function newProblem(same){
     PR.recent.push(g.id); while (PR.recent.length > Math.min(8, Math.floor(pool.length / 2))) PR.recent.shift(); }
   if (PR.cur) openDeep.delete(PR.cur.g.id);
   const p = g.gen(); PR.cur = { g, p }; PR.vals = p.parts.map(() => ""); PR.res = p.parts.map(() => null); PR.steps = new Set(); PR.all = false; PR.focus = 0;
+  PR.goals = (p.goal && p.goal.length ? p.goal : p.parts.map((_, i) => i)).slice().sort((a, b) => a - b);
 }
+/* the hidden in-between parts that lead to goal part i */
+function chainOf(i){ const k = PR.goals.indexOf(i), from = k > 0 ? PR.goals[k - 1] + 1 : 0, out = []; for (let j = from; j < i; j++) if (!PR.goals.includes(j)) out.push(j); return out; }
+const firstGoal = () => (PR.goals && PR.goals.length ? PR.goals[0] : 0);
 const L = i => String.fromCharCode(97 + i);
 RENDER.problems = function(reset){
   const el = $("#v-problems");
@@ -679,30 +688,33 @@ RENDER.problems = function(reset){
   if (!S.sel.length && !PR.flagOnly) body = noTopics;
   else if (!PR.cur) body = `<p class="empty">${PR.flagOnly ? "No flagged problems yet. Use Flag for follow-up on a problem to save it." : "No problems in these topics."}</p>`;
   else {
-    const { g, p } = PR.cur, nOk = PR.res.filter(r => r && r.ok).length;
+    const { g, p } = PR.cur, nOk = PR.goals.filter(i => PR.res[i] && PR.res[i].ok).length;
     body = `<div class="card">
       <div class="meta"><span>${esc(TN[g.t].name)}</span><span>Based on ${esc(g.based)}</span>${g.mr ? '<span class="mr">● High-yield</span>' : ""}</div>
       <h3 class="ptitle">${esc(g.title)}</h3>
       <div class="qtext">${p.setup}</div>
-      <ol class="parts">${p.parts.map((pt, i) => {
-        const r = PR.res[i], show = PR.all || PR.steps.has(i), locked = r && r.ok;
+      <ol class="parts">${(PR.all ? p.parts.map((_, i) => i) : PR.goals).map(i => {
+        const pt = p.parts[i];
+        if (!PR.goals.includes(i)) return `<li class="part inter"><div class="ptop"><span class="plbl">·</span><span class="pq"><span class="lbl">Along the way</span> ${pt.q}</span></div>
+          <div class="psol"><span class="ans">${fmtNum(pt.ans, pt.sig)}${pt.unit ? " " + esc(pt.unit) : ""}</span><ol class="steps">${pt.steps.map(x => `<li>${x}</li>`).join("")}</ol></div></li>`;
+        const r = PR.res[i], show = PR.all || PR.steps.has(i), locked = r && r.ok, k = PR.goals.indexOf(i), chain = PR.all ? [] : chainOf(i);
         return `<li class="part ${r ? (r.ok ? "ok" : r.shown ? "" : "bad") : ""}">
-          <div class="ptop"><span class="plbl">(${L(i)})</span><span class="pq">${pt.q}</span></div>
-          <div class="ansrow"><input id="pa-${i}" data-pi="${i}" inputmode="decimal" autocomplete="off" aria-label="Answer to part ${L(i)}" placeholder="${pt.sig || (Math.abs(pt.ans) > 0 && Math.abs(pt.ans) < 0.01) ? "e.g. 3.75e-7" : "number"}" value="${esc(PR.vals[i])}" ${locked ? "disabled" : ""}>${pt.unit ? `<span class="unit">${esc(pt.unit)}</span>` : ""}
+          <div class="ptop"><span class="plbl">(${L(k)})</span><span class="pq">${pt.q}</span></div>
+          <div class="ansrow"><input id="pa-${i}" data-pi="${i}" inputmode="decimal" autocomplete="off" aria-label="Answer to part ${L(k)}" placeholder="${pt.sig || (Math.abs(pt.ans) > 0 && Math.abs(pt.ans) < 0.01) ? "e.g. 3.75e-7" : "number"}" value="${esc(PR.vals[i])}" ${locked ? "disabled" : ""}>${pt.unit ? `<span class="unit">${esc(pt.unit)}</span>` : ""}
             <button class="btn ghost sm" data-chk="${i}" ${locked ? "disabled" : ""}>Check</button>
             ${r ? `<span class="pv ${r.ok ? "ok" : r.shown ? "" : "bad"}">${r.nan ? "Enter a number" : r.ok ? "Correct" : r.shown ? "Steps shown" : "Not quite, try again"}</span>` : ""}
             <button class="linkbtn" data-stp="${i}">${show ? "Hide steps" : "Show steps"}</button></div>
-          ${show ? `<div class="psol"><span class="ans">Answer: <b>${fmtNum(pt.ans, pt.sig)}${pt.unit ? " " + esc(pt.unit) : ""}</b></span><ol class="steps">${pt.steps.map(x => `<li>${x}</li>`).join("")}</ol></div>` : ""}
+          ${show ? `<div class="psol">${chain.map(j => { const h = p.parts[j]; return `<div class="chain"><span class="lbl">First find</span> ${h.q}: <b>${fmtNum(h.ans, h.sig)}${h.unit ? " " + esc(h.unit) : ""}</b><ol class="steps">${h.steps.map(x => `<li>${x}</li>`).join("")}</ol></div>`; }).join("")}<span class="ans">Answer: <b>${fmtNum(pt.ans, pt.sig)}${pt.unit ? " " + esc(pt.unit) : ""}</b></span><ol class="steps">${pt.steps.map(x => `<li>${x}</li>`).join("")}</ol></div>` : ""}
         </li>`; }).join("")}</ol>
       ${openDeep.has(g.id) ? numDeepHTML(g) : ""}
       ${noteHTML(g.id)}
       <div class="foot"><div class="tools">${flagBtn(g.id, g.t, "num")}${moreBtn(g.id)}${askBtn("pr")}</div>
-        <div class="row"><span class="kbd">${nOk}/${p.parts.length} parts correct</span><button class="btn ghost" id="pr-all">${PR.all ? "Hide full solution" : "Show full solution"}</button><button class="btn ghost" id="pr-same">New numbers</button><button class="btn" id="pr-new">Next problem</button></div></div>
+        <div class="row"><span class="kbd">${nOk}/${PR.goals.length} ${PR.goals.length === 1 ? "answer" : "answers"} correct</span><button class="btn ghost" id="pr-all">${PR.all ? "Hide full solution" : "Show full solution"}</button><button class="btn ghost" id="pr-same">New numbers</button><button class="btn" id="pr-new">Next problem</button></div></div>
     </div>`;
   }
-  const nParts = pool.reduce((a, g) => a + (g._n || (g._n = g.gen().parts.length)), 0);
-  el.innerHTML = `${sheet("Problems", `${pool.length} problems · ${nParts} parts · new numbers every time`)}
-    <div class="head"><h2>Homework-style problems</h2><p>Multi-part problems modeled on HW 1–4 and the reader&rsquo;s worked examples. Later parts build on earlier ones, as on the homework. Check each part (answers within 3% count, to allow for table and chart reading) or open the steps for any part. Answers come from the exact relations; keep your tables or the Flow Lab calculator open.</p></div>
+  const nParts = pool.reduce((a, g) => a + (g._n || (g._n = g.gen().goal.length)), 0);
+  el.innerHTML = `${sheet("Problems", `${pool.length} problems · ${nParts} answers · new numbers every time`)}
+    <div class="head"><h2>Homework-style problems</h2><p>Problems modeled on HW 1–4 and the reader&rsquo;s worked examples, all in air. Each one asks only for the end results: working out which in-between quantities you need, and in what order, is part of the problem. Answers within 3% count, to allow for table and chart reading. Show steps reveals the whole chain for that answer, and Show full solution lays out every intermediate. Keep your tables or the Flow Lab calculator open.</p></div>
     <div class="row"><span class="lbl">Show</span><button class="chip" aria-pressed="${!PR.flagOnly}" data-pf="0">All selected topics</button><button class="chip" aria-pressed="${PR.flagOnly}" data-pf="1">Flagged only (${flagCounts().num})</button></div>${body}`;
   el.querySelectorAll("[data-pf]").forEach(b => b.onclick = () => { PR.flagOnly = b.dataset.pf === "1"; PR.recent = []; RENDER.problems(true); });
   el.querySelectorAll("input[data-pi]").forEach(inp => {
@@ -713,8 +725,8 @@ RENDER.problems = function(reset){
   el.querySelectorAll("[data-chk]").forEach(b => b.onclick = () => checkPart(+b.dataset.chk));
   el.querySelectorAll("[data-stp]").forEach(b => b.onclick = () => { const i = +b.dataset.stp; if (PR.steps.has(i)) PR.steps.delete(i); else { PR.steps.add(i); if (!PR.res[i]) { PR.res[i] = { ok: false, shown: true }; rec(PR.cur.g.id, PR.cur.g.t, false); } } keepScroll(() => RENDER.problems(false)); });
   const all = $("#pr-all"); if (all) all.onclick = () => { PR.all = !PR.all; keepScroll(() => RENDER.problems(false)); };
-  const same = $("#pr-same"); if (same) same.onclick = () => { newProblem(true); RENDER.problems(false); focusPart(0); };
-  const nx = $("#pr-new"); if (nx) nx.onclick = () => { newProblem(false); RENDER.problems(false); window.scrollTo({ top: 0 }); focusPart(0); };
+  const same = $("#pr-same"); if (same) same.onclick = () => { newProblem(true); RENDER.problems(false); focusPart(firstGoal()); };
+  const nx = $("#pr-new"); if (nx) nx.onclick = () => { newProblem(false); RENDER.problems(false); window.scrollTo({ top: 0 }); focusPart(firstGoal()); };
   typeset(el);
 };
 function keepScroll(fn){ const y = window.scrollY; fn(); window.scrollTo(0, y); }
@@ -726,7 +738,7 @@ function checkPart(i){
   PR.res[i] = { ok, v, shown: !!(PR.res[i] && PR.res[i].shown) && !ok };
   if (first) rec(PR.cur.g.id, PR.cur.g.t, ok);
   keepScroll(() => RENDER.problems(false));
-  if (ok) { const nxt = PR.cur.p.parts.findIndex((_, k) => k > i && !(PR.res[k] && PR.res[k].ok)); focusPart(nxt >= 0 ? nxt : i); } else focusPart(i);
+  if (ok) { const nxt = PR.goals.find(k => k > i && !(PR.res[k] && PR.res[k].ok)); focusPart(nxt != null ? nxt : i); } else focusPart(i);
 }
 
 /* ----- Mock exam ----- */
@@ -940,6 +952,7 @@ How to answer:
 - Answer the student's actual question directly first, then explain the reasoning: which relation applies, why, and what it assumes.
 - If the student picked a wrong answer or entered a wrong number, work out the most likely mistake (wrong state, wrong root of A/A*, using the geometric throat after a shock, M instead of M⊥, degrees vs radians, absolute vs gauge, etc.) and say so.
 - If the student has not answered the item yet, give hints and do not reveal the answer unless they ask for it.
+- On multi-part problems the student is deliberately not told which in-between quantities to find. When they are stuck, nudge them toward what they need to solve for next (a question, a principle, a hint about which state or relation) rather than listing the whole path or its numbers, unless they ask for the full method.
 - Keep it short: a few short paragraphs or a short list. Show only the key steps of any calculation, with numbers.
 - Write math in LaTeX using \( … \) inline and \[ … \] for displays. Never use $ signs. Markdown bold and lists are fine; no tables or headings.
 - If the item itself looks wrong, say so plainly.`;
@@ -966,11 +979,13 @@ function mcCtx(q, order, picked, answered, extra){
 }
 function partsCtx(g, p, vals, res){
   const lines = [`Multi-part homework-style problem "${g.title}" (topic: ${TN[g.t].name}; based on ${g.based}):`, toText(p.setup), ""];
+  const goals = p.goal && p.goal.length ? p.goal : p.parts.map((_, i) => i);
+  lines.push("The student is asked ONLY for the parts labelled ASKED. The HIDDEN parts are in-between quantities the student must realize they need and find on their own; that is the point of the exercise.", "");
   p.parts.forEach((pt, i) => {
-    lines.push(`(${L(i)}) ${toText(pt.q)}`);
+    lines.push(goals.includes(i) ? `ASKED (${L(goals.indexOf(i))}) ${toText(pt.q)}` : `HIDDEN in-between: ${toText(pt.q)}`);
     lines.push(`    Correct answer: ${fmtNum(pt.ans, pt.sig)}${pt.unit ? " " + pt.unit : ""} (answers within 3% count)`);
     const r = res && res[i], v = vals && vals[i];
-    lines.push(r && r.ok ? `    Student: ${v} (correct)` : r && r.shown && !(v && String(v).trim()) ? "    Student: opened the steps without answering" : v && String(v).trim() ? `    Student entered: ${v}${r ? " (wrong)" : " (not checked yet)"}` : "    Student: not attempted yet (give hints before revealing this part)");
+    if (goals.includes(i)) lines.push(r && r.ok ? `    Student: ${v} (correct)` : r && r.shown && !(v && String(v).trim()) ? "    Student: opened the steps without answering" : v && String(v).trim() ? `    Student entered: ${v}${r ? " (wrong)" : " (not checked yet)"}` : "    Student: not attempted yet (give hints before revealing this part)");
     lines.push("    Worked steps: " + pt.steps.map(toText).join(" | "));
   });
   return lines.join("\n");

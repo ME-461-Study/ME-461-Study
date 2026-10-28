@@ -45,14 +45,14 @@ mc("thermo","equation",0,R`In the polytropic relation \(p\,V^n = C\), which expo
 mc("thermo","fact",0,R`Real compression and expansion processes (with some heat transfer) usually have a polytropic exponent in which range?`,
  [R`\(1 < n < \gamma\)`,R`\(0 < n < 1\)`,R`\(n > \gamma\)`,R`\(n < 0\)`],
  R`They sit between isothermal and isentropic. The exponent is usually found empirically.`,"Reader §1.2.3");
-mc("thermo","concept",1,R`Methane flows steadily and <b>isothermally</b> through a constant-area duct and speeds up from 20 to 25 m/s. A classmate says \(\dot Q = 0\) because \(T\) is constant. What's wrong with that?`,
+mc("thermo","concept",1,R`Air flows steadily and <b>isothermally</b> through a constant-area duct and speeds up from 20 to 25 m/s. A classmate says \(\dot Q = 0\) because \(T\) is constant. What's wrong with that?`,
  ["Constant T fixes h for a perfect gas, but the kinetic energy rose, so heat had to be added to supply it","Nothing; for a perfect gas, isothermal and adiabatic mean the same thing","Heat transfer is zero, but shaft work must be nonzero to accelerate the gas","Constant T means constant pressure, so the gas cannot accelerate at all"],
  R`SFEE with \(w_s = 0\): \(\dot Q = \dot m\left[\Delta h + \Delta(V^2/2)\right]\). For a perfect gas \(\Delta h = C_p\Delta T = 0\), which leaves \(\dot Q = \dot m\,\Delta(V^2/2) > 0\), into the gas.`,"HW1 #1c",
- R`The trap is mixing up "heat" with "temperature change." Temperature tracks the thermal energy (u and h), not the total energy. Here, pressure and density fall along the duct, so continuity (\(\rho V\) constant) forces the gas to speed up. Without heat input the accelerating gas would cool. With HW 1's numbers, \(\dot Q = (0.0218)(25^2-20^2)/2 \approx 2.45\) W into the gas.`,["sfee","dudh"]);
-mc("thermo","equation",0,R`Methane has a molar mass of 16.0 kg/kmol. Its specific gas constant is closest to:`,
- [R`\(520\ \mathrm{J/(kg\,K)}\)`,R`\(287\ \mathrm{J/(kg\,K)}\)`,R`\(8314\ \mathrm{J/(kg\,K)}\)`,R`\(0.52\ \mathrm{J/(kg\,K)}\)`],
- R`\(R = \hat R/M_w = 8314/16.0 \approx 520\ \mathrm{J/(kg\,K)}\). The 0.52 option is the same number in J/(g·K), which is the unit slip to avoid.`,"Reader §1.1.2; HW1 #1a",
- R`Keep the units straight. \(\hat R = 8.314\ \mathrm{J/(mol\,K)} = 8314\ \mathrm{J/(kmol\,K)}\). Divide by the molar mass in the matching unit (kg/kmol) to get J/(kg K). Lighter gases have larger R, and so a larger sound speed at the same temperature.`,["eos"]);
+ R`The trap is mixing up "heat" with "temperature change." Temperature tracks the thermal energy (u and h), not the total energy. Here, pressure and density fall along the duct, so continuity (\(\rho V\) constant) forces the gas to speed up. Without heat input the accelerating gas would cool. At 0.02 kg/s, for example, \(\dot Q = (0.02)(25^2-20^2)/2 = 2.25\) W into the gas.`,["sfee","dudh"]);
+mc("thermo","equation",0,R`Air has a molar mass of 28.97 kg/kmol. Its specific gas constant is closest to:`,
+ [R`\(287\ \mathrm{J/(kg\,K)}\)`,R`\(8314\ \mathrm{J/(kg\,K)}\)`,R`\(0.287\ \mathrm{J/(kg\,K)}\)`,R`\(241\ \mathrm{J/(kg\,K)}\)`],
+ R`\(R = \hat R/M_w = 8314/28.97 \approx 287\ \mathrm{J/(kg\,K)}\). The 0.287 option is the same number in J/(g·K), which is the unit slip to avoid.`,"Reader §1.1.2; HW1 #1a",
+ R`Keep the units straight. \(\hat R = 8.314\ \mathrm{J/(mol\,K)} = 8314\ \mathrm{J/(kmol\,K)}\). Divide by the molar mass in the matching unit (kg/kmol) to get J/(kg K). A larger R means a larger sound speed at the same temperature.`,["eos"]);
 mc("thermo","fact",0,R`For a diatomic perfect gas with its rotational modes excited (like N₂ or O₂ near room temperature), the internal energy and \(\gamma\) are:`,
  [R`\(u = \tfrac52 RT\), \(\gamma = 7/5\)`,R`\(u = \tfrac32 RT\), \(\gamma = 5/3\)`,R`\(u = \tfrac52 RT\), \(\gamma = 5/3\)`,R`\(u = 3RT\), \(\gamma = 4/3\)`],
  R`Monatomic gases have \(u = \tfrac32RT\) and \(\gamma = 5/3\). Diatomic gases add two rotational modes, giving \(u = \tfrac52RT\), \(C_v = \tfrac52R\), \(C_p = \tfrac72R\), and \(\gamma = 7/5\).`,"Reader §1.1.2; Reader §1.2.4",
@@ -199,14 +199,14 @@ mc("stag","concept",1,R`What does \(p_{t2}/p_{t1} = e^{-\Delta s/R}\) require?`,
  ["Adiabatic flow, no shaft work, and an ideal gas with constant R (constant cp not needed)","Isentropic flow of a calorically perfect gas","Constant static temperature","Only that the flow is steady"],
  R`It comes from \(dp_t/\rho_t + T_t\,ds_i = 0\) with \(p_t = \rho_tRT_t\). It needs constant \(R\) and fixed composition, but not constant specific heat.`,"Reader §3.1.4",
  R`Physically: with no heat and no work, the only thing that can change \(p_t\) is entropy production, and it can only lower it. Treat a stagnation-pressure drop as a direct measure of loss. You'll use this across shocks (the shock tables' \(p_{t2}/p_{t1}\) column), in diffuser recovery \(\eta_r\), and in the invariant \(p_tA^*\).`,["ptloss","stagpe"]);
-mc("stag","equation",1,R`CO₂ (\(R = 189\ \mathrm{J/(kg\,K)}\)) in an adiabatic, no-work device has \(p_{t1} = 7.79\) atm and \(p_{t2} = 6.56\) atm. The specific entropy change is about:`,
- [R`\(+32.6\ \mathrm{J/(kg\,K)}\)`,R`\(-32.6\ \mathrm{J/(kg\,K)}\)`,R`\(+0.172\ \mathrm{J/(kg\,K)}\)`,R`\(+189\ \mathrm{J/(kg\,K)}\)`],
- R`\(\Delta s = -R\ln(p_{t2}/p_{t1}) = -189\ln(6.56/7.79) = +32.6\). Positive, so the process is irreversible but allowed.`,"HW2 #2b",
- R`Get each \(p_t\) from its own local state: \(p_t = p(1 + \tfrac{\gamma-1}{2}M^2)^{\gamma/(\gamma-1)}\), with \(\gamma = 1.29\), \(M_1 = 0.41\), \(M_2 = 0.90\). Then the ratio gives \(\Delta s\). The sign is the check: an adiabatic device can only have \(\Delta s \ge 0\).`,["ptloss","ptp"]);
+mc("stag","equation",1,R`Air (\(R = 287\ \mathrm{J/(kg\,K)}\)) in an adiabatic, no-work device has \(p_{t1} = 7.79\) atm and \(p_{t2} = 6.56\) atm. The specific entropy change is about:`,
+ [R`\(+49.3\ \mathrm{J/(kg\,K)}\)`,R`\(-49.3\ \mathrm{J/(kg\,K)}\)`,R`\(+0.172\ \mathrm{J/(kg\,K)}\)`,R`\(+287\ \mathrm{J/(kg\,K)}\)`],
+ R`\(\Delta s = -R\ln(p_{t2}/p_{t1}) = -287\ln(6.56/7.79) = +49.3\). Positive, so the process is irreversible but allowed.`,"HW2 #2b",
+ R`Get each \(p_t\) from its own local state: \(p_t = p(1 + \tfrac{\gamma-1}{2}M^2)^{\gamma/(\gamma-1)}\), with \(\gamma = 1.4\). Then the ratio gives \(\Delta s\). The sign is the check: an adiabatic device can only have \(\Delta s \ge 0\).`,["ptloss","ptp"]);
 mc("stag","concept",1,R`A second dataset for the same adiabatic, no-work device gives a downstream pressure that makes \(p_{t2} > p_{t1}\). What's the right conclusion?`,
  ["It violates the second law (Δs < 0), even though the energy balance can still be satisfied","It violates the first law","It is fine if the flow decelerated between the stations","It means heat must have been added"],
  R`\(p_{t2} > p_{t1}\) implies \(\Delta s < 0\) with no heat transfer, which is impossible. The energy balance can't catch this, because a perfect gas's enthalpy depends only on T, not p.`,"HW2 #2d",
- R`This is a useful exam pattern. Ask for the largest downstream pressure the second law allows: set \(p_{t2} = p_{t1}\) and solve for \(p_2\) from the local isentropic relation. In HW 2, \(p_2 \le 7.79/1.638 = 4.76\) atm. The 5 atm dataset fails. The energy balance alone doesn't care about pressure for a perfect gas.`,["ptloss","ptp"]);
+ R`This is a useful exam pattern. Ask for the largest downstream pressure the second law allows: set \(p_{t2} = p_{t1}\) and solve for \(p_2\) from the local isentropic relation. For air with \(p_{t1} = 7.79\) atm and \(M_2 = 0.9\): \(p_2 \le 7.79/1.691 = 4.61\) atm, so a dataset reading 5 atm fails. The energy balance alone doesn't care about pressure for a perfect gas.`,["ptloss","ptp"]);
 mc("stag","concept",1,R`Why can you use the local isentropic relations (\(T_t/T\), \(p_t/p\)) at a state inside a flow that is irreversible between stations?`,
  ["Each state's stagnation reference is defined by an isentropic process from that state; it says nothing about the path between stations","Because irreversible flows are approximately isentropic","Because stagnation pressure is constant everywhere","You can't; they only apply to isentropic flows"],
  R`The relations connect a state to its own reference. What you cannot do in a lossy flow is assume \(p_t\) is the same at both stations.`,"Reader §4.1.3; HW2 #2b",
@@ -245,8 +245,8 @@ mc("sound","concept",0,R`Behind a weak compression wave moving at speed \(a\) in
  [R`\(\delta V = a\,\delta\rho/\rho\) is small and in the direction the wave travels; it is not the wave speed`,R`\(\delta V = a\), because the gas moves with the wave`,R`\(\delta V\) points opposite to the wave's motion`,R`\(\delta V = 0\), because sound doesn't move the gas`],
  R`The disturbance propagates at \(a\); the fluid behind a compression just nudges forward by \(\delta V \ll a\). Keep the wave speed and the fluid velocity separate.`,"Reader §3.2.2");
 mc("sound","concept",0,R`The same speed of 340 m/s is measured in two gas flows. Which statement is correct?`,
- ["They can have different Mach numbers if the gases or temperatures differ, since a = √(γRT) is local","They must have the same Mach number","Mach number depends only on speed","Mach number depends only on stagnation temperature"],
- R`Mach number is local: \(M = V/\sqrt{\gamma RT}\), using the static temperature. Helium at 300 K has \(a \approx 1019\) m/s, so 340 m/s there is about M = 0.33.`,"Reader §3.3");
+ ["They can have different Mach numbers if their static temperatures differ, since a = √(γRT) is local","They must have the same Mach number","Mach number depends only on speed","Mach number depends only on stagnation temperature"],
+ R`Mach number is local: \(M = V/\sqrt{\gamma RT}\), using the static temperature. Air at 300 K has \(a \approx 347\) m/s (M ≈ 0.98), but air at 1000 K has \(a \approx 634\) m/s, so 340 m/s there is only about M = 0.54.`,"Reader §3.3");
 mc("sound","equation",1,R`The Mach angle for \(M = 2\) is:`,
  ["30°","60°","26.6°","45°"],
  R`\(\mu = \sin^{-1}(1/M) = \sin^{-1}(0.5) = 30°\). It approaches 90° as \(M \to 1\) and narrows as M grows.`,"Reader §3.3.2");
@@ -307,7 +307,7 @@ mc("area","equation",1,R`For adiabatic flow with losses at fixed mass flow and \
 mc("area","equation",1,R`In the finite-state working equations for adiabatic flow with losses, how does \(\Delta s\) appear?`,
  [R`\(p_2/p_1\) carries \(e^{-\Delta s/R}\); \(A_2/A_1\) carries \(e^{+\Delta s/R}\); \(T_2/T_1\) has no entropy term`,R`All three ratios carry \(e^{-\Delta s/R}\)`,R`Only \(T_2/T_1\) depends on \(\Delta s\)`,R`\(\Delta s\) never appears; the equations assume isentropic flow`],
  R`Energy fixes \(T_t\), so the temperature ratio has no loss term. Losses lower \(p_t\), reducing the pressure ratio, and raise \(A^*\), increasing the area ratio needed for given Mach numbers.`,"Reader §4.5",
- R`HW 2 #2c is a direct use: \(A_2/A_1 = \frac{M_1}{M_2}\left[\frac{1+\frac{\gamma-1}{2}M_2^2}{1+\frac{\gamma-1}{2}M_1^2}\right]^{\frac{\gamma+1}{2(\gamma-1)}}e^{\Delta s/R}\) with \(\gamma = 1.29\), \(M_1 = 0.41\), \(M_2 = 0.9\) and \(\Delta s/R = 32.65/189\) gives 0.763. These equations need \(\Delta s\) supplied from somewhere; they don't predict the losses.`,["workA","workp","workT"]);
+ R`HW 2 #2c is a direct use: \(A_2/A_1 = \frac{M_1}{M_2}\left[\frac{1+\frac{\gamma-1}{2}M_2^2}{1+\frac{\gamma-1}{2}M_1^2}\right]^{\frac{\gamma+1}{2(\gamma-1)}}e^{\Delta s/R}\) for air with \(M_1 = 0.41\), \(M_2 = 0.9\) and \(\Delta s/R = 49.3/287\) gives 0.769. These equations need \(\Delta s\) supplied from somewhere; they don't predict the losses.`,["workA","workp","workT"]);
 mc("area","equation",0,R`The relation \(\dot m = pAM\sqrt{\gamma/(RT)}\):`,
  ["Uses static p and T and holds whether or not the flow is isentropic","Uses stagnation pt and Tt and requires isentropic flow","Applies only at a sonic throat","Applies only to incompressible flow"],
  R`It's just \(\rho AV\) with \(\rho = p/(RT)\) and \(V = M\sqrt{\gamma RT}\) substituted. Replace \(p\) and \(T\) with stagnation values and you get the mass-flow parameter used for choking.`,"Reader §4.1.1");
@@ -331,7 +331,7 @@ mc("area","concept",0,R`Can you apply the differential area relations, like \(dV
 mc("noz","equation",1,R`For air (\(\gamma = 1.4\)), an ideal converging nozzle fed from a reservoir chokes when:`,
  [R`\(p_b/p_t \le 0.5283\) (equivalently \(p_t/p_b \ge 1.893\))`,R`\(p_b/p_t \le 0.6339\)`,R`\(p_b/p_t \le 0.8333\)`,R`\(p_b/p_t \le 0.1278\)`],
  R`\(p^*/p_t = [2/(\gamma+1)]^{\gamma/(\gamma-1)} = 0.5283\). 0.8333 is \(T^*/T_t\), and 0.1278 is \(p/p_t\) at M = 2.`,"Reader §4.8.1",
- R`Remember both forms: \(p_b/p_t \le 0.5283\) and \(p_t/p_b \ge 1.893\). The number depends on \(\gamma\) (0.547 for \(\gamma = 1.29\), 0.487 for \(\gamma = 5/3\)). It applies to a converging nozzle, or to the throat of a CD nozzle once it's choked, but not to the back pressure at which a CD nozzle first chokes.`,["pstar"]);
+ R`Remember both forms: \(p_b/p_t \le 0.5283\) and \(p_t/p_b \ge 1.893\). Both are the \(\gamma = 1.4\) values for air. They apply to a converging nozzle, or to the throat of a CD nozzle once it's choked, but not to the back pressure at which a CD nozzle first chokes.`,["pstar"]);
 mc("noz","concept",1,R`A converging nozzle is already choked. You lower the back pressure further. What happens?`,
  ["Mass flow and exit pressure stay the same; the extra expansion happens in the jet outside the nozzle","Mass flow increases and the exit becomes supersonic","The exit pressure drops to match the back pressure","The nozzle unchokes"],
  R`The sonic exit blocks small disturbances from traveling upstream. The exit stays at \(p^*\), and \(\dot m\) is fixed by \(p_t\), \(T_t\) and the exit area.`,"Reader §4.4.1; Reader §4.8.1",
@@ -616,7 +616,7 @@ dd("stag-50",R`An ideal nozzle or diffuser has no heat, no work and no losses, s
 dd("stag-51",R`The reference process brings the fluid to rest at the datum elevation, so both kinetic and potential energy convert into enthalpy. For gas flows, \(gz\) is usually tiny compared with \(V^2/2\) (10 m of elevation is about 0.1 kJ/kg), so the course usually drops it.`,["ht"]);
 dd("sound-56",R`\(a = \sqrt{\gamma RT}\) with the <i>static</i> temperature. Useful anchors for air: 300 K gives 347 m/s, 288 K gives 340 m/s, and 216.65 K (the stratosphere) gives 295 m/s. Doubling T raises a by √2.`,["a"]);
 dd("sound-57",R`From continuity in the wave frame, \(\delta V = a\,\delta\rho/\rho\). For an ordinary sound wave, \(\delta\rho/\rho\) is tiny, so the gas barely moves while the disturbance races ahead at a. The two speeds only become comparable for finite waves, which is where shocks begin.`,["a"]);
-dd("sound-58",R`Mach number compares the flow speed with the local signal speed, which depends on the gas (γ, R) and the static temperature. Helium's large R makes its sound speed about three times air's, so the same 340 m/s is subsonic. Hot exhaust can be subsonic at speeds that would be supersonic in cold air.`,["mach","a"]);
+dd("sound-58",R`Mach number compares the flow speed with the local signal speed, which for air depends only on the static temperature (a ∝ √T). Hot air leaving a combustor can be subsonic at speeds that would be supersonic in cold air, which is why you always find a from the local T, not the stagnation T.`,["mach","a"]);
 dd("sound-59",R`From the right triangle in the Mach-cone construction: the pulse radius \(a\Delta t\) is the side opposite µ and the source travel \(V\Delta t\) is the hypotenuse. So \(\sin\mu = 1/M\). M = 2 gives exactly 30°, M = 3 gives 19.5°, and M = 1.5 gives 41.8°.`,["muangle"]);
 dd("sound-60",R`Outside the cone, the source's disturbances haven't arrived yet, so that region has no "advance notice" that the source is coming. That's von Kármán's "creates its own silence." It describes the reach of small disturbances only.`,["muangle"]);
 dd("sound-64",R`The finite shock at a body is stronger than a Mach wave, and a stronger compression propagates faster relative to the gas ahead. In the body frame that means a steeper angle than µ. The oblique-shock relations make this precise: \(\theta\) runs from µ (zero strength) up to 90° (normal shock).`,["thmin","muangle"]);
@@ -792,7 +792,7 @@ function eq(id, t, mr, name, tex, terms, use, assume, watch, lab) { EQ.push({ id
 /* Ch 1 */
 eq("eos","thermo",1,"Perfect-gas equation of state",R`p = \rho RT,\qquad p\forall = mRT,\qquad R = \frac{\hat R}{M_w}`,
  [[R`R`,"specific gas constant (287 J/(kg K) for air)"],[R`\hat R`,"universal constant, 8314 J/(kmol K)"],[R`M_w`,"molar mass"]],
- "Linking p, ρ and T at any state; getting R for a new gas (methane: 520 J/(kg K)).","Absolute p and T. Far from phase change.","Use kmol with 8314, or mol with 8.314 and g; mixing them gives answers off by 1000.");
+ "Linking p, ρ and T at any state; getting R from the molar mass (air: 8314/28.97 = 287 J/(kg K)).","Absolute p and T. Far from phase change.","Use kmol with 8314, or mol with 8.314 and g; mixing them gives answers off by 1000.");
 eq("cpcv","thermo",1,"Specific heats",R`C_p - C_v = R,\quad \gamma = \frac{C_p}{C_v},\quad C_p = \frac{\gamma R}{\gamma - 1},\quad C_v = \frac{R}{\gamma-1}`,
  [[R`\gamma`,"ratio of specific heats (1.4 air, 5/3 monatomic)"]],
  "Converting between R, γ, Cp and Cv; turning V²/2 into Mach-number form.","Calorically perfect gas (constant cp, cv).","γR = (γ−1)Cp is the identity behind every Tₜ/T relation.");
@@ -881,7 +881,7 @@ eq("workT","area",0,"Working equation: temperature",R`\frac{T_2}{T_1} = \frac{1 
 eq("workp","area",1,"Working equation: pressure",R`\frac{p_2}{p_1} = \left[\frac{1 + \frac{\gamma-1}{2}M_1^2}{1 + \frac{\gamma-1}{2}M_2^2}\right]^{\frac{\gamma}{\gamma-1}}e^{-\Delta s/R}`,
  [],"Pressure ratio between two states with known Mach numbers and losses.","Adiabatic, no work, calorically perfect gas.","Δs must be supplied; the equation doesn't predict losses.");
 eq("workA","area",1,"Working equation: area",R`\frac{A_2}{A_1} = \frac{M_1}{M_2}\left[\frac{1 + \frac{\gamma-1}{2}M_2^2}{1 + \frac{\gamma-1}{2}M_1^2}\right]^{\frac{\gamma+1}{2(\gamma-1)}}e^{\Delta s/R}`,
- [],"Area ratio between two states (HW 2 #2c: 0.763).","Adiabatic, no work, calorically perfect gas.","Positive exponent: losses increase the required area ratio.");
+ [],"Area ratio between two states with losses (HW 2 #2c).","Adiabatic, no work, calorically perfect gas.","Positive exponent: losses increase the required area ratio.");
 eq("aastar","area",1,"Area–Mach relation",R`\frac{A}{A^*} = \frac{1}{M}\left[\frac{2}{\gamma+1}\left(1 + \frac{\gamma-1}{2}M^2\right)\right]^{\frac{\gamma+1}{2(\gamma-1)}}`,
  [],"Mach number from an area ratio and the reverse; nozzle design and off-design.","Isentropic flow with a fixed A*.","Two roots for A/A* > 1: pick the branch from inlet conditions and geometry.","calc-isen");
 eq("star","area",0,"Sonic reference ratios",R`\frac{T^*}{T_t} = \frac{2}{\gamma+1},\quad \frac{p^*}{p_t} = \left(\frac{2}{\gamma+1}\right)^{\frac{\gamma}{\gamma-1}},\quad \frac{\rho^*}{\rho_t} = \left(\frac{2}{\gamma+1}\right)^{\frac{1}{\gamma-1}}`,
@@ -972,11 +972,10 @@ const f = (x, d) => Number(x).toLocaleString("en-US", { maximumFractionDigits: d
 const NUM = [], NUMREF = {};
 function num(id, t, mr, title, eqs, src, gen) { NUM.push({ id, t, mr: !!mr, title, gen }); NUMREF[id] = { eq: eqs, src }; }
 
-num("n-R","thermo",0,"Specific gas constant",["eos"],"Reader §1.1.2; HW1 #1",()=>{
-  const g = pick([["methane",16.04],["helium",4.003],["CO₂",44.01],["argon",39.95],["hydrogen",2.016],["nitrogen",28.01]]);
-  const Rg = 8314/g[1];
-  return { q:R`Find the specific gas constant of ${g[0]} (molar mass ${g[1]} kg/kmol).`, ans:Rg, unit:"J/(kg·K)",
-    steps:[R`\(R = \hat R/M_w = 8314/${g[1]} = ${f(Rg,1)}\ \mathrm{J/(kg\,K)}\)`] };
+num("n-R","thermo",0,"Mass of air in a tank",["eos"],"Reader §1.1.2; HW1 #2",()=>{
+  const V = rnd(0.05,2,0.05), p = rnd(100,1500,10), T = rnd(250,450,5), m = p*1000*V/(RAIR*T);
+  return { q:R`A rigid ${f(V,2)} m³ tank holds air at ${p} kPa and ${T} K. Find the mass of air in the tank.`, ans:m, unit:"kg",
+    steps:[R`\(m = p\forall/(RT) = ${f(p*1000,0)}(${f(V,2)})/(287\cdot${T}) = ${f(m,4)}\) kg`] };
 });
 num("n-dsheat","thermo",1,"Entropy change of a perfect gas",["ds"],"Reader §1.2.4",()=>{
   const T1 = rnd(280,400,10), T2 = rnd(450,900,10), p1 = rnd(100,300,10), p2 = rnd(150,800,10);
@@ -998,7 +997,7 @@ num("n-tank","rtt",1,"Insulated tank filling",["tankfill","cvenergy"],"HW1 #2b",
 });
 num("n-isoduct","rtt",1,"Isothermal duct exit pressure",["mass","eos"],"HW1 #1a",()=>{
   const p1 = rnd(120,400,10), V1 = rnd(10,40,1), V2 = V1 + rnd(3,20,1), p2 = p1*V1/V2;
-  return { q:R`Gas flows steadily and isothermally through a constant-area duct, accelerating from ${V1} m/s to ${V2} m/s. The inlet pressure is ${p1} kPa. Find the exit pressure.`, ans:p2, unit:"kPa",
+  return { q:R`Air flows steadily and isothermally through a constant-area duct, accelerating from ${V1} m/s to ${V2} m/s. The inlet pressure is ${p1} kPa. Find the exit pressure.`, ans:p2, unit:"kPa",
     steps:[R`Continuity, constant A: \(\rho_2/\rho_1 = V_1/V_2 = ${f(V1/V2,4)}\)`,R`Isothermal ideal gas: \(p \propto \rho\), so \(p_2 = ${p1}(${f(V1/V2,4)}) = ${f(p2,1)}\) kPa`] };
 });
 num("n-rocket","ent",1,"Rocket velocity gain",["rocket"],"HW1 #3",()=>{
@@ -1012,7 +1011,7 @@ num("n-tt","stag",0,"Stagnation temperature",["tt"],"Reader §3.1.1",()=>{
     steps:[R`\(T_t = T + V^2/(2C_p) = ${T} + ${V}^2/2009 = ${f(Tt,1)}\) K`] };
 });
 num("n-ds","stag",1,"Entropy rise from a stagnation-pressure loss",["ptloss"],"Reader §3.1.4; HW2 #2b",()=>{
-  const r = rnd(0.55,0.98,0.01), gas = pick([["air",287],["CO₂",189],["helium",2077]]), ds = -gas[1]*Math.log(r);
+  const r = rnd(0.55,0.98,0.01), gas = ["air",287], ds = -gas[1]*Math.log(r);
   return { q:R`In adiabatic flow of ${gas[0]} (\(R = ${gas[1]}\ \mathrm{J/(kg\,K)}\)) with no shaft work, the stagnation pressure falls to ${f(r*100,0)}% of its upstream value. Find \(\Delta s\).`, ans:ds, unit:"J/(kg·K)",
     steps:[R`\(\Delta s = -R\ln(p_{t2}/p_{t1}) = -${gas[1]}\ln(${f(r,2)}) = ${f(ds,2)}\ \mathrm{J/(kg\,K)}\)`] };
 });

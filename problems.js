@@ -13,14 +13,13 @@ function hw(id, t, mr, title, based, eq, src, gen) { HW.push({ id, t, mr: !!mr, 
 
 /* ---------- HW 1 #1: isothermal duct ---------- */
 hw("hw-isoduct","rtt",1,"Isothermal duct: mass flow, exit pressure, heat","HW 1 #1",["mass","eos","sfee","dudh"],"HW1 #1; Reader §2.3–2.4",(o={})=>{
-  const gas = o.gas ?? pick([["methane",16.0,1.32],["nitrogen",28.0,1.4],["helium",4.0,1.667],["air",28.97,1.4]]);
+  const gas = ["air",28.97,1.4];
   const D = o.D ?? pick([2,3,4,5]), p1 = o.p1 ?? rnd(150,400,10), T = o.T ?? rnd(250,350,5), V1 = o.V1 ?? rnd(10,40,1), V2 = o.V2 ?? V1 + rnd(3,15,1);
   const Rg = 8314/gas[1], A = Math.PI*(D/200)**2, rho1 = p1*1000/(Rg*T), m = rho1*A*V1, p2 = p1*V1/V2, Q = m*(V2*V2 - V1*V1)/2;
-  return { setup: R`${gas[0][0].toUpperCase()+gas[0].slice(1)} (\(\hat m = ${gas[1]}\) kg/kmol, \(\gamma = ${gas[2]}\)) enters a horizontal ${D} cm diameter duct at ${p1} kPa, ${T} K and ${V1} m/s, and leaves at ${V2} m/s. The flow is steady and isothermal, with no shaft work and uniform properties at each section.`,
+  return { setup: R`Air (\(R = 287\ \mathrm{J/(kg\,K)}\), \(\gamma = 1.4\)) enters a horizontal ${D} cm diameter duct at ${p1} kPa, ${T} K and ${V1} m/s, and leaves at ${V2} m/s. The flow is steady and isothermal, with no shaft work and uniform properties at each section.`,
     parts: [
-      { q: "Specific gas constant", ans: Rg, unit: "J/(kg·K)", steps: [R`\(R = 8314/${gas[1]} = ${f(Rg,1)}\ \mathrm{J/(kg\,K)}\)`] },
-      { q: "Mass flow rate", ans: m, unit: "kg/s", sig: true, steps: [R`\(\rho_1 = p_1/(RT) = ${f(p1*1000,0)}/(${f(Rg,1)}\cdot${T}) = ${f(rho1,4)}\ \mathrm{kg/m^3}\)`, R`\(A = \pi(${f(D/200,3)})^2 = ${A.toExponential(3)}\ \mathrm{m^2}\)`, R`\(\dot m = \rho_1AV_1 = ${f(m,5)}\) kg/s`] },
       { q: "Exit pressure", ans: p2, unit: "kPa", steps: [R`Constant A: \(\rho_2 = \rho_1V_1/V_2\). Isothermal: \(p \propto \rho\)`, R`\(p_2 = p_1V_1/V_2 = ${p1}(${V1}/${V2}) = ${f(p2,2)}\) kPa`] },
+      { q: "Mass flow rate", ans: m, unit: "kg/s", sig: true, steps: [R`\(\rho_1 = p_1/(RT) = ${f(p1*1000,0)}/(${f(Rg,1)}\cdot${T}) = ${f(rho1,4)}\ \mathrm{kg/m^3}\)`, R`\(A = \pi(${f(D/200,3)})^2 = ${A.toExponential(3)}\ \mathrm{m^2}\)`, R`\(\dot m = \rho_1AV_1 = ${f(m,5)}\) kg/s`] },
       { q: "Heat-transfer rate (positive into the gas)", ans: Q, unit: "W", steps: [R`SFEE: \(\dot Q = \dot m[\Delta h + \Delta(V^2/2)]\), with \(\Delta h = C_p\Delta T = 0\)`, R`\(\dot Q = ${f(m,5)}(${V2}^2 - ${V1}^2)/2 = ${f(Q,3)}\) W, into the gas`] }
     ] };
 });
@@ -70,7 +69,7 @@ hw("hw-sound","sound",1,"Acoustic stations in a duct","HW 2 #1",["a","mach"],"HW
 
 /* ---------- HW 2 #2: adiabatic device with losses ---------- */
 hw("hw-device","stag",1,"Adiabatic device: stagnation states, entropy, area","HW 2 #2",["tt","ptp","ptloss","workA"],"HW2 #2; Reader §3.1, §4.5",(o={})=>{
-  const gas = o.gas ?? pick([["CO₂",1.29,189],["air",1.4,287],["argon",1.667,208]]);
+  const gas = ["Air",1.4,287];
   const g = gas[1], Rg = gas[2], hm = (g-1)/2;
   let p1, T1, p2, T2, M2, M1, ds;
   for (let k = 0; k < 50; k++) {
@@ -155,7 +154,7 @@ hw("hw-cdmap","noz",1,"CD nozzle: mass flow and critical back pressures","Reader
 hw("hw-shockloc","ns",1,"Locating a normal shock in a nozzle","Reader Ex. 5.4.2",["approd","ptastar","nspt","aastar"],"Reader §5.4.2",(o={})=>{
   const Ar = o.Ar ?? rnd(1.8,3.5,0.05), z = G.cdNozzle(Ar, 0.5);
   const pb = o.pb ?? Math.round((z.p2nd + (z.p1st - z.p2nd)*rnd(0.2,0.8,0.01))*1000)/1000, n = G.cdNozzle(Ar, pb), prod = Ar*pb;
-  return { setup: R`Air flows through a CD nozzle with \(A_e/A_t = ${f(Ar,2)}\). The back pressure is \(p_b = ${f(pb,3)}\,p_{t1}\), which lies between the first and second critical values, so a normal shock stands in the diverging section and the exit is subsonic (\(p_e = p_b\)). Flow is isentropic except across the shock; \(\gamma = 1.4\).`,
+  return { setup: R`Air flows through a CD nozzle with \(A_e/A_t = ${f(Ar,2)}\). The back pressure is \(p_b = ${f(pb,3)}\,p_{t1}\), and a normal shock stands in the diverging section. Flow is isentropic except across the shock; \(\gamma = 1.4\).`,
     parts: [
       { q: R`\(A_ep_e/(A_tp_{t1})\)`, ans: prod, unit: "", steps: [R`\(${f(Ar,2)}\times${f(pb,3)} = ${f(prod,4)}\)`] },
       { q: "Exit Mach number", ans: n.Me, unit: "", steps: [R`Because \(p_{t1}A_t = p_{te}A_e^*\), the product equals \(\dfrac{A_ep_e}{A_e^*p_{te}} = \dfrac{1}{M_e}(1/1.2)^3(1 + 0.2M_e^2)^{-1/2}\)`, R`Solve (subsonic): \(M_e = ${f(n.Me,4)}\)`] },
@@ -172,12 +171,12 @@ hw("hw-ns","ns",1,"Standing normal shock","Reader §5.3",["nsp","nsrho","nspt","
   return { setup: R`Air (\(\gamma = 1.4\), \(R = 287\)) at \(M_1 = ${f(M1,2)}\), \(p_1 = ${p1}\) kPa and \(T_1 = ${T1}\) K approaches a standing normal shock.`,
     parts: [
       { q: "Upstream stagnation pressure", ans: pt1, unit: "kPa", steps: [R`\(p_{t1} = p_1(1 + 0.2M_1^2)^{3.5} = ${f(pt1,2)}\) kPa`] },
-      { q: "Downstream Mach number", ans: s.M2, unit: "", steps: [R`\(M_2 = ${f(s.M2,5)}\)`] },
-      { q: "Downstream static pressure", ans: p1*s.p21, unit: "kPa", steps: [R`\(p_2/p_1 = ${f(s.p21,5)}\), so \(p_2 = ${f(p1*s.p21,2)}\) kPa`] },
-      { q: "Downstream static temperature", ans: T2, unit: "K", steps: [R`\(T_2/T_1 = ${f(s.T21,5)}\), so \(T_2 = ${f(T2,2)}\) K (and \(T_{t2} = T_{t1} = ${f(Tt,1)}\) K)`] },
       { q: "Downstream stagnation pressure", ans: pt1*s.pt21, unit: "kPa", steps: [R`\(p_{t2}/p_{t1} = ${f(s.pt21,5)}\), so \(p_{t2} = ${f(pt1*s.pt21,2)}\) kPa`] },
       { q: "Entropy increase", ans: ds, unit: "J/(kg·K)", steps: [R`\(\Delta s = -R\ln(p_{t2}/p_{t1}) = ${f(ds,2)}\ \mathrm{J/(kg\,K)}\)`] },
-      { q: "Downstream velocity", ans: V2, unit: "m/s", steps: [R`\(V_2 = V_1(\rho_1/\rho_2) = ${f(V1,1)}/${f(s.r21,4)} = ${f(V2,1)}\) m/s`] }
+      { q: "Downstream velocity", ans: V2, unit: "m/s", steps: [R`\(V_1 = M_1\sqrt{\gamma RT_1} = ${f(V1,1)}\) m/s; \(\rho_2/\rho_1 = ${f(s.r21,4)}\)`, R`\(V_2 = V_1(\rho_1/\rho_2) = ${f(V1,1)}/${f(s.r21,4)} = ${f(V2,1)}\) m/s`] },
+      { q: "Downstream Mach number", ans: s.M2, unit: "", steps: [R`\(M_2 = ${f(s.M2,5)}\)`] },
+      { q: "Downstream static temperature", ans: T2, unit: "K", steps: [R`\(T_2/T_1 = ${f(s.T21,5)}\), so \(T_2 = ${f(T2,2)}\) K (and \(T_{t2} = T_{t1} = ${f(Tt,1)}\) K)`] },
+      { q: "Downstream static pressure", ans: p1*s.p21, unit: "kPa", steps: [R`\(p_2/p_1 = ${f(s.p21,5)}\), so \(p_2 = ${f(p1*s.p21,2)}\) kPa`] }
     ] };
 });
 
@@ -225,10 +224,10 @@ hw("hw-pitot","obl",0,"Supersonic Pitot measurement","Reader §5.9",["pitot","pt
 hw("hw-twocase","obl",1,"Normal vs. oblique shock with the same normal Mach number","HW 4 #2",["oblnorm","tbm","nspt","ptp"],"HW4 #2; Reader §5.7",(o={})=>{
   const Mn = o.Mn ?? rnd(1.5,2.5,0.1), MO = o.MO ?? Math.round((Mn + rnd(0.5,1.5,0.1))*10)/10, th = Math.asin(Mn/MO)/D2R;
   const s = G.ns(Mn), ob = G.oblique(MO, th), ptN = s.pt21/G.PT(Mn), ptO = s.pt21/G.PT(MO);
-  return { setup: R`Two stationary planar shocks act on air with the same \(p_1\) and \(T_1\) (\(\gamma = 1.4\)). Case N: normal shock at \(M_1 = ${f(Mn,1)}\). Case O: \(M_1 = ${f(MO,1)}\) with shock angle \(\theta = \sin^{-1}(${f(Mn,1)}/${f(MO,1)}) = ${f(th,2)}°\).`,
+  return { setup: R`Two stationary planar shocks act on air with the same \(p_1\) and \(T_1\) (\(\gamma = 1.4\)). Case N: normal shock at \(M_1 = ${f(Mn,1)}\). Case O: \(M_1 = ${f(MO,1)}\) with a shock angle of \(\theta = ${f(th,2)}°\).`,
     parts: [
-      { q: "Upstream normal Mach number in case O", ans: Mn, unit: "", steps: [R`\(M_{\perp1} = ${f(MO,1)}\sin${f(th,2)}° = ${f(Mn,2)}\), the same as case N, so all static ratios, \(\Delta s\) and \(p_{t2}/p_{t1}\) match`] },
       { q: "Downstream Mach number, case N", ans: s.M2, unit: "", steps: [R`\(M_2 = ${f(s.M2,4)}\)`] },
+      { q: "Upstream normal Mach number in case O", ans: Mn, unit: "", steps: [R`\(M_{\perp1} = ${f(MO,1)}\sin${f(th,2)}° = ${f(Mn,2)}\), the same as case N, so all static ratios, \(\Delta s\) and \(p_{t2}/p_{t1}\) match`] },
       { q: "Flow deflection in case O", ans: ob.delta, unit: "°", abs: 0.2, steps: [R`From the θ–δ–M relation at \(M_1 = ${f(MO,1)}\), \(\theta = ${f(th,2)}°\): \(\delta = ${f(ob.delta,2)}°\)`] },
       { q: "Downstream Mach number, case O", ans: ob.M2, unit: "", steps: [R`\(M_2 = M_{\perp2}/\sin(\theta - \delta) = ${f(s.M2,4)}/\sin(${f(th-ob.delta,2)}°) = ${f(ob.M2,4)}\): still supersonic`] },
       { q: R`\(p_{t2}/p_1\), case N`, ans: ptN, unit: "", steps: [R`\((p_{t2}/p_{t1})(p_{t1}/p_1) = ${f(s.pt21,5)}\times${f(1/G.PT(Mn),4)} = ${f(ptN,4)}\)`] },
@@ -365,14 +364,25 @@ hw("hw3-tunnel","tun",1,"Starting a supersonic wind tunnel","HW 3 #3",["start","
   const M2s = G.M_from_A(A2/A1,true), Mx = G.M1_from_pt21(A1/A2), Ax = A1*G.AA(Mx), MTu = G.M_from_A(AT/A2,false);
   return { setup: R`A wind tunnel is fed from a large reservoir at fixed \(p_{t0}\), \(T_{t0}\). The first throat is \(A_1 = ${f(A1,1)}\) cm², the test section \(A_T = ${f(AT,3)}\) cm², and the adjustable second throat (the tunnel exit) is \(A_2 = ${f(A2,1)}\) cm². Air, \(\gamma = 1.4\); quasi-1D and isentropic except across at most one normal shock. Assume the receiver pressure is low enough for the flows described.`,
     parts: [
-      { q: "Test-section Mach number in the supersonic (started) flow", ans: MTx, unit: "", steps: [R`\(A_T/A_1 = ${f(AT/A1,4)}\) with \(A^* = A_1\); supersonic root: \(M_T = ${f(MTx,4)}\)`] },
       { q: "Second-throat Mach number in the started flow", ans: M2s, unit: "", steps: [R`The flow decelerates isentropically in the contraction but stays supersonic, since \(A_2 > A^* = A_1\)`, R`Supersonic root of \(A_2/A_1 = ${f(A2/A1,4)}\): \(M_2 = ${f(M2s,4)}\)`] },
+      { q: "Test-section Mach number in the supersonic (started) flow", ans: MTx, unit: "", steps: [R`\(A_T/A_1 = ${f(AT/A1,4)}\) with \(A^* = A_1\); supersonic root: \(M_T = ${f(MTx,4)}\)`] },
       { q: "Smallest second-throat area that lets the tunnel start", ans: req, unit: "cm²", steps: [R`The starting shock is strongest in the test section: \(p_{t2}/p_{t1} = ${f(G.ns(MTx).pt21,5)}\) at \(M_T\)`, R`\(A_{2,min} = A_1\,p_{t1}/p_{t2} = ${f(req,3)}\) cm² > ${f(A2,1)} cm², so this tunnel can't start by lowering \(p_b\) alone`] },
       { q: "Mach number just ahead of the shock in the unstarted limiting flow", ans: Mx, unit: "", steps: [R`Both throats sonic: \(p_{t1}A_1 = p_{t2}A_2\), so \(p_{t2}/p_{t1} = A_1/A_2 = ${f(A1/A2,4)}\)`, R`Invert the normal-shock \(p_t\) ratio: \(M_x = ${f(Mx,4)}\)`] },
-      { q: "Area where that shock stands", ans: Ax, unit: "cm²", steps: [R`\(A_x = A_1(A/A^*)_{M_x} = ${f(Ax,3)}\) cm², ahead of the test section`] },
+      { q: "In the unstarted limiting flow (both throats just sonic), the area where the normal shock stands", ans: Ax, unit: "cm²", steps: [R`\(A_x = A_1(A/A^*)_{M_x} = ${f(Ax,3)}\) cm², ahead of the test section`] },
       { q: "Test-section Mach number in the unstarted flow", ans: MTu, unit: "", steps: [R`Behind the shock \(A^* = A_2\): subsonic root of \(A_T/A_2 = ${f(AT/A2,4)}\), \(M_T = ${f(MTu,4)}\)`, R`Start by opening the second throat above ${f(req,2)} cm² to swallow the shock, then close it back to ${f(A2,1)} cm²; the started flow survives because \(A_2 > A_1\).`] }
     ] };
 });
+
+/* Which parts each problem actually asks for. The rest are the in-between quantities the student has to
+   identify and find on the way; they stay hidden until the steps or the full solution are opened. */
+const GOALS = {
+  "hw-isoduct": [0, 2], "hw-tank": [3, 4], "hw-rocket": [1, 2, 3], "hw-sound": [0, 1, 3], "hw-device": [1, 4, 5, 6],
+  "hw-boom": [3], "hw-accel": [1, 2, 3], "hw-diffuser": [3, 4], "hw-cdmap": [0, 2, 3, 4], "hw-shockloc": [4],
+  "hw-ns": [1, 2, 3], "hw-moving": [1, 3, 4], "hw-reflect": [2, 3, 4], "hw-pitot": [2, 3], "hw-twocase": [0, 3, 4, 5],
+  "hw-reflection": [3, 4, 5], "hw-jet": [1, 3], "hw-pm": [2, 3, 5], "hw-plate": [4, 5], "hw-inlet": [2, 3],
+  "hw3-design": [0, 2, 3, 4], "hw3-shockp": [0, 2, 4, 5, 6], "hw3-tunnel": [0, 2, 4, 5]
+};
+HW.forEach(h => { const g0 = h.gen, goal = GOALS[h.id]; h.gen = o => { const p = g0(o); p.goal = (goal || p.parts.map((_, i) => i)).filter(i => i < p.parts.length); return p; }; });
 
 window.AAE_HW = HW;
 })();
