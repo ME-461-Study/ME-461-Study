@@ -1030,21 +1030,40 @@ num("n-isenp","area",1,"Static pressure from Mach number",["ptp"],"Reader §4.1.
   return { q:R`Air (\(\gamma = 1.4\)) flows isentropically from a reservoir at \(p_t = ${pt}\) kPa. Find the static pressure where \(M = ${f(M,2)}\).`, ans:p, unit:"kPa",
     steps:[R`\(p/p_t = (1 + 0.2M^2)^{-3.5} = ${f(G.PT(M),5)}\)`,R`\(p = ${f(p,2)}\) kPa`] };
 });
-num("n-areaM","area",1,"Exit Mach number from area ratio",["aastar"],"Reader §4.6; Reader §4.9.1",()=>{
-  const Ar = rnd(1.2,6,0.05), sup = Math.random() < 0.65, M = G.M_from_A(Ar, sup);
-  return { q:R`A choked CD nozzle has \(A_e/A_t = ${f(Ar,2)}\). Find the exit Mach number on the <b>${sup ? "supersonic" : "subsonic"}</b> branch, isentropic flow, \(\gamma = 1.4\).`, ans:M, unit:"",
-    steps:[R`Choked, isentropic: \(A_e/A^* = A_e/A_t = ${f(Ar,2)}\)`,R`Invert \(A/A^*\) on the ${sup ? "supersonic" : "subsonic"} branch: \(M_e = ${f(M,4)}\)`,R`(The other root is \(${f(G.M_from_A(Ar,!sup),4)}\).)`] };
+num("n-areaM","noz",1,"Exit Mach number of a CD nozzle",["aastar","ptp","approd"],"Reader §4.9; Reader §5.4",()=>{
+  const Ar = rnd(1.4,4,0.05), pt = rnd(200,1500,50), z = G.cdNozzle(Ar, 0.5), reg = pick(["unchoked","shock","over","under"]);
+  let r;
+  if (reg === "unchoked") r = z.p1st + (1 - z.p1st)*rnd(0.15,0.8,0.01);
+  else if (reg === "shock") r = z.p2nd + (z.p1st - z.p2nd)*rnd(0.15,0.85,0.01);
+  else if (reg === "over") r = z.p3rd + (z.p2nd - z.p3rd)*rnd(0.15,0.85,0.01);
+  else r = z.p3rd*rnd(0.3,0.85,0.01);
+  const pb = Math.round(pt*r*10)/10, n = G.cdNozzle(Ar, pb/pt);
+  const why = { unchoked: R`\(p_b/p_t = ${f(pb/pt,4)}\) is above the first critical value ${f(n.p1st,4)}: the throat never reaches sonic, the flow is subsonic throughout, and a subsonic exit has \(p_e = p_b\)`,
+    shock: R`\(p_b/p_t = ${f(pb/pt,4)}\) lies between the second critical value ${f(n.p2nd,4)} and the first ${f(n.p1st,4)}: a normal shock stands in the diverging section and the exit is subsonic with \(p_e = p_b\)`,
+    over: R`\(p_b/p_t = ${f(pb/pt,4)}\) lies between the design value ${f(n.p3rd,4)} and the second critical ${f(n.p2nd,4)}: the nozzle flows full and supersonic, and oblique shocks outside the exit do the compressing`,
+    under: R`\(p_b/p_t = ${f(pb/pt,4)}\) is below the design value ${f(n.p3rd,4)}: the nozzle flows full and supersonic, and the jet expands outside the exit` }[reg];
+  const how = { unchoked: R`\(M_e\) from \(p_e/p_t = ${f(pb/pt,4)}\): \(M_e = ${f(n.Me,4)}\)`,
+    shock: R`Use \(A_ep_e/(A_tp_{t1}) = ${f(Ar*pb/pt,4)} = \tfrac{1}{M_e}(1/1.2)^3(1 + 0.2M_e^2)^{-1/2}\): \(M_e = ${f(n.Me,4)}\)`,
+    over: R`Supersonic root of \(A_e/A_t = ${f(Ar,2)}\): \(M_e = ${f(n.Me,4)}\)`, under: R`Supersonic root of \(A_e/A_t = ${f(Ar,2)}\): \(M_e = ${f(n.Me,4)}\)` }[reg];
+  return { q:R`Air (\(\gamma = 1.4\)) from a reservoir at ${pt} kPa flows through a CD nozzle with \(A_e/A_t = ${f(Ar,2)}\) into a receiver at ${f(pb,1)} kPa. Find the Mach number at the nozzle exit plane.`, ans:n.Me, unit:"",
+    steps:[R`Critical back pressures for \(A_e/A_t = ${f(Ar,2)}\): first ${f(n.p1st*pt,1)} kPa, second ${f(n.p2nd*pt,1)} kPa, design ${f(n.p3rd*pt,1)} kPa`, why, how] };
 });
 num("n-diffuser","area",0,"Subsonic diffuser exit Mach number",["aastar","chain"],"Reader §4.7.1",()=>{
   const M1 = rnd(0.3,0.8,0.05), Ar = rnd(1.5,4,0.1), A2 = G.AA(M1)*Ar, M2 = G.M_from_A(A2,false);
   return { q:R`Air enters a diverging passage at \(M_1 = ${f(M1,2)}\), with \(A_2/A_1 = ${f(Ar,1)}\). Assuming isentropic flow, find \(M_2\).`, ans:M2, unit:"",
     steps:[R`\(A_1/A^* = ${f(G.AA(M1),5)}\)`,R`\(A_2/A^* = ${f(Ar,1)}(${f(G.AA(M1),5)}) = ${f(A2,5)}\)`,R`No throat, subsonic inlet: subsonic root \(M_2 = ${f(M2,4)}\)`] };
 });
-num("n-mdot","noz",1,"Choked mass flow",["mdotmax"],"Reader §4.8.2",()=>{
-  const pt = rnd(200,3000,50), Tt = rnd(280,900,10), A = rnd(2,50,1);
-  const m = G.mdotMax(pt*1000, Tt, A*1e-4);
-  return { q:R`Air (\(\gamma = 1.4\), \(R = 287\)) at \(p_t = ${pt}\) kPa and \(T_t = ${Tt}\) K flows through a choked throat of ${A} cm². Find the mass flow rate.`, ans:m, unit:"kg/s",
-    steps:[R`\(\dot m = A^*\dfrac{p_t}{\sqrt{T_t}}\sqrt{\gamma/R}\,(2/2.4)^{3} = 0.040418\,\dfrac{(${A}\times10^{-4})(${pt}\times10^3)}{\sqrt{${Tt}}}\)`,R`\(\dot m = ${f(m,4)}\) kg/s`] };
+num("n-mdot","noz",1,"Nozzle mass flow",["mdotmax","pstar","ptp"],"Reader §4.8",()=>{
+  const pt = rnd(200,1500,50), Tt = rnd(280,900,10), A = rnd(2,50,1), kind = pick(["cd","conv","conv"]);
+  const mmax = G.mdotMax(pt*1000, Tt, A*1e-4);
+  if (kind === "cd") return { q:R`Air (\(\gamma = 1.4\), \(R = 287\)) from a reservoir at ${pt} kPa and ${Tt} K flows through a CD nozzle with a ${A} cm² throat. A normal shock stands in the diverging section. Find the mass flow rate.`, ans:mmax, unit:"kg/s",
+    steps:[R`A shock in the diverging section needs supersonic flow there, so the throat is sonic: the nozzle is choked`, R`\(\dot m = 0.040418\,A_tp_t/\sqrt{T_t} = 0.040418(${A}\times10^{-4})(${pt}\times10^3)/\sqrt{${Tt}} = ${f(mmax,4)}\) kg/s`] };
+  const pb = rnd(0.2*pt, 0.95*pt, 5), r = pb/pt;
+  if (r <= 0.52828) return { q:R`A converging nozzle with a ${A} cm² exit discharges air (\(\gamma = 1.4\), \(R = 287\)) from a reservoir at ${pt} kPa and ${Tt} K into a room at ${f(pb,0)} kPa. Find the mass flow rate.`, ans:mmax, unit:"kg/s",
+    steps:[R`\(p_b/p_t = ${f(r,4)} \le 0.5283\): the exit is sonic (choked) and \(p_e = p^* \ne p_b\)`, R`\(\dot m = 0.040418\,A_ep_t/\sqrt{T_t} = ${f(mmax,4)}\) kg/s`] };
+  const Me = G.M_from_PT(r), Te = Tt*G.TT(Me), m = pb*1000*A*1e-4*Me*Math.sqrt(GAM/(RAIR*Te));
+  return { q:R`A converging nozzle with a ${A} cm² exit discharges air (\(\gamma = 1.4\), \(R = 287\)) from a reservoir at ${pt} kPa and ${Tt} K into a room at ${f(pb,0)} kPa. Find the mass flow rate.`, ans:m, unit:"kg/s",
+    steps:[R`\(p_b/p_t = ${f(r,4)} > 0.5283\): not choked, so the subsonic exit has \(p_e = p_b\)`, R`\(M_e = \sqrt{5[(p_t/p_e)^{2/7} - 1]} = ${f(Me,4)}\), \(T_e = T_t/(1 + 0.2M_e^2) = ${f(Te,2)}\) K`, R`\(\dot m = p_eA_eM_e\sqrt{\gamma/(RT_e)} = ${f(m,4)}\) kg/s (the choked formula would give ${f(mmax,4)} kg/s)`] };
 });
 num("n-conv","noz",1,"Converging nozzle exit pressure",["pstar"],"Reader §4.8.1",()=>{
   const pt = rnd(150,800,10), pb = rnd(40,0.95*pt,5), crit = 0.52828*pt, pe = Math.max(pb, crit);
@@ -1053,12 +1072,12 @@ num("n-conv","noz",1,"Converging nozzle exit pressure",["pstar"],"Reader §4.8.1
 });
 num("n-design","noz",1,"Design (third critical) back pressure",["aastar","ptp"],"Reader §4.9.1",()=>{
   const pt = rnd(100,2000,50), Ar = rnd(1.5,8,0.1), M = G.M_from_A(Ar,true), p = pt*G.PT(M);
-  return { q:R`A CD nozzle with \(A_e/A_t = ${f(Ar,1)}\) is fed by air at \(p_t = ${pt}\) kPa. Find the design back pressure (isentropic supersonic exit).`, ans:p, unit:"kPa",
+  return { q:R`A CD nozzle with \(A_e/A_t = ${f(Ar,1)}\) is fed by air at \(p_t = ${pt}\) kPa. Find the back pressure at which the exit jet is perfectly expanded.`, ans:p, unit:"kPa",
     steps:[R`Supersonic root of \(A/A^* = ${f(Ar,1)}\): \(M_e = ${f(M,4)}\)`,R`\(p_e/p_t = ${f(G.PT(M),5)}\), so \(p_b = ${f(p,2)}\) kPa`] };
 });
 num("n-first","noz",0,"First critical back pressure",["aastar","ptp"],"Reader §4.9.2",()=>{
   const pt = rnd(100,1000,50), Ar = rnd(1.3,5,0.1), M = G.M_from_A(Ar,false), p = pt*G.PT(M);
-  return { q:R`A CD nozzle with \(A_e/A_t = ${f(Ar,1)}\) is fed by air at \(p_t = ${pt}\) kPa. Find the back pressure at which the throat first becomes sonic.`, ans:p, unit:"kPa",
+  return { q:R`A CD nozzle with \(A_e/A_t = ${f(Ar,1)}\) is fed by air at \(p_t = ${pt}\) kPa. Find the highest back pressure at which the mass flow rate reaches its maximum value.`, ans:p, unit:"kPa",
     steps:[R`At first critical the diverging section is a subsonic diffuser: subsonic root of \(A/A^* = ${f(Ar,1)}\), \(M_e = ${f(M,4)}\)`,R`\(p_b = p_t\,(p/p_t)_e = ${pt}(${f(G.PT(M),5)}) = ${f(p,2)}\) kPa (not \(0.5283\,p_t\))`] };
 });
 num("n-nsp","ns",1,"Pressure behind a normal shock",["nsp"],"Reader §5.2.3; App. B",()=>{
@@ -1088,8 +1107,8 @@ num("n-moving","mov",1,"Pressure behind a moving shock",["galilean","nsp"],"Read
 });
 num("n-reflect","mov",1,"Reflected-shock Mach number",["reflM","dva"],"Reader §5.6.1",()=>{
   const T1 = rnd(280,450,5), Vu = rnd(100,400,10), a1 = Math.sqrt(GAM*RAIR*T1), M = G.M1_from_dVa1(Vu/a1);
-  return { q:R`Air at ${T1} K moving at ${Vu} m/s toward a closed end is brought to rest by a reflected shock. Find the reflected shock's Mach number relative to the gas ahead of it, \(M_1'\).`, ans:M, unit:"",
-    steps:[R`\(a_1 = ${f(a1,2)}\) m/s, \(V_u/a_1 = ${f(Vu/a1,4)}\)`,R`\(M_1' = \tfrac{2.4}{4}\tfrac{V_u}{a_1} + \sqrt{1 + (\tfrac{2.4}{4}\tfrac{V_u}{a_1})^2} = ${f(M,4)}\)`] };
+  return { q:R`Air at ${T1} K moving at ${Vu} m/s toward the closed end of a tube was set moving by an incident shock, which then reflects from the end wall. Find the reflected shock's Mach number relative to the gas ahead of it, \(M_1'\).`, ans:M, unit:"",
+    steps:[R`The gas next to the closed end must end up at rest, so the reflected shock removes the whole \(V_u\): \(\Delta V = V_u\)`,R`\(a_1 = ${f(a1,2)}\) m/s, \(V_u/a_1 = ${f(Vu/a1,4)}\)`,R`\(M_1' = \tfrac{2.4}{4}\tfrac{V_u}{a_1} + \sqrt{1 + (\tfrac{2.4}{4}\tfrac{V_u}{a_1})^2} = ${f(M,4)}\)`] };
 });
 num("n-oblth","obl",1,"Oblique shock angle",["tbm"],"Reader §5.7.1; App. C",()=>{
   let M, d; do { M = rnd(1.6,4,0.1); d = rnd(4,0.8*G.deltaMax(M).delta,1); } while (!isFinite(G.thetaFromDelta(M,d)));
@@ -1103,37 +1122,37 @@ num("n-oblp","obl",1,"Pressure behind an oblique shock",["oblnorm","nsp","tbm"],
   return { q:R`Air at \(M_1 = ${f(M,1)}\) and ${p1} kPa is turned ${d}° by a wedge (weak shock). Find \(p_2\).`, ans:p1*o.p21, unit:"kPa",
     steps:[R`\(\theta = ${f(th,2)}°\)`,R`\(M_{\perp1} = M_1\sin\theta = ${f(o.Mn1,4)}\)`,R`\(p_2/p_1 = ${f(o.p21,4)}\), so \(p_2 = ${f(p1*o.p21,2)}\) kPa`] };
 });
-num("n-pitot","obl",1,"Mach number from a supersonic Pitot reading",["pitot"],"Reader §5.9",()=>{
+num("n-pitot","obl",1,"Mach number from a Pitot–static reading",["pitot"],"Reader §5.9",()=>{
   const M = rnd(1.3,3.5,0.05), r = G.ns(M).pt2p1;
-  return { q:R`A Pitot probe in a supersonic air stream reads \(p_{t2}/p_1 = ${f(r,3)}\), where \(p_1\) comes from a static tap in the undisturbed flow. Find \(M_1\).`, ans:M, unit:"", abs:0.01,
-    steps:[R`The probe reads \(p_{t2}\) behind a normal shock; use the Rayleigh Pitot relation or the \(p_{t2}/p_1\) column of Appendix B`,R`Supersonic solution: \(M_1 = ${f(M,3)}\)`] };
+  return { q:R`A Pitot probe facing into an air stream reads \(p_{t2}/p_1 = ${f(r,3)}\), where \(p_1\) comes from a static tap in the undisturbed flow. Find \(M_1\).`, ans:M, unit:"", abs:0.01,
+    steps:[R`\(${f(r,3)} > 1.893\), more than any subsonic stream can produce, so the flow is supersonic and the probe reads \(p_{t2}\) behind a normal shock; use the Rayleigh Pitot relation or the \(p_{t2}/p_1\) column of Appendix B`,R`Supersonic solution: \(M_1 = ${f(M,3)}\)`] };
 });
 num("n-pm","pm",1,"Mach number after an expansion",["pmturn","pmfun"],"Reader §6.3; App. A",()=>{
   const M = rnd(1,3,0.05), d = rnd(5,30,1), r = G.pmTurn(M,d);
-  return { q:R`Air at \(M_1 = ${f(M,2)}\) expands isentropically around a ${d}° convex corner. Find \(M_2\).`, ans:r.M2, unit:"",
+  return { q:R`Air at \(M_1 = ${f(M,2)}\) flows around a sharp ${d}° convex corner. Find \(M_2\).`, ans:r.M2, unit:"",
     steps:[R`\(\nu_1 = \nu(${f(M,2)}) = ${f(r.nu1,3)}°\)`,R`\(\nu_2 = ${f(r.nu1,3)}° + ${d}° = ${f(r.nu2,3)}°\)`,R`\(M_2 = ${f(r.M2,4)}\)`] };
 });
 num("n-pmp","pm",0,"Pressure after a Prandtl–Meyer turn",["pmturn"],"Reader §6.3.3",()=>{
   const M = rnd(1.8,3,0.1), d = pick([-15,-10,-8,8,10,15,20]), p1 = rnd(20,200,10), r = G.pmTurn(M,d);
-  return { q:R`Air at \(M_1 = ${f(M,1)}\) and ${p1} kPa turns ${d < 0 ? "smoothly through a " + (-d) + "° compression" : "through a " + d + "° expansion"} (isentropic). Find \(p_2\).`, ans:p1*r.p21, unit:"kPa",
+  return { q:R`Air at \(M_1 = ${f(M,1)}\) and ${p1} kPa follows a wall that ${d < 0 ? "curves gradually into the flow through " + (-d) + "°" : "turns away from the flow at a sharp " + d + "° corner"}. Find \(p_2\).`, ans:p1*r.p21, unit:"kPa",
     steps:[R`\(\nu_2 = ${f(r.nu1,3)}° ${d < 0 ? "-" : "+"} ${Math.abs(d)}° = ${f(r.nu2,3)}°\), so \(M_2 = ${f(r.M2,4)}\)`,R`\(p_2/p_1 = (p/p_t)_2/(p/p_t)_1 = ${f(r.p21,4)}\), so \(p_2 = ${f(p1*r.p21,2)}\) kPa`] };
 });
 num("n-plate","ext",1,"Flat-plate lift per unit span",["plate","pmturn","tbm"],"Reader §6.5.2",()=>{
   const M = rnd(1.6,3,0.1), a = pick([3,4,5,6,8]), p1 = rnd(20,80,5), c = rnd(0.5,3,0.5);
   const up = G.pmTurn(M,a), th = G.thetaFromDelta(M,a), lo = G.oblique(M,th), p2 = p1*up.p21, p3 = p1*lo.p21, L = (p3-p2)*1000*c*Math.cos(a*Math.PI/180);
-  return { q:R`A flat plate of chord ${f(c,1)} m is at \(\alpha = ${a}°\) in air at \(M_1 = ${f(M,1)}\) and ${p1} kPa. Find the lift per unit span (shock–expansion theory).`, ans:L, unit:"N/m",
+  return { q:R`A flat plate of chord ${f(c,1)} m is at \(\alpha = ${a}°\) in air at \(M_1 = ${f(M,1)}\) and ${p1} kPa. Find the lift per unit span.`, ans:L, unit:"N/m",
     steps:[R`Upper: \(\nu = ${f(up.nu1,3)}° + ${a}°\), \(M_2 = ${f(up.M2,4)}\), \(p_2 = ${f(p2,3)}\) kPa`,R`Lower: weak shock \(\theta = ${f(th,2)}°\), \(M_\perp = ${f(lo.Mn1,4)}\), \(p_3 = ${f(p3,3)}\) kPa`,R`\(L' = (p_3 - p_2)c\cos\alpha = (${f(p3-p2,3)}\times10^3)(${f(c,1)})\cos${a}° = ${f(L,0)}\) N/m`] };
 });
 
 num("n-throatA","noz",1,"Throat area from mass flow",["mdotmax"],"HW3 #2a; Reader §4.8.2",()=>{
   const pt = rnd(3,20,0.5), Tt = rnd(280,600,10), m = rnd(1,10,0.5), A = m/G.mdotMax(pt*1e5, Tt, 1)*1e4;
-  return { q:R`A choked nozzle passes ${f(m,1)} kg/s of air (\(\gamma = 1.4\), \(R = 287\)) from a reservoir at ${f(pt,1)} bar and ${Tt} K. Find the throat area.`, ans:A, unit:"cm²",
-    steps:[R`\(A_t = \dot m\sqrt{T_t}/(0.040418\,p_t) = ${f(m,1)}\sqrt{${Tt}}/(0.040418\times${f(pt*1e5,0)})\)`,R`\(A_t = ${f(A,3)}\ \mathrm{cm^2}\)`] };
+  return { q:R`A converging nozzle discharges ${f(m,1)} kg/s of air (\(\gamma = 1.4\), \(R = 287\)) from a reservoir at ${f(pt,1)} bar and ${Tt} K into a tank held near vacuum. Find the exit area.`, ans:A, unit:"cm²",
+    steps:[R`Near-vacuum receiver: \(p_b/p_t \ll 0.5283\), so the exit is sonic (choked)`,R`\(A_e = A^* = \dot m\sqrt{T_t}/(0.040418\,p_t) = ${f(m,1)}\sqrt{${Tt}}/(0.040418\times${f(pt*1e5,0)})\)`,R`\(A_e = ${f(A,3)}\ \mathrm{cm^2}\)`] };
 });
 num("n-shockA","ns",1,"Shock location from the pressure ahead of it",["ptp","aastar"],"HW3 #2a",()=>{
   const pt = rnd(5,20,0.5), M = rnd(1.3,2.6,0.05), px = Math.round(pt*G.PT(M)*100)/100, Mx = G.M_from_PT(px/pt), At = rnd(5,40,1), Ax = At*G.AA(Mx);
-  return { q:R`A choked CD nozzle with a ${At} cm² throat is fed by air at \(p_t = ${f(pt,1)}\) bar. The static pressure just ahead of a normal shock in the diverging section is ${f(px,2)} bar. Find the area where the shock stands.`, ans:Ax, unit:"cm²",
-    steps:[R`Isentropic up to the shock: \(p_x/p_t = ${f(px/pt,5)}\), supersonic branch, \(M_x = ${f(Mx,4)}\)`,R`\(A^* = A_t\) upstream of the shock, so \(A_x = ${At}\times(A/A^*)_{M_x} = ${At}\times${f(G.AA(Mx),4)} = ${f(Ax,3)}\ \mathrm{cm^2}\)`] };
+  return { q:R`A CD nozzle with a ${At} cm² throat is fed by air at \(p_t = ${f(pt,1)}\) bar. The static pressure just ahead of a normal shock in the diverging section is ${f(px,2)} bar. Find the area where the shock stands.`, ans:Ax, unit:"cm²",
+    steps:[R`A shock in the diverging section means the throat is sonic, so \(A^* = A_t\) upstream of it`,R`Isentropic up to the shock: \(p_x/p_t = ${f(px/pt,5)}\), supersonic branch, \(M_x = ${f(Mx,4)}\)`,R`\(A^* = A_t\) upstream of the shock, so \(A_x = ${At}\times(A/A^*)_{M_x} = ${At}\times${f(G.AA(Mx),4)} = ${f(Ax,3)}\ \mathrm{cm^2}\)`] };
 });
 num("n-start","tun",1,"Second-throat area needed to start a tunnel",["start","aastar","nspt"],"HW3 #3",()=>{
   const A1 = rnd(5,30,0.5), MT = rnd(1.5,3.5,0.1), AT = A1*G.AA(MT), A2 = A1/G.ns(MT).pt21;

@@ -142,25 +142,25 @@ hw("hw-cdmap","noz",1,"CD nozzle: mass flow and critical back pressures","Reader
   const Msub = G.M_from_A(Ar,false), Msup = G.M_from_A(Ar,true), p1 = pt*G.PT(Msub), p3 = pt*G.PT(Msup), p2 = p3*G.ns(Msup).p21, m = G.mdotMax(pt*1000,Tt,At*1e-4);
   return { setup: R`A converging–diverging nozzle with a ${At} cm² throat and \(A_e/A_t = ${f(Ar,2)}\) is supplied with air (\(\gamma = 1.4\), \(R = 287\)) from a large reservoir at ${pt} kPa and ${Tt} K.`,
     parts: [
-      { q: "Mass flow rate when choked", ans: m, unit: "kg/s", steps: [R`\(\dot m = 0.040418\,A_tp_t/\sqrt{T_t} = 0.040418(${At}\times10^{-4})(${pt}\times10^3)/\sqrt{${Tt}} = ${f(m,4)}\) kg/s`] },
+      { q: "Largest mass flow rate this nozzle can pass from the reservoir", ans: m, unit: "kg/s", steps: [R`\(\dot m = 0.040418\,A_tp_t/\sqrt{T_t} = 0.040418(${At}\times10^{-4})(${pt}\times10^3)/\sqrt{${Tt}} = ${f(m,4)}\) kg/s`] },
       { q: "Design exit Mach number", ans: Msup, unit: "", steps: [R`Supersonic root of \(A/A^* = ${f(Ar,2)}\): \(M_e = ${f(Msup,4)}\)`] },
-      { q: "Third critical (design) back pressure", ans: p3, unit: "kPa", steps: [R`\(p_e = p_t(p/p_t) = ${pt}(${f(G.PT(Msup),5)}) = ${f(p3,2)}\) kPa`] },
-      { q: "First critical back pressure", ans: p1, unit: "kPa", steps: [R`Subsonic root: \(M_e = ${f(Msub,4)}\)`, R`\(p_b = ${pt}(${f(G.PT(Msub),5)}) = ${f(p1,2)}\) kPa (well above \(0.5283p_t = ${f(0.52828*pt,1)}\) kPa)`] },
-      { q: "Second critical back pressure (normal shock at the exit)", ans: p2, unit: "kPa", steps: [R`Shock at \(M = ${f(Msup,4)}\): \(p_2/p_1 = ${f(G.ns(Msup).p21,4)}\)`, R`\(p_b = ${f(p3,3)}(${f(G.ns(Msup).p21,4)}) = ${f(p2,2)}\) kPa`] }
+      { q: "Back pressure at which the exit jet is perfectly expanded", ans: p3, unit: "kPa", steps: [R`\(p_e = p_t(p/p_t) = ${pt}(${f(G.PT(Msup),5)}) = ${f(p3,2)}\) kPa`] },
+      { q: "Highest back pressure at which the mass flow is still the maximum value", ans: p1, unit: "kPa", steps: [R`Subsonic root: \(M_e = ${f(Msub,4)}\)`, R`\(p_b = ${pt}(${f(G.PT(Msub),5)}) = ${f(p1,2)}\) kPa (well above \(0.5283p_t = ${f(0.52828*pt,1)}\) kPa)`] },
+      { q: "Back pressure that holds a normal shock exactly at the exit plane", ans: p2, unit: "kPa", steps: [R`Shock at \(M = ${f(Msup,4)}\): \(p_2/p_1 = ${f(G.ns(Msup).p21,4)}\)`, R`\(p_b = ${f(p3,3)}(${f(G.ns(Msup).p21,4)}) = ${f(p2,2)}\) kPa`] }
     ] };
 });
 
 /* ---------- Reader 5.4.2: locating an internal shock ---------- */
-hw("hw-shockloc","ns",1,"Locating a normal shock in a nozzle","Reader Ex. 5.4.2",["approd","ptastar","nspt","aastar"],"Reader §5.4.2",(o={})=>{
+hw("hw-shockloc","ns",1,"CD nozzle at an off-design back pressure","Reader Ex. 5.4.2",["approd","ptastar","nspt","aastar"],"Reader §5.4.2",(o={})=>{
   const Ar = o.Ar ?? rnd(1.8,3.5,0.05), z = G.cdNozzle(Ar, 0.5);
   const pb = o.pb ?? Math.round((z.p2nd + (z.p1st - z.p2nd)*rnd(0.2,0.8,0.01))*1000)/1000, n = G.cdNozzle(Ar, pb), prod = Ar*pb;
-  return { setup: R`Air flows through a CD nozzle with \(A_e/A_t = ${f(Ar,2)}\). The back pressure is \(p_b = ${f(pb,3)}\,p_{t1}\), and a normal shock stands in the diverging section. Flow is isentropic except across the shock; \(\gamma = 1.4\).`,
+  return { setup: R`Air (\(\gamma = 1.4\)) from a large reservoir at stagnation pressure \(p_{t1}\) flows through a CD nozzle with \(A_e/A_t = ${f(Ar,2)}\) and exhausts into a receiver at \(p_b = ${f(pb,3)}\,p_{t1}\). Neglect friction and heat transfer.`,
     parts: [
-      { q: R`\(A_ep_e/(A_tp_{t1})\)`, ans: prod, unit: "", steps: [R`\(${f(Ar,2)}\times${f(pb,3)} = ${f(prod,4)}\)`] },
+      { q: R`\(A_ep_e/(A_tp_{t1})\)`, ans: prod, unit: "", steps: [R`Find the regime first. First critical \(p_b/p_{t1} = ${f(z.p1st,4)}\) (subsonic root of \(A_e/A_t\)); second critical \(= ${f(z.p2nd,4)}\) (normal shock at the exit). \(${f(pb,3)}\) lies between them, so a normal shock stands in the diverging section and the exit flow is subsonic.`, R`A subsonic jet cannot hold a pressure difference at the exit, so \(p_e = p_b\).`, R`\(A_ep_e/(A_tp_{t1}) = ${f(Ar,2)}\times${f(pb,3)} = ${f(prod,4)}\)`] },
       { q: "Exit Mach number", ans: n.Me, unit: "", steps: [R`Because \(p_{t1}A_t = p_{te}A_e^*\), the product equals \(\dfrac{A_ep_e}{A_e^*p_{te}} = \dfrac{1}{M_e}(1/1.2)^3(1 + 0.2M_e^2)^{-1/2}\)`, R`Solve (subsonic): \(M_e = ${f(n.Me,4)}\)`] },
       { q: R`Stagnation-pressure ratio \(p_{te}/p_{t1}\)`, ans: n.ptRatio, unit: "", steps: [R`\(p_{te}/p_{t1} = (p_e/p_{t1})/(p_e/p_{te}) = ${f(pb,3)}/${f(G.PT(n.Me),5)} = ${f(n.ptRatio,5)}\)`, "This is the whole loss, taken across the shock."] },
       { q: "Mach number just upstream of the shock", ans: n.Ms, unit: "", steps: [R`Invert \(p_{t2}/p_{t1}\) on the supersonic branch: \(M_s = ${f(n.Ms,4)}\) (downstream \(${f(n.Ms2,4)}\))`] },
-      { q: R`Area ratio at the shock \(A_s/A_t\)`, ans: n.AsAt, unit: "", steps: [R`Upstream of the shock \(A^* = A_t\), so \(A_s/A_t = A/A^*\) at \(M_s\) \(= ${f(n.AsAt,4)}\)`] }
+      { q: R`Location of any normal shock in the nozzle, as \(A/A_t\) where it stands`, ans: n.AsAt, unit: "", steps: [R`Upstream of the shock \(A^* = A_t\), so \(A_s/A_t = A/A^*\) at \(M_s\) \(= ${f(n.AsAt,4)}\)`] }
     ] };
 });
 
@@ -198,7 +198,7 @@ hw("hw-moving","mov",1,"Shock moving into still air","Reader Ex. 5.5.1",["galile
 hw("hw-reflect","mov",1,"Shock reflection from a closed end","Reader Ex. 5.6.1",["reflM","dva","nsp"],"Reader §5.6",(o={})=>{
   const p1 = o.p1 ?? rnd(1,5,0.5), T1 = o.T1 ?? rnd(280,500,5), Vu = o.Vu ?? rnd(100,450,10);
   const a1 = Math.sqrt(GAM*RAIR*T1), M = G.M1_from_dVa1(Vu/a1), s = G.ns(M), T2 = T1*s.T21, VR = M*a1 - Vu;
-  return { setup: R`Behind an incident shock, air at \(p_1 = ${f(p1,1)}\) bar and \(T_1 = ${T1}\) K moves at \(V_u = ${Vu}\) m/s toward the closed end of a tube. A reflected shock brings it to rest (\(\gamma = 1.4\), \(R = 287\)).`,
+  return { setup: R`Behind an incident shock, air at \(p_1 = ${f(p1,1)}\) bar and \(T_1 = ${T1}\) K moves at \(V_u = ${Vu}\) m/s toward the closed end of a tube. The incident shock then reflects from the end wall (\(\gamma = 1.4\), \(R = 287\)).`,
     parts: [
       { q: R`\(V_u/a_1\)`, ans: Vu/a1, unit: "", steps: [R`\(a_1 = ${f(a1,2)}\) m/s; \(V_u/a_1 = ${f(Vu/a1,5)}\)`] },
       { q: R`Reflected-shock Mach number \(M_1'\)`, ans: M, unit: "", steps: [R`Gas behind is at rest, so \(\Delta V/a_1 = V_u/a_1\)`, R`\(M_1' = \tfrac{\gamma+1}{4}\tfrac{V_u}{a_1} + \sqrt{1 + (\tfrac{\gamma+1}{4}\tfrac{V_u}{a_1})^2} = ${f(M,5)}\)`] },
@@ -209,12 +209,12 @@ hw("hw-reflect","mov",1,"Shock reflection from a closed end","Reader Ex. 5.6.1",
 });
 
 /* ---------- Reader 5.9: Pitot ---------- */
-hw("hw-pitot","obl",0,"Supersonic Pitot measurement","Reader §5.9",["pitot","ptp","nspt"],"Reader §5.9",(o={})=>{
+hw("hw-pitot","obl",0,"Pitot–static measurement","Reader §5.9",["pitot","ptp","nspt"],"Reader §5.9",(o={})=>{
   const M = o.M ?? rnd(1.4,3.5,0.05), p1 = o.p1 ?? rnd(10,80,1), T1 = o.T1 ?? rnd(200,300,5), s = G.ns(M), pt2 = p1*s.pt2p1, pt1 = p1/G.PT(M), V = M*Math.sqrt(GAM*RAIR*T1);
-  return { setup: R`A Pitot probe in a supersonic air stream reads ${f(pt2,2)} kPa. A static tap in the undisturbed stream reads ${p1} kPa, and the static temperature is ${T1} K (\(\gamma = 1.4\), \(R = 287\)).`,
+  return { setup: R`A Pitot probe facing into an air stream reads ${f(pt2,2)} kPa. A static tap in the undisturbed stream reads ${p1} kPa, and the static temperature is ${T1} K (\(\gamma = 1.4\), \(R = 287\)).`,
     parts: [
       { q: R`Ratio \(p_{t2}/p_1\)`, ans: s.pt2p1, unit: "", steps: [R`\(${f(pt2,2)}/${p1} = ${f(s.pt2p1,4)}\)`] },
-      { q: "Freestream Mach number", ans: M, unit: "", abs: 0.005, steps: [R`Solve the Rayleigh Pitot relation (or the \(p_{t2}/p_1\) column of Appendix B) on the supersonic branch: \(M_1 = ${f(M,3)}\)`] },
+      { q: "Freestream Mach number", ans: M, unit: "", abs: 0.005, steps: [R`\(p_{t2}/p_1 = ${f(s.pt2p1,4)} > 1.893\): no subsonic stream reaches that ratio, so the flow is supersonic and the probe sits behind a bow (normal) shock`, R`Solve the Rayleigh Pitot relation (or the \(p_{t2}/p_1\) column of Appendix B) on the supersonic branch: \(M_1 = ${f(M,3)}\)`] },
       { q: "Freestream speed", ans: V, unit: "m/s", steps: [R`\(V_1 = M_1\sqrt{\gamma RT_1} = ${f(V,1)}\) m/s`] },
       { q: "Freestream stagnation pressure (what an isentropic probe would read)", ans: pt1, unit: "kPa", steps: [R`\(p_{t1} = p_1(1 + 0.2M_1^2)^{3.5} = ${f(pt1,2)}\) kPa, versus \(p_{t2} = ${f(pt2,2)}\) kPa read behind the shock`] }
     ] };
@@ -244,7 +244,7 @@ hw("hw-reflection","obl",1,"Regular reflection of an oblique shock from a wall",
     o1 = G.oblique(M1,t1); th2 = G.thetaFromDelta(o1.M2,d); if (isFinite(th2)) break;
   }
   const o2 = G.oblique(o1.M2, th2), refl = th2 - d;
-  return { setup: R`Mach ${f(M1,1)} air (\(\gamma = 1.4\)) flows above a flat wall. An upper ramp turns the stream down through \(\delta = ${d}°\), creating a weak incident oblique shock that reaches the lower wall. Assume a regular reflection on the weak branch.`,
+  return { setup: R`Mach ${f(M1,1)} air (\(\gamma = 1.4\)) flows above a flat wall. An upper ramp turns the stream down through \(\delta = ${d}°\), creating an oblique shock that reaches the lower wall. Use weak-shock solutions.`,
     parts: [
       { q: "Incident shock angle", ans: o1.theta, unit: "°", abs: 0.3, steps: [R`Weak root of θ–δ–M at \(M_1 = ${f(M1,1)}\), \(\delta = ${d}°\): \(\theta_1 = ${f(o1.theta,2)}°\)`] },
       { q: "Mach number between the shocks", ans: o1.M2, unit: "", steps: [R`\(M_{\perp1} = ${f(o1.Mn1,4)}\) → \(M_{\perp2} = ${f(o1.Mn2,4)}\)`, R`\(M_2 = M_{\perp2}/\sin(\theta_1 - \delta) = ${f(o1.M2,4)}\)`] },
@@ -277,7 +277,7 @@ hw("hw-jet","ext",1,"First shock cell of an over-expanded jet","HW 4 #1",["jetbc
 hw("hw-pm","pm",1,"Expansion fan and smooth compression","Reader Ex. 6.3.1–6.3.3",["pmturn","pmfun","muangle"],"Reader §6.3",(o={})=>{
   const M1 = o.M1 ?? rnd(1.2,2.6,0.05), d = o.d ?? rnd(8,25,1), p1 = o.p1 ?? rnd(20,200,5), T1 = o.T1 ?? rnd(220,400,5), dc = o.dc ?? rnd(5,d,1);
   const e = G.pmTurn(M1,d), c = G.pmTurn(e.M2,-dc);
-  return { setup: R`Air (\(\gamma = 1.4\)) at \(M_1 = ${f(M1,2)}\), ${p1} kPa and ${T1} K expands around a sharp ${d}° convex corner. Downstream, the wall then curves smoothly back through ${dc}° of compression. Treat both turns as simple isentropic waves.`,
+  return { setup: R`Air (\(\gamma = 1.4\)) at \(M_1 = ${f(M1,2)}\), ${p1} kPa and ${T1} K expands around a sharp ${d}° convex corner. Downstream, the wall then curves smoothly back through ${dc}° of compression.`,
     parts: [
       { q: R`\(\nu_1\)`, ans: e.nu1, unit: "°", abs: 0.05, steps: [R`\(\nu(${f(M1,2)}) = ${f(e.nu1,3)}°\) (Appendix A or Eq. 6.8)`] },
       { q: "Mach number after the expansion", ans: e.M2, unit: "", steps: [R`\(\nu_2 = ${f(e.nu1,3)}° + ${d}° = ${f(e.nu2,3)}°\), so \(M_2 = ${f(e.M2,4)}\)`] },
@@ -289,7 +289,7 @@ hw("hw-pm","pm",1,"Expansion fan and smooth compression","Reader Ex. 6.3.1–6.3
 });
 
 /* ---------- Reader 6.5.2: flat plate ---------- */
-hw("hw-plate","ext",1,"Flat plate at incidence (shock–expansion theory)","Reader Ex. 6.5.2",["plate","pmturn","tbm","oblnorm"],"Reader §6.5",(o={})=>{
+hw("hw-plate","ext",1,"Flat plate at incidence","Reader Ex. 6.5.2",["plate","pmturn","tbm","oblnorm"],"Reader §6.5",(o={})=>{
   const M1 = o.M1 ?? rnd(1.6,3,0.1), a = o.a ?? pick([3,4,5,6,7,8]), p1 = o.p1 ?? rnd(0.2,1,0.05), c = o.c ?? pick([1,1.5,2,3]);
   const up = G.pmTurn(M1,a), th = G.thetaFromDelta(M1,a), lo = G.oblique(M1,th), p2 = p1*up.p21, p3 = p1*lo.p21, dp = (p3-p2)*1e5, ca = Math.cos(a*D2R), sa = Math.sin(a*D2R);
   return { setup: R`A flat plate of chord ${c} m sits at \(\alpha = ${a}°\) in air (\(\gamma = 1.4\)) at \(M_1 = ${f(M1,1)}\) and \(p_1 = ${f(p1,2)}\) bar. Neglect friction; forces are per unit span.`,
@@ -368,7 +368,7 @@ hw("hw3-tunnel","tun",1,"Starting a supersonic wind tunnel","HW 3 #3",["start","
       { q: "Test-section Mach number in the supersonic (started) flow", ans: MTx, unit: "", steps: [R`\(A_T/A_1 = ${f(AT/A1,4)}\) with \(A^* = A_1\); supersonic root: \(M_T = ${f(MTx,4)}\)`] },
       { q: "Smallest second-throat area that lets the tunnel start", ans: req, unit: "cm²", steps: [R`The starting shock is strongest in the test section: \(p_{t2}/p_{t1} = ${f(G.ns(MTx).pt21,5)}\) at \(M_T\)`, R`\(A_{2,min} = A_1\,p_{t1}/p_{t2} = ${f(req,3)}\) cm² > ${f(A2,1)} cm², so this tunnel can't start by lowering \(p_b\) alone`] },
       { q: "Mach number just ahead of the shock in the unstarted limiting flow", ans: Mx, unit: "", steps: [R`Both throats sonic: \(p_{t1}A_1 = p_{t2}A_2\), so \(p_{t2}/p_{t1} = A_1/A_2 = ${f(A1/A2,4)}\)`, R`Invert the normal-shock \(p_t\) ratio: \(M_x = ${f(Mx,4)}\)`] },
-      { q: "In the unstarted limiting flow (both throats just sonic), the area where the normal shock stands", ans: Ax, unit: "cm²", steps: [R`\(A_x = A_1(A/A^*)_{M_x} = ${f(Ax,3)}\) cm², ahead of the test section`] },
+      { q: "Area where the normal shock stands in the unstarted flow", ans: Ax, unit: "cm²", steps: [R`\(A_x = A_1(A/A^*)_{M_x} = ${f(Ax,3)}\) cm², ahead of the test section`] },
       { q: "Test-section Mach number in the unstarted flow", ans: MTu, unit: "", steps: [R`Behind the shock \(A^* = A_2\): subsonic root of \(A_T/A_2 = ${f(AT/A2,4)}\), \(M_T = ${f(MTu,4)}\)`, R`Start by opening the second throat above ${f(req,2)} cm² to swallow the shock, then close it back to ${f(A2,1)} cm²; the started flow survives because \(A_2 > A_1\).`] }
     ] };
 });
@@ -377,7 +377,7 @@ hw("hw3-tunnel","tun",1,"Starting a supersonic wind tunnel","HW 3 #3",["start","
    identify and find on the way; they stay hidden until the steps or the full solution are opened. */
 const GOALS = {
   "hw-isoduct": [0, 2], "hw-tank": [3, 4], "hw-rocket": [1, 2, 3], "hw-sound": [0, 1, 3], "hw-device": [1, 4, 5, 6],
-  "hw-boom": [3], "hw-accel": [1, 2, 3], "hw-diffuser": [3, 4], "hw-cdmap": [0, 2, 3, 4], "hw-shockloc": [4],
+  "hw-boom": [3], "hw-accel": [1, 2, 3], "hw-diffuser": [3, 4], "hw-cdmap": [0, 2, 3, 4], "hw-shockloc": [1, 4],
   "hw-ns": [1, 2, 3], "hw-moving": [1, 3, 4], "hw-reflect": [2, 3, 4], "hw-pitot": [2, 3], "hw-twocase": [0, 3, 4, 5],
   "hw-reflection": [3, 4, 5], "hw-jet": [1, 3], "hw-pm": [2, 3, 5], "hw-plate": [4, 5], "hw-inlet": [2, 3],
   "hw3-design": [0, 2, 3, 4], "hw3-shockp": [0, 2, 4, 5, 6], "hw3-tunnel": [0, 2, 4, 5]
